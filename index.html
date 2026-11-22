@@ -3252,6 +3252,196 @@ Product Design, Design Systems, Interaction Design, Prototyping, Figma, User Res
       $('#modal-backdrop').classList.remove('open');
     }
 
+    /* ==========================================================================
+       SMART JOB LINK AUTO-FILL (Greenhouse, Lever, Public Reader + URL Fallback)
+       ========================================================================== */
+    function titleCase(str) {
+      return (str || '')
+        .replace(/[-_]+/g, ' ')
+        .replace(/\b\w/g, (c) => c.toUpperCase())
+        .trim();
+    }
+
+    function stripHtml(html) {
+      const div = document.createElement('div');
+      div.innerHTML = html || '';
+      return (div.textContent || div.innerText || '').replace(/\s+\n/g, '\n').replace(/\n{3,}/g, '\n\n').trim();
+    }
+
+    function detectLevel(text) {
+      const m = (text || '').match(/\b(ICT[2-6]|IC[3-7]|L[3-8]|Principal|Staff|Distinguished|Senior|Sr\.?|Lead|Director|VP|Head of|Manager|Entry|Junior|Intern)\b/i);
+      if (!m) return '';
+      const val = m[1].replace(/^Sr\.?$/i, 'Senior');
+      return val.length <= 4 ? val.toUpperCase() : titleCase(val);
+    }
+
+    function detectComp(text) {
+      if (!text) return '';
+      const range = text.match(/\$[0-9]{2,3}(?:,[0-9]{3}|k)\s*(?:[-–—to]{1,3})\s*\$[0-9]{2,3}(?:,[0-9]{3}|k)/i);
+      if (range) return range[0].replace(/\s+/g, ' ');
+      const single = text.match(/\$[1-9][0-9]{2},[0-9]{3}/);
+      return single ? single[0] : '';
+    }
+
+    function detectWorkMode(text) {
+      const lower = (text || '').toLowerCase();
+      if (/\b(fully remote|100% remote|remote-first|remote only|\bremote\b)\b/.test(lower) && !/\bhybrid\b/.test(lower)) return 'Remote';
+      if (/\bhybrid\b/.test(lower)) return 'Hybrid';
+      if (/\b(on-site|onsite|in-office|in office)\b/.test(lower)) return 'On-site';
+      return '';
+    }
+
+    function detectLocation(text) {
+      if (!text) return '';
+      const m = text.match(/\b(San Francisco|Cupertino|New York|Seattle|Austin|Los Angeles|Boston|Chicago|Denver|Atlanta|Miami|London|Toronto|Vancouver|Remote)(?:,\s*[A-Z]{2})?\b/);
+      return m ? m[0] : '';
+    }
+
+    function parseJobUrlFallback(rawUrl) {
+      const out = { company: '', role: '', level: '', comp: '', workMode: '', location: '', jd: '' };
+      try {
+        const u = new URL(rawUrl);
+        const host = u.hostname.replace(/^www\./, '');
+        const parts = u.pathname.split('/').filter(Boolean);
+
+        // Known ATS boards: company is first path segment
+        if (/greenhouse\.io|lever\.co|ashbyhq\.com|smartrecruiters\.com|workable\.com/i.test(host)) {
+          if (parts[0]) out.company = titleCase(parts[0]);
+        } else {
+          // Strip common career subdomains
+          const hostParts = host.split('.');
+          const core = hostParts.length >= 2 ? hostParts[hostParts.length - 2] : hostParts[0];
+          if (!['linkedin', 'indeed', 'glassdoor', 'myworkdayjobs'].includes(core.toLowerCase())) {
+            out.company = titleCase(core);
+          } else if (host.includes('myworkdayjobs.com')) {
+            out.company = titleCase(hostParts[0]);
+          }
+        }
+
+        // Look for human-readable slug in path
+        const slug = parts
+          .slice()
+          .reverse()
+          .find((seg) => seg.includes('-') && /[a-z]/i.test(seg) && !/^[0-9a-f-]{20,}$/i.test(seg) && !['jobs', 'careers', 'en-us', 'details', 'view'].includes(seg.toLowerCase()));
+        if (slug) {
+          out.role = titleCase(slug.replace(/-\d{5,}$/, ''));
+          out.level = detectLevel(out.role);
+        }
+      } catch {}
+      return out;
+    }
+
+    async function fetchJobDetailsFromUrl(rawUrl) {
+      const fallback = parseJobUrlFallback(rawUrl);
+      let u;
+      try {
+        u = new URL(rawUrl);
+      } catch {
+        return fallback;
+      }
+
+      // Tier 1A: Greenhouse Public Board API (CORS-friendly)
+      const ghMatch = u.href.match(/(?:boards|job-boards)\.greenhouse\.io\/([^/]+)\/jobs\/(\d+)/i);
+      if (ghMatch) {
+        try {
+          const res = await fetch(`https://boards-api.greenhouse.io/v1/boards/${ghMatch[1]}/jobs/${ghMatch[2]}`);
+          if (res.ok) {
+            const data = await res.json();
+            const jd = stripHtml(data.content || '').slice(0, 2600);
+            const role = data.title || fallback.role;
+            const loc = data.location?.name || detectLocation(jd);
+            return {
+              company: titleCase(ghMatch[1]),
+              role,
+              level: detectLevel(role + ' ' + jd),
+              comp: detectComp(jd),
+              workMode: detectWorkMode(loc + ' ' + jd),
+              location: loc,
+              jd
+            };
+          }
+        } catch {}
+      }
+
+      // Tier 1B: Lever Public Postings API (CORS-friendly)
+      const leverMatch = u.href.match(/jobs\.lever\.co\/([^/]+)\/([0-9a-f-]{10,})/i);
+      if (leverMatch) {
+        try {
+          const res = await fetch(`https://api.lever.co/v0/postings/${leverMatch[1]}/${leverMatch[2]}`);
+          if (res.ok) {
+            const data = await res.json();
+            const jd = [data.descriptionPlain || stripHtml(data.description || ''), ...(data.lists || []).map((l) => `${l.text}\n${stripHtml(l.content)}`)].join('\n\n').slice(0, 2600);
+            const role = data.text || fallback.role;
+            const loc = data.categories?.location || detectLocation(jd);
+            return {
+              company: titleCase(leverMatch[1]),
+              role,
+              level: detectLevel(role + ' ' + jd),
+              comp: detectComp(jd),
+              workMode: detectWorkMode((data.workplaceType || '') + ' ' + loc + ' ' + jd),
+              location: loc,
+              jd
+            };
+          }
+        } catch {}
+      }
+
+      // Tier 2: Free Public Markdown Reader (r.jina.ai) for Apple, Stripe, Figma, Ashby, etc.
+      try {
+        const ctrl = new AbortController();
+        const timer = setTimeout(() => ctrl.abort(), 7000);
+        const res = await fetch(`https://r.jina.ai/${rawUrl}`, {
+          headers: { Accept: 'text/plain' },
+          signal: ctrl.signal
+        });
+        clearTimeout(timer);
+        if (res.ok) {
+          const md = await res.text();
+          if (md && md.length > 120 && !/sign in to linkedin|join now/i.test(md.slice(0, 500))) {
+            const titleLine = (md.match(/^Title:\s*(.+)$/m)?.[1] || md.match(/^#\s+(.+)$/m)?.[1] || '').trim();
+            let role = fallback.role;
+            let company = fallback.company;
+
+            if (titleLine) {
+              // Common patterns: "Senior Product Designer - Apple", "Staff Designer at Linear", "Role | Company"
+              const atMatch = titleLine.match(/^(.+?)\s+(?:at|@)\s+([^|–—-]+)/i);
+              const sepMatch = titleLine.split(/\s+[|–—-]\s+/);
+              if (atMatch) {
+                role = atMatch[1].trim();
+                if (!company) company = atMatch[2].trim();
+              } else if (sepMatch.length >= 2) {
+                role = sepMatch[0].trim();
+                if (!company && !/careers|jobs/i.test(sepMatch[1])) company = sepMatch[1].trim();
+              } else {
+                role = titleLine;
+              }
+            }
+
+            const bodyStart = md.indexOf('Markdown Content:');
+            const cleanBody = (bodyStart !== -1 ? md.slice(bodyStart + 17) : md)
+              .replace(/!\[.*?\]\(.*?\)/g, '')
+              .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1')
+              .replace(/[#*_`>]+/g, '')
+              .replace(/\n{3,}/g, '\n\n')
+              .trim();
+
+            return {
+              company: company || fallback.company,
+              role: role || fallback.role,
+              level: detectLevel((role || '') + ' ' + cleanBody.slice(0, 1200)),
+              comp: detectComp(cleanBody),
+              workMode: detectWorkMode(cleanBody.slice(0, 2000)),
+              location: detectLocation(cleanBody.slice(0, 1500)),
+              jd: cleanBody.slice(0, 2600)
+            };
+          }
+        }
+      } catch {}
+
+      // Tier 3: Instant URL heuristic fallback
+      return fallback;
+    }
+
     window.openJobModal = function (existing = null) {
       const j = existing || {
         company: '', role: '', level: '', status: 'Applied', comp: '', location: '', workMode: 'Hybrid',
@@ -3261,6 +3451,14 @@ Product Design, Design Systems, Interaction Design, Prototyping, Figma, User Res
         <div class="modal-header">
           <h3 class="modal-title">${existing ? 'Edit Job Application' : 'New Job Application'}</h3>
           <button class="icon-btn" onclick="closeModal()">✕</button>
+        </div>
+        <div class="field">
+          <label for="m-j-url">Job Posting Link <span style="font-weight:450; color:var(--text-tertiary)">— paste a link to prefill details automatically</span></label>
+          <div style="display:flex; gap:8px;">
+            <input id="m-j-url" class="input" type="url" value="${esc(j.url)}" placeholder="https://boards.greenhouse.io/… or any career URL" style="flex:1;" />
+            <button type="button" class="btn btn-sm" id="autofill-job-btn" style="height:38px; padding:0 14px;">✦ Auto-Fill</button>
+          </div>
+          <div id="autofill-status" style="font-size:11.5px; color:var(--accent-text); min-height:15px;"></div>
         </div>
         <div class="form-row">
           <div class="field"><label>Company *</label><input id="m-j-company" class="input" value="${esc(j.company)}" placeholder="Apple" /></div>
@@ -3282,18 +3480,61 @@ Product Design, Design Systems, Interaction Design, Prototyping, Figma, User Res
         </div>
         <div class="form-row">
           <div class="field"><label>Location</label><input id="m-j-loc" class="input" value="${esc(j.location)}" placeholder="San Francisco, CA" /></div>
-          <div class="field"><label>Job Posting Link</label><input id="m-j-url" class="input" type="url" value="${esc(j.url)}" placeholder="https://..." /></div>
-        </div>
-        <div class="form-row">
           <div class="field"><label>Applied Date</label><input id="m-j-applied" class="input" type="date" value="${esc(j.appliedDate)}" /></div>
-          <div class="field"><label>Next Step Date</label><input id="m-j-next" class="input" type="date" value="${esc(j.nextStepDate)}" /></div>
         </div>
-        <div class="field"><label>Job Description (for Resume ATS Match)</label><textarea id="m-j-jd" class="notes-area" style="min-height:80px;" placeholder="Paste key requirements…">${esc(j.jd)}</textarea></div>
+        <div class="field"><label>Next Step Date</label><input id="m-j-next" class="input" type="date" value="${esc(j.nextStepDate)}" /></div>
+        <div class="field"><label>Job Description (for Resume ATS Match)</label><textarea id="m-j-jd" class="notes-area" style="min-height:86px;" placeholder="Paste key requirements or let Auto-Fill fetch them…">${esc(j.jd)}</textarea></div>
         <div class="modal-footer">
           <button class="btn" onclick="closeModal()">Cancel</button>
           <button class="btn btn-primary" id="save-job-modal-btn">${existing ? 'Save Changes' : 'Add Job'}</button>
         </div>
       `);
+
+      async function runAutoFill(forceOverwrite = false) {
+        const rawUrl = $('#m-j-url').value.trim();
+        if (!rawUrl) return toast('Paste a job posting URL first');
+        const btn = $('#autofill-job-btn');
+        const status = $('#autofill-status');
+        btn.disabled = true;
+        btn.textContent = 'Reading…';
+        status.textContent = 'Fetching role title, compensation, location & description…';
+
+        try {
+          const info = await fetchJobDetailsFromUrl(rawUrl);
+          const setIf = (sel, val) => {
+            const el = $(sel);
+            if (val && (forceOverwrite || !el.value.trim())) el.value = val;
+          };
+          setIf('#m-j-company', info.company);
+          setIf('#m-j-role', info.role);
+          setIf('#m-j-level', info.level);
+          setIf('#m-j-comp', info.comp);
+          setIf('#m-j-loc', info.location);
+          setIf('#m-j-jd', info.jd);
+          if (info.workMode) $('#m-j-mode').value = info.workMode;
+
+          const filledCount = [info.company, info.role, info.level, info.comp, info.location, info.jd].filter(Boolean).length;
+          if (filledCount > 0) {
+            status.textContent = `Prefilled ${filledCount} field${filledCount === 1 ? '' : 's'} — review and adjust anything below.`;
+            toast(`Prefilled ${info.company || 'job'} details`);
+          } else {
+            status.textContent = 'Site blocked automatic reading — fill in details manually.';
+          }
+        } catch {
+          status.textContent = 'Could not read that URL — fill in details manually.';
+        } finally {
+          btn.disabled = false;
+          btn.textContent = '✦ Auto-Fill';
+        }
+      }
+
+      $('#autofill-job-btn').addEventListener('click', () => runAutoFill(true));
+      $('#m-j-url').addEventListener('paste', () => {
+        setTimeout(() => {
+          const val = $('#m-j-url').value.trim();
+          if (/^https?:\/\//i.test(val)) runAutoFill(false);
+        }, 40);
+      });
 
       $('#save-job-modal-btn').addEventListener('click', () => {
         const company = $('#m-j-company').value.trim();
