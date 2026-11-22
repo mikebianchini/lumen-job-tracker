@@ -3468,28 +3468,7 @@ Product Design, Design Systems, Interaction Design, Prototyping, Figma, User Res
 
           <!-- Pipeline Breakdown & Recent Roles -->
           <div style="display:flex; flex-direction:column; gap:14px;">
-            <div class="home-panel glass">
-              <div class="section-head">
-                <span class="section-title">Pipeline Breakdown</span>
-                <button class="btn btn-ghost btn-sm" id="home-view-all-jobs">View All →</button>
-              </div>
-              <div class="stage-bars">
-                ${JOB_STATUSES.filter((s) => s.id !== 'Archived')
-                  .map((s) => {
-                    const cnt = stageCounts[s.id] || 0;
-                    const w = Math.round((cnt / maxStage) * 100);
-                    return `
-                      <div class="stage-row" data-home-stage="${s.id}">
-                        <span class="stage-name"><span class="pill-dot" style="background:${s.color}"></span>${s.id}</span>
-                        <div class="stage-bar-track"><div class="stage-bar-fill" style="width:${cnt ? Math.max(8, w) : 0}%; background:${s.color};"></div></div>
-                        <span class="stage-count">${cnt}</span>
-                      </div>`;
-                  })
-                  .join('')}
-              </div>
-            </div>
-
-            <div class="home-panel glass">
+<div class="home-panel glass">
               <div class="section-head">
                 <span class="section-title">Recent Applications (${state.jobs.length})</span><button class="btn btn-ghost btn-sm" onclick="ui.jobFilter='All'; switchView('jobs');">View All →</button>
               </div>
@@ -3730,7 +3709,7 @@ Product Design, Design Systems, Interaction Design, Prototyping, Figma, User Res
       $('#home-add-job').addEventListener('click', () => openJobModal());
       $('#home-add-person').addEventListener('click', () => openPersonModal());
       $('#home-open-resume').addEventListener('click', () => switchView('resume'));
-      $('#home-view-all-jobs').addEventListener('click', () => {
+      $('#home-view-all-jobs')?.addEventListener('click', () => {
         ui.jobFilter = 'All';
         switchView('jobs');
       });
