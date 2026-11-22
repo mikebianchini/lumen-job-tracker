@@ -1312,7 +1312,7 @@
         right: 14px;
         z-index: 60;
         display: grid;
-        grid-template-columns: repeat(4, 1fr);
+        grid-template-columns: repeat(5, 1fr);
         padding: 6px;
         border-radius: var(--radius-pill);
       }
@@ -1553,6 +1553,174 @@
         justify-content: flex-start;
       }
     }
+
+    /* Home Dashboard */
+    .home-scroll {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      overflow-y: auto;
+      padding-bottom: 24px;
+      min-height: 0;
+      flex: 1;
+    }
+
+    .home-hero {
+      padding: 22px 24px;
+    }
+
+    .home-greeting {
+      font-size: 26px;
+      font-weight: 720;
+      letter-spacing: -0.035em;
+      line-height: 1.15;
+    }
+
+    .home-kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .kpi-card {
+      border-radius: var(--radius-xl);
+      padding: 18px 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      cursor: pointer;
+      transition: all 0.22s var(--ease-spring);
+    }
+
+    .kpi-card:hover {
+      transform: translateY(-2px);
+      background: var(--glass-bg-elevated);
+    }
+
+    .kpi-label {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .kpi-value {
+      font-size: 30px;
+      font-weight: 740;
+      letter-spacing: -0.035em;
+      font-variant-numeric: tabular-nums;
+      line-height: 1.1;
+    }
+
+    .kpi-sub {
+      font-size: 12px;
+      color: var(--text-tertiary);
+    }
+
+    .home-two-col {
+      display: grid;
+      grid-template-columns: 1.1fr 0.9fr;
+      gap: 14px;
+    }
+
+    .home-panel {
+      border-radius: var(--radius-xl);
+      padding: 20px 22px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .agenda-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .agenda-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 11px 13px;
+      border-radius: var(--radius-md);
+      background: var(--glass-bg-subtle);
+      border: 1px solid var(--divider);
+      cursor: pointer;
+      transition: all 0.2s var(--ease-spring);
+    }
+
+    .agenda-row:hover {
+      background: var(--glass-bg-elevated);
+      border-color: var(--accent);
+      transform: translateY(-1px);
+    }
+
+    .stage-bars {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .stage-row {
+      display: grid;
+      grid-template-columns: 92px 1fr 28px;
+      align-items: center;
+      gap: 10px;
+      font-size: 12.5px;
+      cursor: pointer;
+    }
+
+    .stage-row:hover .stage-name {
+      color: var(--text-primary);
+    }
+
+    .stage-name {
+      color: var(--text-secondary);
+      font-weight: 560;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .stage-bar-track {
+      height: 8px;
+      border-radius: var(--radius-pill);
+      background: var(--divider);
+      overflow: hidden;
+    }
+
+    .stage-bar-fill {
+      height: 100%;
+      border-radius: var(--radius-pill);
+      transition: width 0.45s var(--ease-spring);
+    }
+
+    .stage-count {
+      text-align: right;
+      font-weight: 650;
+      font-variant-numeric: tabular-nums;
+    }
+
+    @media (max-width: 1120px) {
+      .home-kpi-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+      .home-two-col {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 560px) {
+      .home-greeting {
+        font-size: 22px;
+      }
+      .kpi-value {
+        font-size: 24px;
+      }
+    }
   </style>
 </head>
 <body>
@@ -1580,7 +1748,13 @@
       </div>
 
       <nav class="nav-group">
-        <button class="nav-btn active" data-view="jobs">
+        <button class="nav-btn active" data-view="home">
+          <span class="nav-btn-left">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+            Home
+          </span>
+        </button>
+        <button class="nav-btn" data-view="jobs">
           <span class="nav-btn-left">
             <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="3"></rect><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"></path></svg>
             Jobs
@@ -1630,8 +1804,8 @@
       <!-- Top Bar -->
       <header class="topbar glass">
         <div class="topbar-left">
-          <h1 class="page-title" id="page-title">Jobs</h1>
-          <div class="search-wrap" id="search-wrap">
+          <h1 class="page-title" id="page-title">Home</h1>
+          <div class="search-wrap" id="search-wrap" style="display: none;">
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
             <input id="global-search" class="search-input" type="search" placeholder="Search roles, companies, people…" autocomplete="off" />
             <span class="search-kbd">⌘K</span>
@@ -1648,8 +1822,13 @@
         </div>
       </header>
 
+      <!-- VIEW 0: HOME DASHBOARD -->
+      <section class="view active" id="view-home" aria-label="Home Dashboard">
+        <div class="home-scroll" id="home-dashboard"></div>
+      </section>
+
       <!-- VIEW 1: JOBS -->
-      <section class="view active" id="view-jobs" aria-label="Jobs tracker">
+      <section class="view" id="view-jobs" aria-label="Jobs tracker">
         <div class="visual-hero glass" id="jobs-visual-hero"></div>
         <div class="filter-bar" id="job-filters"></div>
         <div class="split-pane" id="jobs-split">
@@ -1841,7 +2020,11 @@
 
   <!-- Mobile Floating Liquid Glass Tab Bar -->
   <nav class="mobile-tabbar glass-elevated" aria-label="Mobile navigation">
-    <button class="mobile-tab active" data-view="jobs">
+    <button class="mobile-tab active" data-view="home">
+      <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+      Home
+    </button>
+    <button class="mobile-tab" data-view="jobs">
       <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="3"></rect><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"></path></svg>
       Jobs
     </button>
@@ -2019,7 +2202,7 @@ Product Design, Design Systems, Interaction Design, Prototyping, Figma, User Res
 
     let state = loadState();
     let ui = {
-      view: 'jobs',
+      view: 'home',
       search: '',
       jobFilter: 'All',
       peopleFilter: 'All',
@@ -2140,14 +2323,14 @@ Product Design, Design Systems, Interaction Design, Prototyping, Figma, User Res
       $$('.nav-btn').forEach((b) => b.classList.toggle('active', b.dataset.view === viewName));
       $$('.mobile-tab').forEach((b) => b.classList.toggle('active', b.dataset.view === viewName));
 
-      const titles = { jobs: 'Jobs', people: 'People', resume: 'Resume Studio', sync: 'Sync & Cloud' };
+      const titles = { home: 'Home', jobs: 'Jobs', people: 'People', resume: 'Resume Studio', sync: 'Sync & Cloud' };
       $('#page-title').textContent = titles[viewName];
 
       const searchVisible = viewName === 'jobs' || viewName === 'people';
       $('#search-wrap').style.display = searchVisible ? '' : 'none';
 
       const addBtn = $('#primary-add-btn');
-      if (viewName === 'jobs') {
+      if (viewName === 'home' || viewName === 'jobs') {
         addBtn.style.display = '';
         $('#primary-add-label').textContent = 'New Job';
       } else if (viewName === 'people') {
@@ -2180,10 +2363,246 @@ Product Design, Design Systems, Interaction Design, Prototyping, Figma, User Res
     }
 
     function renderCurrentView() {
-      if (ui.view === 'jobs') renderJobs();
+      if (ui.view === 'home') renderHome();
+      else if (ui.view === 'jobs') renderJobs();
       else if (ui.view === 'people') renderPeople();
       else if (ui.view === 'resume') renderResumeStudio();
       else if (ui.view === 'sync') renderSyncView();
+    }
+
+    /* ==========================================================================
+       VIEW 0: HOME DASHBOARD
+       ========================================================================== */
+    function renderHome() {
+      const hour = new Date().getHours();
+      const greeting = hour < 12 ? 'Good morning' : hour < 18 ? 'Good afternoon' : 'Good evening';
+      const todayLabel = new Date().toLocaleDateString(undefined, { weekday: 'long', month: 'long', day: 'numeric' });
+
+      const activeJobs = state.jobs.filter((j) => j.status !== 'Archived');
+      const interviewing = state.jobs.filter((j) => j.status === 'Interviewing').length;
+      const screening = state.jobs.filter((j) => j.status === 'Screening').length;
+      const offers = state.jobs.filter((j) => j.status === 'Offer').length;
+      const tailored = state.jobs.filter((j) => j.tailoredResume && j.tailoredResume.trim()).length;
+      const advanced = screening + interviewing + offers;
+      const momentumPct = activeJobs.length ? Math.round((advanced / activeJobs.length) * 100) : 0;
+      const circ = 125.6;
+      const offset = circ - (circ * momentumPct) / 100;
+
+      // Build upcoming agenda (job next steps + people follow-ups)
+      const todayStr = new Date().toISOString().slice(0, 10);
+      const agenda = [];
+      state.jobs.forEach((j) => {
+        if (j.nextStepDate && j.status !== 'Archived') {
+          agenda.push({
+            type: 'job',
+            id: j.id,
+            date: j.nextStepDate,
+            title: `${j.company} — ${j.role}`,
+            sub: `${j.status} · Next step`,
+            badge: j.status
+          });
+        }
+      });
+      state.people.forEach((p) => {
+        if (p.followUpDate) {
+          agenda.push({
+            type: 'person',
+            id: p.id,
+            date: p.followUpDate,
+            title: `Follow up with ${p.name}`,
+            sub: `${p.roleType}${p.company ? ' · ' + p.company : ''}`,
+            badge: 'Follow-Up'
+          });
+        }
+      });
+      agenda.sort((a, b) => a.date.localeCompare(b.date));
+
+      const stageCounts = {};
+      JOB_STATUSES.forEach((s) => (stageCounts[s.id] = state.jobs.filter((j) => j.status === s.id).length));
+      const maxStage = Math.max(1, ...JOB_STATUSES.filter((s) => s.id !== 'Archived').map((s) => stageCounts[s.id]));
+
+      $('#home-dashboard').innerHTML = `
+        <!-- Hero Greeting & Momentum -->
+        <div class="visual-hero glass home-hero">
+          <div style="display:flex; flex-direction:column; gap:10px; min-width:0;">
+            <div class="hero-kicker">${esc(todayLabel)}</div>
+            <h2 class="home-greeting">${greeting}.</h2>
+            <p style="font-size:13.5px; color:var(--text-secondary); max-width:520px; line-height:1.45;">
+              You have <strong style="color:var(--text-primary)">${activeJobs.length}</strong> active role${activeJobs.length === 1 ? '' : 's'}, <strong style="color:var(--text-primary)">${interviewing}</strong> interview loop${interviewing === 1 ? '' : 's'}, and <strong style="color:var(--text-primary)">${agenda.length}</strong> upcoming action${agenda.length === 1 ? '' : 's'}.
+            </p>
+            <div style="display:flex; gap:8px; flex-wrap:wrap; margin-top:2px;">
+              <button class="btn btn-primary btn-sm" id="home-add-job">+ Add Job</button>
+              <button class="btn btn-sm" id="home-add-person">+ Add Person</button>
+              <button class="btn btn-sm" id="home-open-resume">Tailor Resume</button>
+            </div>
+          </div>
+          <div class="hero-gauge" style="padding:12px 16px;">
+            <div class="hero-gauge-ring">
+              <svg viewBox="0 0 50 50">
+                <defs>
+                  <linearGradient id="homeRingGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stop-color="#007aff" />
+                    <stop offset="100%" stop-color="#30d158" />
+                  </linearGradient>
+                </defs>
+                <circle cx="25" cy="25" r="20" fill="none" stroke="var(--divider)" stroke-width="5"></circle>
+                <circle cx="25" cy="25" r="20" fill="none" stroke="url(#homeRingGrad)" stroke-width="5" stroke-linecap="round" stroke-dasharray="${circ}" stroke-dashoffset="${offset}"></circle>
+              </svg>
+              <div class="hero-gauge-val">${momentumPct}%</div>
+            </div>
+            <div>
+              <div style="font-size:13.5px; font-weight:660;">Pipeline Momentum</div>
+              <div style="font-size:12px; color:var(--text-secondary); margin-top:2px;">${advanced} of ${activeJobs.length || 0} advanced</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 4 Clean KPI Glass Cards -->
+        <div class="home-kpi-grid">
+          <div class="kpi-card glass" data-kpi-nav="jobs">
+            <span class="kpi-label">Active Roles <span style="color:var(--accent)">↗</span></span>
+            <span class="kpi-value">${activeJobs.length}</span>
+            <span class="kpi-sub">${stageCounts.Applied || 0} applied · ${stageCounts.Saved || 0} saved</span>
+          </div>
+          <div class="kpi-card glass" data-kpi-stage="Interviewing">
+            <span class="kpi-label">Interviewing <span style="color:var(--amber)">↗</span></span>
+            <span class="kpi-value">${interviewing}</span>
+            <span class="kpi-sub">${screening} screening · ${offers} offer${offers === 1 ? '' : 's'}</span>
+          </div>
+          <div class="kpi-card glass" data-kpi-nav="people">
+            <span class="kpi-label">People Network <span style="color:var(--teal)">↗</span></span>
+            <span class="kpi-value">${state.people.length}</span>
+            <span class="kpi-sub">${state.people.filter((p) => p.roleType === 'Referral').length} referrals · ${state.people.filter((p) => p.roleType === 'Recruiter').length} recruiters</span>
+          </div>
+          <div class="kpi-card glass" data-kpi-nav="resume">
+            <span class="kpi-label">Tailored Resumes <span style="color:var(--green)">↗</span></span>
+            <span class="kpi-value">${tailored}</span>
+            <span class="kpi-sub">${state.baseResumeName ? esc(state.baseResumeName) : 'Upload base resume'}</span>
+          </div>
+        </div>
+
+        <!-- Two-Column Actionable Split -->
+        <div class="home-two-col">
+          <!-- Upcoming Focus -->
+          <div class="home-panel glass">
+            <div class="section-head">
+              <span class="section-title">Upcoming Focus &amp; Follow-Ups</span>
+              <span class="chip">${agenda.length} scheduled</span>
+            </div>
+            <div class="agenda-list">
+              ${
+                agenda.length
+                  ? agenda
+                      .slice(0, 6)
+                      .map((item) => {
+                        const isOverdue = item.date < todayStr;
+                        const isToday = item.date === todayStr;
+                        const dateBadge = isOverdue
+                          ? `<span class="badge badge-archived">Overdue · ${formatDate(item.date)}</span>`
+                          : isToday
+                          ? `<span class="badge badge-interviewing">Today</span>`
+                          : `<span class="badge badge-applied">${formatDate(item.date)}</span>`;
+                        return `
+                          <div class="agenda-row" data-agenda-type="${item.type}" data-agenda-id="${item.id}">
+                            <div style="min-width:0;">
+                              <div style="font-size:13.5px; font-weight:620; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${esc(item.title)}</div>
+                              <div style="font-size:12px; color:var(--text-secondary); margin-top:2px;">${esc(item.sub)}</div>
+                            </div>
+                            ${dateBadge}
+                          </div>`;
+                      })
+                      .join('')
+                  : `<div style="padding:22px 10px; text-align:center; color:var(--text-secondary); font-size:13px;">No upcoming dates yet. Add a Next Step date on a job or a Follow-Up date on a contact to stay ahead.</div>`
+              }
+            </div>
+          </div>
+
+          <!-- Pipeline Breakdown & Recent Roles -->
+          <div style="display:flex; flex-direction:column; gap:14px;">
+            <div class="home-panel glass">
+              <div class="section-head">
+                <span class="section-title">Pipeline Breakdown</span>
+                <button class="btn btn-ghost btn-sm" id="home-view-all-jobs">View All →</button>
+              </div>
+              <div class="stage-bars">
+                ${JOB_STATUSES.filter((s) => s.id !== 'Archived')
+                  .map((s) => {
+                    const cnt = stageCounts[s.id] || 0;
+                    const w = Math.round((cnt / maxStage) * 100);
+                    return `
+                      <div class="stage-row" data-home-stage="${s.id}">
+                        <span class="stage-name"><span class="pill-dot" style="background:${s.color}"></span>${s.id}</span>
+                        <div class="stage-bar-track"><div class="stage-bar-fill" style="width:${cnt ? Math.max(8, w) : 0}%; background:${s.color};"></div></div>
+                        <span class="stage-count">${cnt}</span>
+                      </div>`;
+                  })
+                  .join('')}
+              </div>
+            </div>
+
+            <div class="home-panel glass">
+              <div class="section-head">
+                <span class="section-title">Recent Applications</span>
+              </div>
+              <div class="agenda-list">
+                ${
+                  state.jobs.length
+                    ? state.jobs
+                        .slice(0, 3)
+                        .map((j) => {
+                          const [bg, fg] = tintFor(j.company);
+                          return `
+                            <div class="agenda-row" data-agenda-type="job" data-agenda-id="${j.id}">
+                              <div class="item-identity">
+                                <div class="monogram" style="width:34px; height:34px; font-size:12px; background:${bg}; color:${fg}">${esc(initials(j.company))}</div>
+                                <div style="min-width:0;">
+                                  <div style="font-size:13.5px; font-weight:620; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${esc(j.role)}</div>
+                                  <div style="font-size:12px; color:var(--text-secondary);">${esc(j.company)}${j.comp ? ' · ' + esc(j.comp) : ''}</div>
+                                </div>
+                              </div>
+                              <span class="badge ${statusClass(j.status)}">${esc(j.status)}</span>
+                            </div>`;
+                        })
+                        .join('')
+                    : `<div style="padding:14px; text-align:center; color:var(--text-secondary); font-size:13px;">No applications tracked yet.</div>`
+                }
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+
+      $('#home-add-job').addEventListener('click', () => openJobModal());
+      $('#home-add-person').addEventListener('click', () => openPersonModal());
+      $('#home-open-resume').addEventListener('click', () => switchView('resume'));
+      $('#home-view-all-jobs').addEventListener('click', () => {
+        ui.jobFilter = 'All';
+        switchView('jobs');
+      });
+
+      $$('[data-kpi-nav]').forEach((el) => el.addEventListener('click', () => switchView(el.dataset.kpiNav)));
+      $$('[data-kpi-stage], [data-home-stage]').forEach((el) =>
+        el.addEventListener('click', () => {
+          ui.jobFilter = el.dataset.kpiStage || el.dataset.homeStage;
+          switchView('jobs');
+        })
+      );
+
+      $$('[data-agenda-id]').forEach((el) =>
+        el.addEventListener('click', () => {
+          if (el.dataset.agendaType === 'job') {
+            ui.selectedJobId = el.dataset.agendaId;
+            switchView('jobs');
+            ui.mobileDetailOpen = true;
+            renderJobs();
+          } else {
+            ui.selectedPersonId = el.dataset.agendaId;
+            switchView('people');
+            ui.mobileDetailOpen = true;
+            renderPeople();
+          }
+        })
+      );
     }
 
     /* ==========================================================================
@@ -3566,7 +3985,7 @@ Product Design, Design Systems, Interaction Design, Prototyping, Figma, User Res
         }
         saveState();
         closeModal();
-        renderJobs();
+        renderCurrentView();
       });
     };
 
@@ -4088,7 +4507,7 @@ function doPost(e) {
     // Boot
     applyTheme();
     updateSidebarStats();
-    renderJobs();
+    renderHome();
     if (hasCloudConfig()) autoPullFromCloud(true);
     if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
       navigator.serviceWorker.register('./sw.js').catch(() => {});
