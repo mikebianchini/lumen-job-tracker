@@ -3570,6 +3570,92 @@ Product Design, Design Systems, Interaction Design, Prototyping, Figma, User Res
       });
     };
 
+    /* ==========================================================================
+       SMART LINKEDIN CONTACT AUTO-FILL (Public Reader + URL Slug Fallback)
+       ========================================================================== */
+    function inferPersonCategory(title) {
+      const t = (title || '').toLowerCase();
+      if (/recruit|talent|sourcer|staffing|people ops|coordinator/.test(t)) return 'Recruiter';
+      if (/manager|director|vp|vice president|head of|chief|partner/.test(t)) return 'Hiring Manager';
+      return 'Peer / Coffee Chat';
+    }
+
+    function parseLinkedInUrlFallback(rawUrl) {
+      const out = { name: '', title: '', company: '', roleType: '' };
+      try {
+        const u = new URL(rawUrl);
+        const match = u.pathname.match(/\/in\/([^/?#]+)/i);
+        if (match && match[1]) {
+          // Strip trailing LinkedIn random hash/digits (e.g. jane-doe-4b2a9c12 or jane-doe-123456)
+          const cleaned = decodeURIComponent(match[1])
+            .replace(/-[0-9a-f]{6,}$/i, '')
+            .replace(/-\d{3,}$/, '');
+          const parts = cleaned.split(/[-_]+/).filter((s) => s && !/^\d+$/.test(s));
+          if (parts.length) {
+            out.name = parts.slice(0, 3).map((p) => p.charAt(0).toUpperCase() + p.slice(1).toLowerCase()).join(' ');
+          }
+        }
+      } catch {}
+      return out;
+    }
+
+    async function fetchPersonDetailsFromLinkedIn(rawUrl) {
+      const fallback = parseLinkedInUrlFallback(rawUrl);
+      try {
+        const ctrl = new AbortController();
+        const timer = setTimeout(() => ctrl.abort(), 6500);
+        const res = await fetch(`https://r.jina.ai/${rawUrl}`, {
+          headers: { Accept: 'text/plain' },
+          signal: ctrl.signal
+        });
+        clearTimeout(timer);
+
+        if (res.ok) {
+          const md = await res.text();
+          const titleLine = (md.match(/^Title:\s*(.+)$/m)?.[1] || '').trim();
+          // Ignore LinkedIn login/authwall titles
+          if (titleLine && !/^(sign in|join linkedin|linkedin login|security verification|999)/i.test(titleLine)) {
+            const cleanTitle = titleLine.replace(/\s*\|\s*LinkedIn\s*$/i, '').trim();
+            // Common LinkedIn formats:
+            // "Claire Bennett - Design Recruiting Lead - Apple"
+            // "Daniel Park - Design Manager at Apple"
+            // "Maya Lin - Principal Designer | Linear"
+            const parts = cleanTitle.split(/\s+[-–—]\s+/);
+            let name = parts[0]?.trim() || fallback.name;
+            let title = '';
+            let company = '';
+
+            if (parts.length >= 3) {
+              title = parts[1].trim();
+              company = parts[2].trim();
+            } else if (parts.length === 2) {
+              const atMatch = parts[1].match(/^(.+?)\s+(?:at|@)\s+(.+)$/i);
+              if (atMatch) {
+                title = atMatch[1].trim();
+                company = atMatch[2].trim();
+              } else {
+                title = parts[1].trim();
+              }
+            }
+
+            if (!company) {
+              const expMatch = md.match(/(?:Experience|Current)[\s\S]{0,180}?(?:at|@)\s+([A-Z][A-Za-z0-9 &.,'-]{1,40})/);
+              if (expMatch) company = expMatch[1].trim();
+            }
+
+            return {
+              name: name || fallback.name,
+              title,
+              company,
+              roleType: title ? inferPersonCategory(title) : ''
+            };
+          }
+        }
+      } catch {}
+
+      return fallback;
+    }
+
     window.openPersonModal = function (existing = null) {
       const p = existing || {
         name: '', title: '', company: '', roleType: 'Recruiter', email: '', linkedin: '',
@@ -3579,6 +3665,14 @@ Product Design, Design Systems, Interaction Design, Prototyping, Figma, User Res
         <div class="modal-header">
           <h3 class="modal-title">${existing ? 'Edit Person' : 'New Contact'}</h3>
           <button class="icon-btn" onclick="closeModal()">✕</button>
+        </div>
+        <div class="field">
+          <label for="m-p-linkedin">LinkedIn Profile URL <span style="font-weight:450; color:var(--text-tertiary)">— paste a profile link to prefill automatically</span></label>
+          <div style="display:flex; gap:8px;">
+            <input id="m-p-linkedin" class="input" type="url" value="${esc(p.linkedin)}" placeholder="https://www.linkedin.com/in/…" style="flex:1;" />
+            <button type="button" class="btn btn-sm" id="autofill-person-btn" style="height:38px; padding:0 14px;">✦ Auto-Fill</button>
+          </div>
+          <div id="autofill-person-status" style="font-size:11.5px; color:var(--accent-text); min-height:15px;"></div>
         </div>
         <div class="form-row">
           <div class="field"><label>Full Name *</label><input id="m-p-name" class="input" value="${esc(p.name)}" placeholder="Jordan Lee" /></div>
@@ -3592,18 +3686,61 @@ Product Design, Design Systems, Interaction Design, Prototyping, Figma, User Res
         </div>
         <div class="form-row">
           <div class="field"><label>Email</label><input id="m-p-email" class="input" type="email" value="${esc(p.email)}" placeholder="name@company.com" /></div>
-          <div class="field"><label>LinkedIn URL</label><input id="m-p-linkedin" class="input" type="url" value="${esc(p.linkedin)}" placeholder="https://linkedin.com/in/..." /></div>
-        </div>
-        <div class="form-row">
           <div class="field"><label>Last Contacted</label><input id="m-p-last" class="input" type="date" value="${esc(p.lastContact)}" /></div>
-          <div class="field"><label>Follow-Up Date</label><input id="m-p-follow" class="input" type="date" value="${esc(p.followUpDate)}" /></div>
         </div>
+        <div class="field"><label>Follow-Up Date</label><input id="m-p-follow" class="input" type="date" value="${esc(p.followUpDate)}" /></div>
         <div class="field"><label>Notes</label><textarea id="m-p-notes" class="notes-area" style="min-height:76px;" placeholder="How you met, what you discussed…">${esc(p.notes)}</textarea></div>
         <div class="modal-footer">
           <button class="btn" onclick="closeModal()">Cancel</button>
           <button class="btn btn-primary" id="save-person-modal-btn">${existing ? 'Save Changes' : 'Add Contact'}</button>
         </div>
       `);
+
+      async function runPersonAutoFill(forceOverwrite = false) {
+        const rawUrl = $('#m-p-linkedin').value.trim();
+        if (!rawUrl) return toast('Paste a LinkedIn profile URL first');
+        const btn = $('#autofill-person-btn');
+        const status = $('#autofill-person-status');
+        btn.disabled = true;
+        btn.textContent = 'Reading…';
+        status.textContent = 'Reading LinkedIn profile details…';
+
+        try {
+          const info = await fetchPersonDetailsFromLinkedIn(rawUrl);
+          const setIf = (sel, val) => {
+            const el = $(sel);
+            if (val && (forceOverwrite || !el.value.trim())) el.value = val;
+          };
+          setIf('#m-p-name', info.name);
+          setIf('#m-p-title', info.title);
+          setIf('#m-p-company', info.company);
+          if (info.roleType) $('#m-p-role').value = info.roleType;
+
+          const filledCount = [info.name, info.title, info.company].filter(Boolean).length;
+          if (filledCount >= 2) {
+            status.textContent = `Prefilled ${info.name}${info.company ? ' · ' + info.company : ''} — review below.`;
+            toast(`Prefilled ${info.name}`);
+          } else if (info.name) {
+            status.textContent = `Prefilled name "${info.name}" from URL (LinkedIn hid title/company behind login).`;
+            toast(`Prefilled ${info.name}`);
+          } else {
+            status.textContent = 'Could not read profile — fill in details manually.';
+          }
+        } catch {
+          status.textContent = 'Could not read profile — fill in details manually.';
+        } finally {
+          btn.disabled = false;
+          btn.textContent = '✦ Auto-Fill';
+        }
+      }
+
+      $('#autofill-person-btn').addEventListener('click', () => runPersonAutoFill(true));
+      $('#m-p-linkedin').addEventListener('paste', () => {
+        setTimeout(() => {
+          const val = $('#m-p-linkedin').value.trim();
+          if (/^https?:\/\//i.test(val)) runPersonAutoFill(false);
+        }, 40);
+      });
 
       $('#save-person-modal-btn').addEventListener('click', () => {
         const name = $('#m-p-name').value.trim();
