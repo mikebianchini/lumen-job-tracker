@@ -2423,6 +2423,58 @@
       flex-shrink: 0;
       margin-top: 2px;
     }
+
+    /* Supabase LinkedIn Auth Chip & Button */
+    .account-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      height: 36px;
+      padding: 3px 12px 3px 4px;
+      border-radius: var(--radius-pill);
+      background: var(--lg-surface);
+      backdrop-filter: blur(18px) saturate(175%);
+      -webkit-backdrop-filter: blur(18px) saturate(175%);
+      border: 1px solid var(--lg-outer-border);
+      box-shadow: var(--lg-rim), 0 2px 8px rgba(34, 34, 34, 0.05);
+      color: var(--text-primary);
+      font-family: inherit;
+      font-size: 13px;
+      font-weight: 620;
+      cursor: pointer;
+      transition: all 0.2s var(--ease-spring);
+    }
+
+    .account-chip:hover {
+      background: var(--lg-surface-strong);
+      transform: translateY(-1px);
+    }
+
+    .account-avatar {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      object-fit: cover;
+      background: var(--accent-soft);
+      color: var(--accent-text);
+      display: grid;
+      place-items: center;
+      font-size: 11.5px;
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+
+    .btn-linkedin {
+      background: #0a66c2;
+      border-color: transparent;
+      color: #ffffff;
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.28), 0 4px 14px rgba(10, 102, 194, 0.3);
+    }
+
+    .btn-linkedin:hover {
+      background: #004182;
+      color: #ffffff;
+    }
   </style>
 </head>
 <body>
@@ -2549,6 +2601,12 @@
         </nav>
 
         <div class="hub-right">
+          <button class="account-chip" id="hub-auth-btn" title="Sign in with LinkedIn" aria-label="Account and Sign in">
+            <span class="account-avatar" id="hub-auth-avatar">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14m-.5 15.5v-5.3a3.26 3.26 0 0 0-3.26-3.26c-.85 0-1.84.52-2.28 1.3v-1.11h-2.79v8.37h2.79v-4.93c0-.77.62-1.4 1.39-1.4a1.4 1.4 0 0 1 1.4 1.4v4.93h2.75M6.88 8.56a1.68 1.68 0 0 0 1.68-1.68c0-.93-.75-1.69-1.68-1.69a1.69 1.69 0 0 0-1.69 1.69c0 .93.76 1.68 1.69 1.68m1.39 9.94v-8.37H5.5v8.37h2.77z"/></svg>
+            </span>
+            <span id="hub-auth-label">Sign in</span>
+          </button>
           <button class="icon-btn" id="hub-settings-btn" title="Settings &amp; Sync" aria-label="Settings and Sync">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
           </button>
@@ -2805,9 +2863,15 @@
               <label for="supa-key">Supabase Anon Key</label>
               <input id="supa-key" class="input" type="password" placeholder="eyJhbGciOi..." />
             </div>
+            <div id="supa-auth-status" style="font-size:12.5px; color:var(--text-secondary);"></div>
             <div style="display: flex; gap: 8px; flex-wrap: wrap;">
-              <button class="btn btn-primary btn-sm" id="supa-sync-btn">Sync Now</button>
-              <button class="btn btn-ghost btn-sm" id="supa-sql-btn">View SQL Setup</button>
+              <button type="button" class="btn btn-linkedin btn-sm" id="supa-linkedin-btn">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14m-.5 15.5v-5.3a3.26 3.26 0 0 0-3.26-3.26c-.85 0-1.84.52-2.28 1.3v-1.11h-2.79v8.37h2.79v-4.93c0-.77.62-1.4 1.39-1.4a1.4 1.4 0 0 1 1.4 1.4v4.93h2.75M6.88 8.56a1.68 1.68 0 0 0 1.68-1.68c0-.93-.75-1.69-1.68-1.69a1.69 1.69 0 0 0-1.69 1.69c0 .93.76 1.68 1.69 1.68m1.39 9.94v-8.37H5.5v8.37h2.77z"/></svg>
+                Continue with LinkedIn
+              </button>
+              <button type="button" class="btn btn-sm" id="supa-sync-btn">Sync Now</button>
+              <button type="button" class="btn btn-ghost btn-sm" id="supa-sql-btn">View SQL &amp; Setup</button>
+              <button type="button" class="btn btn-danger btn-sm" id="supa-signout-btn" style="display:none;">Sign Out</button>
             </div>
           </div>
 
@@ -3011,7 +3075,8 @@ Product Design, Design Systems, Interaction Design, Prototyping, Figma, User Res
           gsheetsUrl: '',
           supaUrl: '',
           supaKey: '',
-          aiApiKey: ''
+          aiApiKey: '',
+          supaSession: null
         },
         weeklyGoal: 5,
         timeline: [],
@@ -5042,15 +5107,18 @@ Product Design, Design Systems, Interaction Design, Prototyping, Figma, User Res
         if (state.sync.supaUrl && state.sync.supaKey) {
           const url = state.sync.supaUrl.trim().replace(/\/$/, '');
           const key = state.sync.supaKey.trim();
-          const res = await fetch(`${url}/rest/v1/lumen_state?id=eq.default`, {
+          const sess = await ensureValidSupaSession();
+          const rowId = sess?.user?.id || 'default';
+          const authToken = sess?.access_token || key;
+          const res = await fetch(`${url}/rest/v1/lumen_state`, {
             method: 'POST',
             headers: {
               apikey: key,
-              Authorization: `Bearer ${key}`,
+              Authorization: `Bearer ${authToken}`,
               'Content-Type': 'application/json',
               Prefer: 'resolution=merge-duplicates'
             },
-            body: JSON.stringify({ id: 'default', payload: getSyncPayload(), updated_at: state.updatedAt })
+            body: JSON.stringify({ id: rowId, payload: getSyncPayload(), updated_at: state.updatedAt })
           });
           if (!res.ok) throw new Error(res.statusText);
         } else if (state.sync.gsheetsUrl) {
@@ -5077,8 +5145,11 @@ Product Design, Design Systems, Interaction Design, Prototyping, Figma, User Res
         if (state.sync.supaUrl && state.sync.supaKey) {
           const url = state.sync.supaUrl.trim().replace(/\/$/, '');
           const key = state.sync.supaKey.trim();
-          const res = await fetch(`${url}/rest/v1/lumen_state?id=eq.default&select=payload,updated_at`, {
-            headers: { apikey: key, Authorization: `Bearer ${key}` }
+          const sess = await ensureValidSupaSession();
+          const rowId = sess?.user?.id || 'default';
+          const authToken = sess?.access_token || key;
+          const res = await fetch(`${url}/rest/v1/lumen_state?id=eq.${encodeURIComponent(rowId)}&select=payload,updated_at`, {
+            headers: { apikey: key, Authorization: `Bearer ${authToken}` }
           });
           if (res.ok) {
             const rows = await res.json();
@@ -5100,6 +5171,185 @@ Product Design, Design Systems, Interaction Design, Prototyping, Figma, User Res
       }
     }
 
+    /* ==========================================================================
+       SUPABASE LINKEDIN OIDC AUTHENTICATION
+       ========================================================================== */
+    function updateAuthUI() {
+      const user = state.sync.supaSession?.user;
+      const label = $('#hub-auth-label');
+      const avatar = $('#hub-auth-avatar');
+      const status = $('#supa-auth-status');
+      const signOutBtn = $('#supa-signout-btn');
+      const liBtn = $('#supa-linkedin-btn');
+
+      if (user) {
+        const meta = user.user_metadata || {};
+        const fullName = meta.full_name || meta.name || state.profile?.name || user.email || 'Account';
+        const first = fullName.split(/\s+/)[0];
+        const pic = meta.avatar_url || meta.picture || '';
+        if (label) label.textContent = first;
+        if (avatar) {
+          avatar.innerHTML = pic
+            ? `<img src="${esc(pic)}" alt="" style="width:100%; height:100%; border-radius:50%; object-fit:cover;" />`
+            : esc(initials(fullName));
+        }
+        if (status) status.innerHTML = `Signed in with LinkedIn as <strong style="color:var(--text-primary)">${esc(fullName)}</strong> (${esc(user.email || '')}) · Auto-Sync active`;
+        if (signOutBtn) signOutBtn.style.display = '';
+        if (liBtn) liBtn.style.display = 'none';
+      } else {
+        if (label) label.textContent = 'Sign in';
+        if (avatar) {
+          avatar.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14m-.5 15.5v-5.3a3.26 3.26 0 0 0-3.26-3.26c-.85 0-1.84.52-2.28 1.3v-1.11h-2.79v8.37h2.79v-4.93c0-.77.62-1.4 1.39-1.4a1.4 1.4 0 0 1 1.4 1.4v4.93h2.75M6.88 8.56a1.68 1.68 0 0 0 1.68-1.68c0-.93-.75-1.69-1.68-1.69a1.69 1.69 0 0 0-1.69 1.69c0 .93.76 1.68 1.69 1.68m1.39 9.94v-8.37H5.5v8.37h2.77z"/></svg>';
+        }
+        if (status) status.textContent = state.sync.supaUrl && state.sync.supaKey ? 'Supabase connected — sign in with LinkedIn for private per-user sync.' : 'Enter your Supabase URL & Anon Key to enable Continue with LinkedIn.';
+        if (signOutBtn) signOutBtn.style.display = 'none';
+        if (liBtn) liBtn.style.display = '';
+      }
+    }
+
+    async function ensureValidSupaSession() {
+      const sess = state.sync.supaSession;
+      if (!sess || !state.sync.supaUrl || !state.sync.supaKey) return null;
+      const nowSec = Math.floor(Date.now() / 1000);
+      if (sess.expires_at && sess.expires_at > nowSec + 60) return sess;
+      if (!sess.refresh_token) return sess;
+      try {
+        const url = state.sync.supaUrl.trim().replace(/\/$/, '');
+        const res = await fetch(`${url}/auth/v1/token?grant_type=refresh_token`, {
+          method: 'POST',
+          headers: { apikey: state.sync.supaKey.trim(), 'Content-Type': 'application/json' },
+          body: JSON.stringify({ refresh_token: sess.refresh_token })
+        });
+        if (res.ok) {
+          const fresh = await res.json();
+          state.sync.supaSession = {
+            access_token: fresh.access_token,
+            refresh_token: fresh.refresh_token || sess.refresh_token,
+            expires_at: fresh.expires_at || nowSec + (fresh.expires_in || 3600),
+            user: fresh.user || sess.user
+          };
+          saveState(true);
+          return state.sync.supaSession;
+        }
+      } catch {}
+      return sess;
+    }
+
+    function startLinkedInSignIn() {
+      const url = ($('#supa-url')?.value || state.sync.supaUrl || '').trim().replace(/\/$/, '');
+      const key = ($('#supa-key')?.value || state.sync.supaKey || '').trim();
+      if (!url || !key) {
+        switchView('sync');
+        toast('Paste your Supabase Project URL & Anon Key first');
+        return;
+      }
+      state.sync.supaUrl = url;
+      state.sync.supaKey = key;
+      saveState(true);
+      const redirectTo = window.location.origin + window.location.pathname;
+      window.location.href = `${url}/auth/v1/authorize?provider=linkedin_oidc&redirect_to=${encodeURIComponent(redirectTo)}`;
+    }
+
+    async function handleSupabaseOAuthCallback() {
+      if (!window.location.hash || !window.location.hash.includes('access_token=')) return;
+      const params = new URLSearchParams(window.location.hash.slice(1));
+      const access_token = params.get('access_token');
+      const refresh_token = params.get('refresh_token');
+      const expires_in = Number(params.get('expires_in') || 3600);
+      if (!access_token || !state.sync.supaUrl || !state.sync.supaKey) return;
+
+      try {
+        const url = state.sync.supaUrl.trim().replace(/\/$/, '');
+        const res = await fetch(`${url}/auth/v1/user`, {
+          headers: { apikey: state.sync.supaKey.trim(), Authorization: `Bearer ${access_token}` }
+        });
+        const user = res.ok ? await res.json() : null;
+        state.sync.supaSession = {
+          access_token,
+          refresh_token,
+          expires_at: Math.floor(Date.now() / 1000) + expires_in,
+          user
+        };
+        if (user?.user_metadata) {
+          const meta = user.user_metadata;
+          if (!state.profile.name && (meta.full_name || meta.name)) state.profile.name = meta.full_name || meta.name;
+        }
+        saveState(true);
+        history.replaceState(null, '', window.location.pathname + window.location.search);
+        updateAuthUI();
+        await autoPullFromCloud(false);
+        toast(`Signed in as ${state.profile.name || user?.email || 'LinkedIn user'}`);
+      } catch (e) {
+        toast('LinkedIn sign-in failed — check Supabase Auth settings');
+      }
+    }
+
+    async function signOutSupabase() {
+      const sess = state.sync.supaSession;
+      if (sess?.access_token && state.sync.supaUrl && state.sync.supaKey) {
+        try {
+          await fetch(`${state.sync.supaUrl.trim().replace(/\/$/, '')}/auth/v1/logout`, {
+            method: 'POST',
+            headers: { apikey: state.sync.supaKey.trim(), Authorization: `Bearer ${sess.access_token}` }
+          });
+        } catch {}
+      }
+      state.sync.supaSession = null;
+      saveState(true);
+      updateAuthUI();
+      renderCurrentView();
+      toast('Signed out');
+    }
+
+    function openAuthModal() {
+      const user = state.sync.supaSession?.user;
+      if (user) {
+        const meta = user.user_metadata || {};
+        const fullName = meta.full_name || meta.name || state.profile?.name || user.email;
+        openModal(`
+          <div class="modal-header">
+            <h3 class="modal-title">Account</h3>
+            <button class="icon-btn" onclick="closeModal()" aria-label="Close dialog"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></button>
+          </div>
+          <div style="display:flex; align-items:center; gap:12px; padding:12px; border-radius:var(--radius-md); background:var(--glass-bg-subtle); border:1px solid var(--divider);">
+            <div class="account-avatar" style="width:42px; height:42px; font-size:15px;">${meta.avatar_url ? `<img src="${esc(meta.avatar_url)}" alt="" style="width:100%; height:100%; border-radius:50%; object-fit:cover;" />` : esc(initials(fullName))}</div>
+            <div style="min-width:0;">
+              <div style="font-size:15px; font-weight:700;">${esc(fullName)}</div>
+              <div style="font-size:12.5px; color:var(--text-secondary);">${esc(user.email || 'Signed in with LinkedIn')}</div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button class="btn" onclick="closeModal(); switchView('sync');">Settings &amp; Sync</button>
+            <button class="btn btn-danger" id="modal-signout-btn">Sign Out</button>
+          </div>
+        `);
+        $('#modal-signout-btn')?.addEventListener('click', () => { closeModal(); signOutSupabase(); });
+        return;
+      }
+
+      openModal(`
+        <div class="modal-header">
+          <h3 class="modal-title">Sign in to Lumen</h3>
+          <button class="icon-btn" onclick="closeModal()" aria-label="Close dialog"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></button>
+        </div>
+        <p style="font-size:13.5px; color:var(--text-secondary); line-height:1.5;">
+          Sign in with LinkedIn via Supabase to sync your jobs, contacts, timeline, and tailored resumes automatically across desktop and mobile.
+        </p>
+        <button type="button" class="btn btn-linkedin" id="modal-linkedin-btn" style="height:44px; width:100%;">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14m-.5 15.5v-5.3a3.26 3.26 0 0 0-3.26-3.26c-.85 0-1.84.52-2.28 1.3v-1.11h-2.79v8.37h2.79v-4.93c0-.77.62-1.4 1.39-1.4a1.4 1.4 0 0 1 1.4 1.4v4.93h2.75M6.88 8.56a1.68 1.68 0 0 0 1.68-1.68c0-.93-.75-1.69-1.68-1.69a1.69 1.69 0 0 0-1.69 1.69c0 .93.76 1.68 1.69 1.68m1.39 9.94v-8.37H5.5v8.37h2.77z"/></svg>
+          Continue with LinkedIn
+        </button>
+        <div style="font-size:12px; color:var(--text-tertiary); text-align:center;">
+          ${state.sync.supaUrl && state.sync.supaKey ? 'Powered by your connected Supabase project.' : 'Need to connect Supabase first? Click below to paste your Project URL & Anon Key.'}
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-ghost" onclick="closeModal(); switchView('sync');">Configure Supabase</button>
+          <button class="btn" onclick="closeModal()">Cancel</button>
+        </div>
+      `);
+      $('#modal-linkedin-btn')?.addEventListener('click', () => { closeModal(); startLinkedInSignIn(); });
+    }
+
     function renderSyncView() {
       const prof = state.profile || {};
       if ($('#prof-linkedin')) $('#prof-linkedin').value = prof.linkedinUrl || '';
@@ -5115,6 +5365,7 @@ Product Design, Design Systems, Interaction Design, Prototyping, Figma, User Res
       $('#gsheets-url').value = state.sync.gsheetsUrl || '';
       $('#supa-url').value = state.sync.supaUrl || '';
       $('#supa-key').value = state.sync.supaKey || '';
+      updateAuthUI();
     }
 
     async function pushToGoogleSheets() {
@@ -5979,18 +6230,33 @@ function doPost(e) {
     });
 
     $('#supa-sync-btn').addEventListener('click', syncSupabase);
+    $('#supa-linkedin-btn')?.addEventListener('click', startLinkedInSignIn);
+    $('#supa-signout-btn')?.addEventListener('click', signOutSupabase);
+    $('#hub-auth-btn')?.addEventListener('click', openAuthModal);
     $('#supa-sql-btn').addEventListener('click', () => {
       openModal(`
         <div class="modal-header">
           <h3 class="modal-title">Supabase Table SQL</h3>
           <button class="icon-btn" onclick="closeModal()" aria-label="Close dialog"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></button>
         </div>
-        <p style="font-size:13px; color:var(--text-secondary);">Run this once in your Supabase SQL Editor:</p>
+        <p style="font-size:13px; color:var(--text-secondary); line-height:1.5;">
+          <strong>1. Run this SQL</strong> in Supabase SQL Editor (enables private per-user Row-Level Security):
+        </p>
         <div class="code-box">create table if not exists lumen_state (
   id text primary key,
   payload jsonb not null,
   updated_at timestamptz default now()
-);</div>
+);
+
+alter table lumen_state enable row level security;
+
+create policy "Users manage own Lumen data"
+  on lumen_state for all
+  using (auth.uid()::text = id)
+  with check (auth.uid()::text = id);</div>
+        <p style="font-size:12.5px; color:var(--text-secondary); line-height:1.5;">
+          <strong>2. Enable LinkedIn (OIDC):</strong> In Supabase → Authentication → Providers → LinkedIn (OIDC), paste your LinkedIn Client ID &amp; Secret, and add <code>https://mikebianchini.github.io/lumen-job-tracker/</code> under Authentication → URL Configuration → Redirect URLs.
+        </p>
         <div class="modal-footer"><button class="btn btn-primary" onclick="closeModal()">Done</button></div>
       `);
     });
@@ -6089,8 +6355,11 @@ function doPost(e) {
     // Boot
     applyTheme();
     updateSidebarStats();
+    updateAuthUI();
     renderHome();
-    if (hasCloudConfig()) autoPullFromCloud(true);
+    handleSupabaseOAuthCallback().then(() => {
+      if (hasCloudConfig() && !window.location.hash.includes('access_token=')) autoPullFromCloud(true);
+    });
     if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
       navigator.serviceWorker.register('./sw.js').catch(() => {});
     }
