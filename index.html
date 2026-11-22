@@ -2365,6 +2365,64 @@
         box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.55);
       }
     }
+
+    /* Home Dashboard Activity Timeline */
+    .timeline-list {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      padding-left: 20px;
+    }
+
+    .timeline-list::before {
+      content: "";
+      position: absolute;
+      left: 7px;
+      top: 12px;
+      bottom: 12px;
+      width: 2px;
+      background: var(--divider);
+      border-radius: 2px;
+    }
+
+    .timeline-item {
+      position: relative;
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 10px 12px;
+      border-radius: var(--radius-md);
+      cursor: pointer;
+      transition: background 0.16s ease;
+    }
+
+    .timeline-item:hover {
+      background: var(--glass-bg-subtle);
+    }
+
+    .timeline-dot {
+      position: absolute;
+      left: -18px;
+      top: 15px;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      border: 2px solid var(--glass-bg);
+      box-shadow: 0 0 0 1.5px var(--divider);
+      flex-shrink: 0;
+    }
+
+    .timeline-time {
+      font-size: 11.5px;
+      font-weight: 560;
+      color: var(--text-tertiary);
+      white-space: nowrap;
+      font-variant-numeric: tabular-nums;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
   </style>
 </head>
 <body>
@@ -2918,8 +2976,23 @@ Product Design, Design Systems, Interaction Design, Prototyping, Figma, User Res
           supaKey: '',
           aiApiKey: ''
         },
-        weeklyGoal: 5
+        weeklyGoal: 5,
+        timeline: []
       };
+    }
+
+    function logActivity({ kind = 'job', title, detail = '', targetType = '', targetId = '', timestamp = null }) {
+      if (!Array.isArray(state.timeline)) state.timeline = [];
+      state.timeline.unshift({
+        id: uid('ev'),
+        kind,
+        title,
+        detail,
+        targetType,
+        targetId,
+        timestamp: timestamp || new Date().toISOString()
+      });
+      if (state.timeline.length > 120) state.timeline = state.timeline.slice(0, 120);
     }
 
     const PREP_STEPS = [
@@ -3451,7 +3524,213 @@ Product Design, Design Systems, Interaction Design, Prototyping, Figma, User Res
             </div>
           </div>
         </div>
+
+        <!-- Activity Timeline History -->
+        <div class="home-panel glass">
+          ${(() => {
+            const filter = ui.timelineFilter || 'All';
+            const events = [];
+            const seen = new Set();
+
+            (state.timeline || []).forEach((ev) => {
+              events.push(ev);
+              seen.add(ev.title + '|' + (ev.timestamp || '').slice(0, 10));
+            });
+
+            state.jobs.forEach((j) => {
+              if (j.appliedDate) {
+                const title = `Applied to ${j.company} — ${j.role}`;
+                const key = title + '|' + j.appliedDate;
+                if (!seen.has(key)) {
+                  events.push({
+                    id: 'hist-job-' + j.id,
+                    kind: 'applied',
+                    title,
+                    detail: [j.status, j.comp, j.workMode].filter(Boolean).join(' · '),
+                    targetType: 'job',
+                    targetId: j.id,
+                    timestamp: j.appliedDate + 'T12:00:00.000Z'
+                  });
+                }
+              }
+              (j.comments || []).forEach((c) => {
+                const title = `${c.tag || 'Note'} logged on ${j.company}`;
+                const key = title + '|' + (c.createdAt || '').slice(0, 10);
+                if (!seen.has(key)) {
+                  events.push({
+                    id: 'hist-cmt-' + c.id,
+                    kind: c.tag === 'Interview' ? 'interview' : 'note',
+                    title,
+                    detail: (c.text || '').slice(0, 90),
+                    targetType: 'job',
+                    targetId: j.id,
+                    timestamp: c.createdAt || new Date().toISOString()
+                  });
+                }
+              });
+            });
+
+            state.people.forEach((p) => {
+              if (p.lastContact) {
+                const title = `Spoke with ${p.name}${p.company ? ' at ' + p.company : ''}`;
+                const key = title + '|' + p.lastContact;
+                if (!seen.has(key)) {
+                  events.push({
+                    id: 'hist-per-' + p.id,
+                    kind: 'person',
+                    title,
+                    detail: [p.roleType, p.title].filter(Boolean).join(' · '),
+                    targetType: 'person',
+                    targetId: p.id,
+                    timestamp: p.lastContact + 'T14:00:00.000Z'
+                  });
+                }
+              }
+            });
+
+            events.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+
+            const filteredEvents = events.filter((e) => {
+              if (filter === 'All') return true;
+              if (filter === 'Jobs') return ['job', 'applied', 'status', 'offer', 'resume'].includes(e.kind);
+              if (filter === 'Interviews & Notes') return ['interview', 'note'].includes(e.kind);
+              if (filter === 'People') return e.kind === 'person';
+              return true;
+            });
+
+            const dotColors = {
+              job: 'var(--accent)',
+              applied: 'var(--accent)',
+              status: 'var(--teal)',
+              interview: 'var(--amber)',
+              offer: 'var(--green)',
+              person: 'var(--teal)',
+              note: 'var(--slate)',
+              resume: 'var(--green)'
+            };
+
+            const kindLabels = {
+              job: 'Job Added',
+              applied: 'Applied',
+              status: 'Stage Update',
+              interview: 'Interview',
+              offer: 'Offer',
+              person: 'Meeting / Contact',
+              note: 'Note',
+              resume: 'Resume'
+            };
+
+            const fmtTime = (ts) => {
+              if (!ts) return '';
+              const d = new Date(ts);
+              const sameDay = d.toDateString() === new Date().toDateString();
+              return sameDay
+                ? 'Today · ' + d.toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' })
+                : d.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: d.getFullYear() !== new Date().getFullYear() ? 'numeric' : undefined });
+            };
+
+            return `
+              <div class="section-head" style="flex-wrap:wrap;">
+                <span class="section-title">Activity Timeline (${filteredEvents.length})</span>
+                <div style="display:flex; gap:6px; flex-wrap:wrap; align-items:center;">
+                  ${['All', 'Jobs', 'Interviews & Notes', 'People'].map((f) => `<button type="button" class="pill ${f === filter ? 'active' : ''}" style="padding:4px 10px; font-size:11.5px;" data-tl-filter="${f}">${f}</button>`).join('')}
+                  <button type="button" class="btn btn-sm" id="home-log-event-btn">+ Log Event</button>
+                </div>
+              </div>
+              <div class="timeline-list">
+                ${
+                  filteredEvents.length
+                    ? filteredEvents
+                        .slice(0, 15)
+                        .map((ev) => `
+                          <div class="timeline-item" data-tl-type="${ev.targetType || ''}" data-tl-id="${ev.targetId || ''}">
+                            <span class="timeline-dot" style="background:${dotColors[ev.kind] || 'var(--accent)'};"></span>
+                            <div style="min-width:0; flex:1;">
+                              <div style="display:flex; align-items:center; gap:7px; flex-wrap:wrap;">
+                                <span style="font-size:13.5px; font-weight:640; color:var(--text-primary);">${esc(ev.title)}</span>
+                                <span class="chip" style="padding:2px 8px; font-size:11px;">${kindLabels[ev.kind] || 'Activity'}</span>
+                              </div>
+                              ${ev.detail ? `<div style="font-size:12.5px; color:var(--text-secondary); margin-top:2px;">${esc(ev.detail)}</div>` : ''}
+                            </div>
+                            <span class="timeline-time">${esc(fmtTime(ev.timestamp))}</span>
+                          </div>`)
+                        .join('')
+                    : '<div style="font-size:13px; color:var(--text-tertiary); padding:10px 4px;">No activity yet — add a job, log a meeting, or post a note to start your timeline.</div>'
+                }
+              </div>
+            `;
+          })()}
+        </div>
       `;
+
+      $$('[data-tl-filter]').forEach((btn) =>
+        btn.addEventListener('click', () => {
+          ui.timelineFilter = btn.dataset.tlFilter;
+          renderHome();
+        })
+      );
+
+      $$('[data-tl-id]').forEach((el) =>
+        el.addEventListener('click', () => {
+          if (!el.dataset.tlId) return;
+          if (el.dataset.tlType === 'job') {
+            ui.selectedJobId = el.dataset.tlId;
+            switchView('jobs');
+            ui.mobileDetailOpen = true;
+            renderJobs();
+          } else if (el.dataset.tlType === 'person') {
+            ui.selectedPersonId = el.dataset.tlId;
+            switchView('people');
+            ui.mobileDetailOpen = true;
+            renderPeople();
+          }
+        })
+      );
+
+      $('#home-log-event-btn')?.addEventListener('click', () => {
+        openModal(`
+          <div class="modal-header">
+            <h3 class="modal-title">Log Timeline Event</h3>
+            <button class="icon-btn" onclick="closeModal()" aria-label="Close dialog"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></button>
+          </div>
+          <div class="form-row">
+            <div class="field"><label for="m-ev-kind">Event Type</label>
+              <select id="m-ev-kind" class="select">
+                <option value="interview">Interview</option>
+                <option value="person">Meeting / Coffee Chat</option>
+                <option value="applied">Applied</option>
+                <option value="status">Stage Update</option>
+                <option value="note">Milestone / Note</option>
+              </select>
+            </div>
+            <div class="field"><label for="m-ev-date">Date</label><input id="m-ev-date" class="input" type="date" value="${new Date().toISOString().slice(0, 10)}" /></div>
+          </div>
+          <div class="field"><label for="m-ev-title">What happened? *</label><input id="m-ev-title" class="input" placeholder="Portfolio review with Apple Design Manager" /></div>
+          <div class="field"><label for="m-ev-detail">Details (optional)</label><textarea id="m-ev-detail" class="notes-area" style="min-height:76px;" placeholder="Key takeaways, next steps, or who you met…"></textarea></div>
+          <div class="modal-footer">
+            <button class="btn" onclick="closeModal()">Cancel</button>
+            <button class="btn btn-primary" id="save-ev-modal-btn">Add to Timeline</button>
+          </div>
+        `);
+        $('#save-ev-modal-btn').addEventListener('click', () => {
+          const title = $('#m-ev-title').value.trim();
+          const tEl = $('#m-ev-title');
+          tEl.classList.toggle('input-error', !title);
+          if (!title) { tEl.focus(); return toast('Please describe what happened'); }
+          const dVal = $('#m-ev-date').value;
+          const isToday = dVal === new Date().toISOString().slice(0, 10);
+          logActivity({
+            kind: $('#m-ev-kind').value,
+            title,
+            detail: $('#m-ev-detail').value.trim(),
+            timestamp: isToday ? new Date().toISOString() : new Date(dVal + 'T12:00:00').toISOString()
+          });
+          saveState();
+          closeModal();
+          renderHome();
+          toast('Event added to timeline');
+        });
+      });
 
       $('#home-add-job').addEventListener('click', () => openJobModal());
       $('#home-add-person').addEventListener('click', () => openPersonModal());
@@ -3686,7 +3965,15 @@ Product Design, Design Systems, Interaction Design, Prototyping, Figma, User Res
             const targetStage = col.dataset.kcolStage;
             const job = state.jobs.find((j) => j.id === jobId);
             if (job && targetStage && job.status !== targetStage) {
+              const prev = job.status;
               job.status = targetStage;
+              logActivity({
+                kind: targetStage === 'Interviewing' ? 'interview' : targetStage === 'Offer' ? 'offer' : 'status',
+                title: `Moved ${job.company} to ${targetStage}`,
+                detail: `${job.role} (from ${prev})`,
+                targetType: 'job',
+                targetId: job.id
+              });
               saveState();
               renderJobs();
               toast(`Moved ${job.company} to ${targetStage}`);
@@ -3708,7 +3995,15 @@ Product Design, Design Systems, Interaction Design, Prototyping, Figma, User Res
             e.stopPropagation();
             const job = state.jobs.find((j) => j.id === btn.dataset.kadvanceId);
             if (job) {
+              const prev = job.status;
               job.status = btn.dataset.knext;
+              logActivity({
+                kind: job.status === 'Interviewing' ? 'interview' : job.status === 'Offer' ? 'offer' : 'status',
+                title: `Moved ${job.company} to ${job.status}`,
+                detail: `${job.role} (from ${prev})`,
+                targetType: 'job',
+                targetId: job.id
+              });
               saveState();
               renderJobs();
               toast(`Moved ${job.company} to ${job.status}`);
@@ -3926,7 +4221,15 @@ Product Design, Design Systems, Interaction Design, Prototyping, Figma, User Res
       });
 
       $('#detail-job-status').addEventListener('change', (e) => {
+        const prev = job.status;
         job.status = e.target.value;
+        logActivity({
+          kind: job.status === 'Interviewing' ? 'interview' : job.status === 'Offer' ? 'offer' : 'status',
+          title: `Moved ${job.company} to ${job.status}`,
+          detail: `${job.role} (from ${prev})`,
+          targetType: 'job',
+          targetId: job.id
+        });
         saveState();
         renderJobs();
         toast(`Status updated to ${job.status}`);
@@ -4013,12 +4316,20 @@ Product Design, Design Systems, Interaction Design, Prototyping, Figma, User Res
         const input = $('#new-comment-input');
         const text = input.value.trim();
         if (!text) return toast('Write a note before posting');
+        const cTag = ui.commentTag || 'Note';
         job.comments.unshift({
           id: uid('cmt'),
-          tag: ui.commentTag || 'Note',
+          tag: cTag,
           text,
           createdAt: new Date().toISOString(),
           pinned: false
+        });
+        logActivity({
+          kind: cTag === 'Interview' ? 'interview' : 'note',
+          title: `${cTag} logged on ${job.company}`,
+          detail: text.slice(0, 90) + (text.length > 90 ? '…' : ''),
+          targetType: 'job',
+          targetId: job.id
         });
         saveState();
         renderJobDetail();
@@ -4658,6 +4969,7 @@ Product Design, Design Systems, Interaction Design, Prototyping, Figma, User Res
       return {
         jobs: state.jobs,
         people: state.people,
+        timeline: state.timeline || [],
         baseResume: state.baseResume,
         baseResumeName: state.baseResumeName,
         updatedAt: state.updatedAt || new Date().toISOString()
@@ -4672,6 +4984,7 @@ Product Design, Design Systems, Interaction Design, Prototyping, Figma, User Res
 
       if (Array.isArray(data.jobs)) state.jobs = data.jobs;
       if (Array.isArray(data.people)) state.people = data.people;
+      if (Array.isArray(data.timeline)) state.timeline = data.timeline;
       if (typeof data.baseResume === 'string') state.baseResume = data.baseResume;
       if (typeof data.baseResumeName === 'string') state.baseResumeName = data.baseResumeName;
       state.updatedAt = data.updatedAt || new Date().toISOString();
@@ -5112,6 +5425,13 @@ Product Design, Design Systems, Interaction Design, Prototyping, Figma, User Res
         } else {
           const newJob = { id: uid('job'), ...payload, notes: '', personIds: [], tailoredResume: '' };
           state.jobs.unshift(newJob);
+          logActivity({
+            kind: payload.status === 'Applied' ? 'applied' : 'job',
+            title: `${payload.status === 'Applied' ? 'Applied to' : 'Added'} ${company} — ${role}`,
+            detail: [payload.level, payload.comp, payload.workMode].filter(Boolean).join(' · '),
+            targetType: 'job',
+            targetId: newJob.id
+          });
           ui.selectedJobId = newJob.id;
           if (ui.jobFilter !== 'All' && ui.jobFilter !== newJob.status) ui.jobFilter = 'All';
           if (ui.search) { ui.search = ''; const s = $('#global-search'); if (s) s.value = ''; }
@@ -5316,6 +5636,13 @@ Product Design, Design Systems, Interaction Design, Prototyping, Figma, User Res
         } else {
           const newPerson = { id: uid('person'), warmth: 'Warm', ...payload };
           state.people.unshift(newPerson);
+          logActivity({
+            kind: 'person',
+            title: `Added contact ${payload.name}`,
+            detail: [payload.roleType, payload.title, payload.company].filter(Boolean).join(' · '),
+            targetType: 'person',
+            targetId: newPerson.id
+          });
           // Auto-link if company matches an existing job
           state.jobs.forEach((j) => {
             if (payload.company && j.company.toLowerCase() === payload.company.toLowerCase()) {
@@ -5505,7 +5832,18 @@ Product Design, Design Systems, Interaction Design, Prototyping, Figma, User Res
 
     $('#save-resume-version-btn').addEventListener('click', () => {
       persistStudioEditor();
-      toast(ui.studioJobId ? 'Saved tailored resume for this role' : 'Saved master base resume');
+      const j = state.jobs.find((x) => x.id === ui.studioJobId);
+      if (j) {
+        logActivity({
+          kind: 'resume',
+          title: `Tailored resume for ${j.company}`,
+          detail: j.role,
+          targetType: 'job',
+          targetId: j.id
+        });
+        saveState();
+      }
+      toast(j ? 'Saved tailored resume for this role' : 'Saved master base resume');
     });
 
     $('#smart-tailor-btn').addEventListener('click', smartAutoTailor);
