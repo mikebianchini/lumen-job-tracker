@@ -1340,7 +1340,7 @@
         right: 14px;
         z-index: 60;
         display: grid;
-        grid-template-columns: repeat(5, 1fr);
+        grid-template-columns: repeat(4, 1fr);
         padding: 6px;
         border-radius: var(--radius-pill);
       }
@@ -2345,15 +2345,13 @@
               Resume
             </span>
           </button>
-          <button class="nav-btn" data-view="sync">
-            <span class="nav-btn-left">
-              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path><path d="M3 3v5h5"></path></svg>
-              Sync
-            </span>
-          </button>
+
         </nav>
 
         <div class="hub-right">
+          <button class="icon-btn" id="hub-settings-btn" title="Settings &amp; Sync" aria-label="Settings and Sync">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+          </button>
           <button class="icon-btn" id="hub-theme-btn" title="Toggle Light/Dark Mode" aria-label="Toggle theme">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
           </button>
@@ -2619,10 +2617,7 @@
       <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
       Resume
     </button>
-    <button class="mobile-tab" data-view="sync">
-      <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path><path d="M3 3v5h5"></path></svg>
-      Sync
-    </button>
+
   </nav>
 
   <!-- Modal Backdrop -->
@@ -2998,7 +2993,9 @@ Product Design, Design Systems, Interaction Design, Prototyping, Figma, User Res
       $('.nav-btn').forEach((b) => { const on = b.dataset.view === viewName; b.classList.toggle('active', on); if (on) b.setAttribute('aria-current', 'page'); else b.removeAttribute('aria-current'); });
       $$('.mobile-tab').forEach((b) => b.classList.toggle('active', b.dataset.view === viewName));
 
-      const titles = { home: 'Home', jobs: 'Jobs', people: 'People', resume: 'Resume Studio', sync: 'Sync & Cloud' };
+      const titles = { home: 'Home', jobs: 'Jobs', people: 'People', resume: 'Resume Studio', sync: 'Settings' };
+      const gear = $('#hub-settings-btn');
+      if (gear) { gear.style.borderColor = viewName === 'sync' ? 'var(--accent)' : ''; gear.style.color = viewName === 'sync' ? 'var(--accent)' : ''; }
       $('#page-title').textContent = titles[viewName];
 
       const searchVisible = viewName === 'jobs' || viewName === 'people';
@@ -5320,6 +5317,7 @@ Product Design, Design Systems, Interaction Design, Prototyping, Figma, User Res
 
     $('#theme-toggle-desktop').addEventListener('click', toggleTheme);
     $('#hub-theme-btn')?.addEventListener('click', toggleTheme);
+    $('#hub-settings-btn')?.addEventListener('click', () => switchView('sync'));
     $('#hub-quick-add')?.addEventListener('click', () => {
       if (ui.view === 'people') openPersonModal();
       else openJobModal();
