@@ -10,7 +10,7 @@
   <meta name="theme-color" content="#ff385c" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   <link rel="icon" type="image/png" sizes="64x64" href="./assets/favicon.png?v=5" />
   <link rel="apple-touch-icon" sizes="180x180" href="./assets/apple-touch-icon.png?v=5" />
   <link rel="manifest" href="./manifest.json?v=5" />
@@ -19,31 +19,32 @@
        LUMEN — Warm Airbnb-Inspired Hospitality Design System
        ========================================================================== */
     :root {
-      --font-sans: "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      --font-sans: "Figtree", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
       --font-mono: ui-monospace, "SF Mono", SFMono-Regular, Menlo, Monaco, Consolas, monospace;
 
-      /* Light Mode Palette — Sunlit Warm Hospitality */
-      --bg-canvas: #faf8f5;
+      /* Light Mode Palette — Kathmere / The Block Marketplace Look */
+      --bg-canvas: #ffffff linear-gradient(160deg, #ffe9ee 0%, #ffffff 42%, #e8f0ff 100%) fixed no-repeat;
+      --bg-solid: #ffffff;
       --bg-pattern: none;
 
       --glass-bg: #ffffff;
       --glass-bg-elevated: #ffffff;
-      --glass-bg-subtle: #f7f4ef;
-      --glass-bg-hover: #f2ede6;
-      --glass-border: #ebe6df;
-      --glass-border-subtle: #e7e1d8;
-      --glass-highlight: inset 0 1px 0 rgba(255, 255, 255, 1);
-      --glass-shadow: 0 2px 10px rgba(34, 34, 34, 0.04), 0 1px 2px rgba(34, 34, 34, 0.03);
-      --glass-shadow-lg: 0 20px 52px -12px rgba(34, 34, 34, 0.14), 0 4px 14px rgba(34, 34, 34, 0.05);
+      --glass-bg-subtle: #f7f7f7;
+      --glass-bg-hover: #efefef;
+      --glass-border: #dddddd;
+      --glass-border-subtle: #ebebeb;
+      --glass-highlight: none;
+      --glass-shadow: 0 1px 2px rgba(0, 0, 0, 0.08), 0 4px 12px rgba(0, 0, 0, 0.05);
+      --glass-shadow-lg: 0 6px 16px rgba(0, 0, 0, 0.12);
 
       --text-primary: #222222;
-      --text-secondary: #524d48;
-      --text-tertiary: #66605a;
+      --text-secondary: #555555;
+      --text-tertiary: #717171;
 
       --accent: #ff385c;
-      --accent-gradient: linear-gradient(135deg, #ff385c 0%, #e31c5f 100%);
-      --accent-soft: rgba(255, 56, 92, 0.1);
-      --accent-text: #c9184a;
+      --accent-gradient: linear-gradient(135deg, #ff385c 0%, #e00b41 100%);
+      --accent-soft: #fff1f3;
+      --accent-text: #d1123f;
       --green: #166534;
       --green-soft: rgba(22, 101, 52, 0.11);
       --amber: #b45309;
@@ -69,27 +70,28 @@
     }
 
     [data-theme="dark"] {
-      --bg-canvas: #171514;
+      --bg-canvas: #121212 linear-gradient(160deg, #2b1219 0%, #121212 45%, #0f1a2c 100%) fixed no-repeat;
+      --bg-solid: #121212;
       --bg-pattern: none;
 
-      --glass-bg: #221f1d;
-      --glass-bg-elevated: #2a2624;
-      --glass-bg-subtle: #2c2826;
-      --glass-bg-hover: #342f2c;
-      --glass-border: rgba(255, 245, 235, 0.1);
-      --glass-border-subtle: rgba(255, 245, 235, 0.08);
-      --glass-highlight: inset 0 1px 0 rgba(255, 245, 235, 0.06);
-      --glass-shadow: 0 4px 18px rgba(0, 0, 0, 0.34), 0 1px 3px rgba(0, 0, 0, 0.24);
-      --glass-shadow-lg: 0 24px 60px -12px rgba(0, 0, 0, 0.62);
+      --glass-bg: #1c1c1c;
+      --glass-bg-elevated: #242424;
+      --glass-bg-subtle: #262626;
+      --glass-bg-hover: #303030;
+      --glass-border: #3a3a3a;
+      --glass-border-subtle: #2c2c2c;
+      --glass-highlight: none;
+      --glass-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+      --glass-shadow-lg: 0 6px 16px rgba(0, 0, 0, 0.5);
 
-      --text-primary: #f7f4f0;
-      --text-secondary: #d4ccc4;
-      --text-tertiary: #a19890;
+      --text-primary: #f2f2f2;
+      --text-secondary: #c0c0c0;
+      --text-tertiary: #9a9a9a;
 
-      --accent: #ff4d6d;
-      --accent-gradient: linear-gradient(135deg, #ff4d6d 0%, #e31c5f 100%);
-      --accent-soft: rgba(255, 77, 109, 0.18);
-      --accent-text: #ff758f;
+      --accent: #ff5a75;
+      --accent-gradient: linear-gradient(135deg, #ff5a75 0%, #e00b41 100%);
+      --accent-soft: #2a171b;
+      --accent-text: #ff8ea1;
       --green: #34d399;
       --green-soft: rgba(52, 211, 153, 0.16);
       --amber: #fbbf24;
@@ -107,8 +109,8 @@
     }
 
     /* 5 Warm Curated Hospitality Backgrounds */
-    [data-bg="linen"] { --bg-canvas: #faf8f5; }
-    [data-theme="dark"][data-bg="linen"] { --bg-canvas: #171514; }
+    [data-bg="linen"] { --bg-canvas: #ffffff linear-gradient(160deg, #ffe9ee 0%, #ffffff 42%, #e8f0ff 100%) fixed no-repeat; }
+    [data-theme="dark"][data-bg="linen"] { --bg-canvas: #121212 linear-gradient(160deg, #2b1219 0%, #121212 45%, #0f1a2c 100%) fixed no-repeat; }
 
     [data-bg="white"] { --bg-canvas: #ffffff; }
     [data-theme="dark"][data-bg="white"] { --bg-canvas: #131212; }
@@ -2046,6 +2048,181 @@
       align-items: center;
       gap: 4px;
     }
+
+    /* ==========================================================================
+       Kathmere / The Block Top-Nav Shell (Desktop Top Nav + Mobile Bottom Bar)
+       ========================================================================== */
+    .app-shell {
+      display: block;
+      max-width: none;
+      height: auto;
+      min-height: 100vh;
+      padding: 0;
+    }
+
+    .sidebar {
+      display: none !important;
+    }
+
+    .hub-topbar {
+      position: sticky;
+      top: 0;
+      z-index: 40;
+      background: color-mix(in srgb, var(--bg-solid) 86%, transparent);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--glass-border-subtle);
+    }
+
+    .hub-topbar-in {
+      max-width: 1280px;
+      margin: 0 auto;
+      height: 76px;
+      padding: 0 36px;
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .hub-brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      background: none;
+      border: 0;
+      padding: 0;
+      cursor: pointer;
+      justify-self: start;
+    }
+
+    .hub-brand-text {
+      font: 800 22px/1 var(--font-sans);
+      color: var(--accent);
+      letter-spacing: -0.035em;
+    }
+
+    .hub-nav {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .hub-nav .nav-btn {
+      width: auto;
+      padding: 10px 16px;
+      border-radius: var(--radius-pill);
+      font: 600 15px/1 var(--font-sans);
+      color: var(--text-secondary);
+      position: relative;
+      border: 0;
+      background: transparent;
+      box-shadow: none;
+      gap: 7px;
+    }
+
+    .hub-nav .nav-btn:hover {
+      background: var(--glass-bg-subtle);
+      color: var(--text-primary);
+    }
+
+    .hub-nav .nav-btn.active {
+      background: transparent;
+      border: 0;
+      box-shadow: none;
+      color: var(--text-primary);
+      font-weight: 700;
+    }
+
+    .hub-nav .nav-btn.active::after {
+      content: "";
+      position: absolute;
+      left: 16px;
+      right: 16px;
+      bottom: 2px;
+      height: 2.5px;
+      border-radius: 2px;
+      background: var(--text-primary);
+    }
+
+    .hub-nav .nav-btn.active svg {
+      color: var(--text-primary);
+    }
+
+    .hub-right {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      justify-self: end;
+    }
+
+    .workspace {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 20px 36px 56px;
+      gap: 16px;
+      min-height: calc(100vh - 76px);
+    }
+
+    .topbar {
+      background: transparent !important;
+      border: 0 !important;
+      box-shadow: none !important;
+      padding: 4px 0 6px !important;
+      border-radius: 0 !important;
+    }
+
+    .page-title {
+      font: 800 32px/1.1 var(--font-sans);
+      letter-spacing: -0.03em;
+    }
+
+    .split-pane {
+      min-height: 620px;
+      align-items: start;
+    }
+
+    .list-panel, .detail-panel, .studio-col {
+      max-height: calc(100vh - 210px);
+    }
+
+    @media (max-width: 980px) {
+      .hub-topbar-in {
+        height: 60px;
+        padding: 0 16px;
+        grid-template-columns: auto 1fr;
+      }
+      .hub-nav {
+        display: none;
+      }
+      .workspace {
+        padding: 12px 16px 96px;
+      }
+      .page-title {
+        font-size: 26px;
+      }
+      .list-panel, .detail-panel, .studio-col {
+        max-height: none;
+      }
+      .mobile-tabbar {
+        left: 0;
+        right: 0;
+        bottom: 0;
+        border-radius: 0;
+        border-left: 0;
+        border-right: 0;
+        border-bottom: 0;
+        padding: 8px 4px calc(8px + env(safe-area-inset-bottom, 0px));
+        background: color-mix(in srgb, var(--bg-solid) 94%, transparent);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+      }
+      .mobile-tab.active {
+        background: transparent;
+        box-shadow: none;
+        color: var(--accent);
+      }
+    }
   </style>
 </head>
 <body>
@@ -2132,6 +2309,61 @@
         </div>
       </div>
     </aside>
+
+    <!-- Kathmere-Style Sticky Top Navigation -->
+    <header class="hub-topbar" aria-label="Primary navigation">
+      <div class="hub-topbar-in">
+        <button class="hub-brand" onclick="switchView('home')" aria-label="Lumen Home">
+          <img src="./assets/icon-192.png?v=5" class="brand-icon-img" alt="" style="width:32px; height:32px; border-radius:9px;" />
+          <span class="hub-brand-text">Lumen</span>
+        </button>
+
+        <nav class="hub-nav">
+          <button class="nav-btn active" data-view="home" aria-current="page">
+            <span class="nav-btn-left">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+              Home
+            </span>
+          </button>
+          <button class="nav-btn" data-view="jobs">
+            <span class="nav-btn-left">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="7" width="20" height="14" rx="3"></rect><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"></path></svg>
+              Jobs
+            </span>
+            <span class="nav-count" id="top-count-jobs"></span>
+          </button>
+          <button class="nav-btn" data-view="people">
+            <span class="nav-btn-left">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle></svg>
+              People
+            </span>
+            <span class="nav-count" id="top-count-people"></span>
+          </button>
+          <button class="nav-btn" data-view="resume">
+            <span class="nav-btn-left">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
+              Resume
+            </span>
+          </button>
+          <button class="nav-btn" data-view="sync">
+            <span class="nav-btn-left">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path><path d="M3 3v5h5"></path></svg>
+              Sync
+            </span>
+          </button>
+        </nav>
+
+        <div class="hub-right">
+          <button class="icon-btn" id="hub-theme-btn" title="Toggle Light/Dark Mode" aria-label="Toggle theme">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+          </button>
+          <button class="btn btn-primary" id="hub-quick-add">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+            <span>New Job</span>
+          </button>
+        </div>
+      </div>
+    </header>
 
     <!-- Main Workspace -->
     <main class="workspace">
@@ -2750,6 +2982,7 @@ Product Design, Design Systems, Interaction Design, Prototyping, Figma, User Res
       const moonIcon = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>`;
       $('#theme-toggle-desktop').innerHTML = isDark ? sunIcon : moonIcon;
       $('#theme-toggle-mobile').innerHTML = isDark ? sunIcon : moonIcon;
+      if ($('#hub-theme-btn')) $('#hub-theme-btn').innerHTML = isDark ? sunIcon : moonIcon;
     }
 
     function toggleTheme() {
@@ -2788,6 +3021,8 @@ Product Design, Design Systems, Interaction Design, Prototyping, Figma, User Res
     function updateSidebarStats() {
       $('#nav-count-jobs').textContent = state.jobs.length;
       $('#nav-count-people').textContent = state.people.length;
+      if ($('#top-count-jobs')) $('#top-count-jobs').textContent = state.jobs.length;
+      if ($('#top-count-people')) $('#top-count-people').textContent = state.people.length;
       const tailoredCount = state.jobs.filter((j) => j.tailoredResume && j.tailoredResume.trim()).length;
       $('#nav-count-resumes').textContent = tailoredCount;
 
@@ -5079,6 +5314,11 @@ Product Design, Design Systems, Interaction Design, Prototyping, Figma, User Res
     );
 
     $('#theme-toggle-desktop').addEventListener('click', toggleTheme);
+    $('#hub-theme-btn')?.addEventListener('click', toggleTheme);
+    $('#hub-quick-add')?.addEventListener('click', () => {
+      if (ui.view === 'people') openPersonModal();
+      else openJobModal();
+    });
     $('#theme-toggle-mobile').addEventListener('click', toggleTheme);
     $$('[data-bg-pick]').forEach((btn) =>
       btn.addEventListener('click', () => {
