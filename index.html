@@ -2731,6 +2731,43 @@
           </div>
         </div>
         <div class="sync-grid">
+          <!-- Your Profile & LinkedIn Personalization -->
+          <div class="sync-card glass" style="grid-column: 1 / -1;">
+            <span class="sync-tag" style="background: var(--accent-soft); color: var(--accent-text);">Personalization</span>
+            <div>
+              <h2 style="font-size: 17px; font-weight: 700; letter-spacing: -0.02em;">Your LinkedIn Profile</h2>
+              <p style="font-size: 13px; color: var(--text-secondary); margin-top: 4px; line-height: 1.5;">
+                Link your LinkedIn profile to personalize your Home greeting, sign off outreach messages with your name, set default job preferences, and keep your profile link handy.
+              </p>
+            </div>
+            <div class="field">
+              <label for="prof-linkedin">Your LinkedIn Profile URL</label>
+              <div style="display:flex; gap:8px;">
+                <input id="prof-linkedin" class="input" type="url" placeholder="https://www.linkedin.com/in/your-name" style="flex:1;" />
+                <button type="button" class="btn btn-sm" id="prof-autofill-btn" style="height:38px; padding:0 14px;">Import from LinkedIn</button>
+              </div>
+              <div id="prof-autofill-status" style="font-size:11.5px; color:var(--accent-text); min-height:15px;"></div>
+            </div>
+            <div class="form-row">
+              <div class="field"><label for="prof-name">Your Name</label><input id="prof-name" class="input" placeholder="Mike Bianchini" /></div>
+              <div class="field"><label for="prof-headline">Target Role / Headline</label><input id="prof-headline" class="input" placeholder="Senior Product Designer" /></div>
+            </div>
+            <div class="form-row">
+              <div class="field"><label for="prof-location">Default Location</label><input id="prof-location" class="input" placeholder="San Francisco, CA" /></div>
+              <div class="field"><label for="prof-mode">Preferred Work Mode</label>
+                <select id="prof-mode" class="select">
+                  <option value="Remote">Remote</option>
+                  <option value="Hybrid">Hybrid</option>
+                  <option value="On-site">On-site</option>
+                </select>
+              </div>
+            </div>
+            <div style="display:flex; gap:8px; flex-wrap:wrap; align-items:center;">
+              <button type="button" class="btn btn-primary btn-sm" id="prof-save-btn">Save Profile</button>
+              <a id="prof-open-link" class="btn btn-sm" href="#" target="_blank" rel="noopener" style="display:none; text-decoration:none;">View My LinkedIn ↗</a>
+            </div>
+          </div>
+
           <!-- Option 1: Google Sheets -->
           <div class="sync-card glass">
             <span class="sync-tag" style="background: var(--green-soft); color: var(--green);">Recommended · Zero Cost</span>
@@ -2977,7 +3014,14 @@ Product Design, Design Systems, Interaction Design, Prototyping, Figma, User Res
           aiApiKey: ''
         },
         weeklyGoal: 5,
-        timeline: []
+        timeline: [],
+        profile: {
+          name: '',
+          headline: '',
+          linkedinUrl: '',
+          preferredMode: 'Hybrid',
+          location: ''
+        }
       };
     }
 
@@ -3018,12 +3062,14 @@ Product Design, Design Systems, Interaction Design, Prototyping, Figma, User Res
 
     window.openOutreachModal = function ({ name = 'there', company = 'your team', role = 'this role', email = '' } = {}) {
       const firstName = (name || 'there').split(/\s+/)[0];
+      const myName = (state.profile?.name || '').trim();
+      const signOff = myName ? `Best,\n${myName}` : 'Best,';
       const templates = [
         {
           id: 'referral',
           label: 'Warm Referral Ask',
           subject: `Quick question about ${role} at ${company}`,
-          body: `Hi ${firstName},\n\nHope you're doing well! I saw the ${role} opening at ${company} and it feels like a really strong match for my background.\n\nSince you're on the team, I'd love to hear your honest take on the group — and if it feels comfortable, I'd be grateful for a referral. Totally understand either way, and happy to send over my tailored resume!\n\nBest,`
+          body: `Hi ${firstName},\n\nHope you're doing well! I saw the ${role} opening at ${company} and it feels like a really strong match for my background.\n\nSince you're on the team, I'd love to hear your honest take on the group — and if it feels comfortable, I'd be grateful for a referral. Totally understand either way, and happy to send over my tailored resume!\n\n${signOff}`
         },
         {
           id: 'recruiter',
@@ -3035,13 +3081,13 @@ Product Design, Design Systems, Interaction Design, Prototyping, Figma, User Res
           id: 'coffee',
           label: 'Coffee Chat (15 min)',
           subject: `Quick 15-min chat about your work at ${company}?`,
-          body: `Hi ${firstName},\n\nI've been following your work at ${company} and really admire what your team has been shipping. I'm currently exploring ${role} opportunities and would love to ask 2–3 quick questions about your experience there.\n\nNo pressure at all — if you have 15 minutes over the next couple weeks, I'd really appreciate it!\n\nBest,`
+          body: `Hi ${firstName},\n\nI've been following your work at ${company} and really admire what your team has been shipping. I'm currently exploring ${role} opportunities and would love to ask 2–3 quick questions about your experience there.\n\nNo pressure at all — if you have 15 minutes over the next couple weeks, I'd really appreciate it!\n\n${signOff}`
         },
         {
           id: 'thankyou',
           label: 'Post-Interview Thank You',
           subject: `Thank you — ${role} conversation`,
-          body: `Hi ${firstName},\n\nThank you so much for taking the time to speak with me about the ${role} role at ${company}. I really enjoyed learning more about the team's priorities and walked away even more excited about the opportunity.\n\nPlease let me know if there's any additional context or work samples I can share. Looking forward to staying in touch!\n\nBest,`
+          body: `Hi ${firstName},\n\nThank you so much for taking the time to speak with me about the ${role} role at ${company}. I really enjoyed learning more about the team's priorities and walked away even more excited about the opportunity.\n\nPlease let me know if there's any additional context or work samples I can share. Looking forward to staying in touch!\n\n${signOff}`
         }
       ];
 
@@ -3100,7 +3146,8 @@ Product Design, Design Systems, Interaction Design, Prototyping, Figma, User Res
         return {
           ...getDefaultState(),
           ...parsed,
-          sync: { ...getDefaultState().sync, ...(parsed.sync || {}) }
+          sync: { ...getDefaultState().sync, ...(parsed.sync || {}) },
+          profile: { ...getDefaultState().profile, ...(parsed.profile || {}) }
         };
       } catch {
         return getDefaultState();
@@ -3269,12 +3316,14 @@ Product Design, Design Systems, Interaction Design, Prototyping, Figma, User Res
        ========================================================================== */
     function renderHome() {
       const hour = new Date().getHours();
+      const firstName = (state.profile?.name || '').trim().split(/\s+/)[0];
+      const namePart = firstName ? `, ${firstName}` : '';
       const greeting =
         hour < 12
-          ? "Good morning — let's find your next home."
+          ? `Good morning${namePart} — let's find your next home.`
           : hour < 18
-          ? 'Good afternoon — one thoughtful step at a time.'
-          : "Good evening — celebrate how far you've come.";
+          ? `Good afternoon${namePart} — one thoughtful step at a time.`
+          : `Good evening${namePart} — celebrate how far you've come.`;
       const todayLabel = new Date().toLocaleDateString(undefined, { weekday: 'long', month: 'long', day: 'numeric' });
 
       const activeJobs = state.jobs.filter((j) => j.status !== 'Archived');
@@ -3333,6 +3382,9 @@ Product Design, Design Systems, Interaction Design, Prototyping, Figma, User Res
               <button class="btn btn-primary btn-sm" id="home-add-job">+ Add Job</button>
               <button class="btn btn-sm" id="home-add-person">+ Add Person</button>
               <button class="btn btn-sm" id="home-open-resume">Tailor Resume</button>
+              ${state.profile?.linkedinUrl
+                ? `<a class="btn btn-ghost btn-sm" href="${esc(state.profile.linkedinUrl)}" target="_blank" rel="noopener" style="text-decoration:none;">My LinkedIn ↗</a>`
+                : `<button class="btn btn-ghost btn-sm" id="home-link-linkedin">Link LinkedIn →</button>`}
             </div>
           </div>
         </div>
@@ -3709,6 +3761,7 @@ Product Design, Design Systems, Interaction Design, Prototyping, Figma, User Res
       $('#home-add-job').addEventListener('click', () => openJobModal());
       $('#home-add-person').addEventListener('click', () => openPersonModal());
       $('#home-open-resume').addEventListener('click', () => switchView('resume'));
+      $('#home-link-linkedin')?.addEventListener('click', () => switchView('sync'));
       $('#home-view-all-jobs')?.addEventListener('click', () => {
         ui.jobFilter = 'All';
         switchView('jobs');
@@ -4944,6 +4997,7 @@ Product Design, Design Systems, Interaction Design, Prototyping, Figma, User Res
         jobs: state.jobs,
         people: state.people,
         timeline: state.timeline || [],
+        profile: state.profile || {},
         baseResume: state.baseResume,
         baseResumeName: state.baseResumeName,
         updatedAt: state.updatedAt || new Date().toISOString()
@@ -4959,6 +5013,7 @@ Product Design, Design Systems, Interaction Design, Prototyping, Figma, User Res
       if (Array.isArray(data.jobs)) state.jobs = data.jobs;
       if (Array.isArray(data.people)) state.people = data.people;
       if (Array.isArray(data.timeline)) state.timeline = data.timeline;
+      if (data.profile && typeof data.profile === 'object') state.profile = { ...state.profile, ...data.profile };
       if (typeof data.baseResume === 'string') state.baseResume = data.baseResume;
       if (typeof data.baseResumeName === 'string') state.baseResumeName = data.baseResumeName;
       state.updatedAt = data.updatedAt || new Date().toISOString();
@@ -5046,6 +5101,17 @@ Product Design, Design Systems, Interaction Design, Prototyping, Figma, User Res
     }
 
     function renderSyncView() {
+      const prof = state.profile || {};
+      if ($('#prof-linkedin')) $('#prof-linkedin').value = prof.linkedinUrl || '';
+      if ($('#prof-name')) $('#prof-name').value = prof.name || '';
+      if ($('#prof-headline')) $('#prof-headline').value = prof.headline || '';
+      if ($('#prof-location')) $('#prof-location').value = prof.location || '';
+      if ($('#prof-mode')) $('#prof-mode').value = prof.preferredMode || 'Hybrid';
+      const openLink = $('#prof-open-link');
+      if (openLink) {
+        openLink.style.display = prof.linkedinUrl ? '' : 'none';
+        if (prof.linkedinUrl) openLink.href = prof.linkedinUrl;
+      }
       $('#gsheets-url').value = state.sync.gsheetsUrl || '';
       $('#supa-url').value = state.sync.supaUrl || '';
       $('#supa-key').value = state.sync.supaKey || '';
@@ -5282,7 +5348,7 @@ Product Design, Design Systems, Interaction Design, Prototyping, Figma, User Res
 
     window.openJobModal = function (existing = null) {
       const j = existing || {
-        company: '', role: '', level: '', status: 'Applied', comp: '', location: '', workMode: 'Hybrid',
+        company: '', role: '', level: '', status: 'Applied', comp: '', location: state.profile?.location || '', workMode: state.profile?.preferredMode || 'Hybrid',
         url: '', appliedDate: new Date().toISOString().slice(0, 10), nextStepDate: '', jd: '', notes: ''
       };
       openModal(`
@@ -5831,6 +5897,59 @@ Product Design, Design Systems, Interaction Design, Prototyping, Figma, User Res
     });
 
     // Sync events
+    async function importMyLinkedIn() {
+      const url = $('#prof-linkedin').value.trim();
+      if (!url) return toast('Paste your LinkedIn profile URL first');
+      const btn = $('#prof-autofill-btn');
+      const status = $('#prof-autofill-status');
+      btn.disabled = true;
+      btn.textContent = 'Importing…';
+      status.textContent = 'Reading your LinkedIn profile…';
+      try {
+        const info = await fetchPersonDetailsFromLinkedIn(url);
+        if (info.name) $('#prof-name').value = info.name;
+        if (info.title) $('#prof-headline').value = info.title;
+        state.profile = {
+          ...(state.profile || {}),
+          linkedinUrl: url,
+          name: $('#prof-name').value.trim(),
+          headline: $('#prof-headline').value.trim(),
+          location: $('#prof-location').value.trim(),
+          preferredMode: $('#prof-mode').value
+        };
+        saveState();
+        renderSyncView();
+        status.textContent = info.name
+          ? `Linked as ${info.name}${info.title ? ' · ' + info.title : ''}! Lumen is now personalized for you.`
+          : 'LinkedIn URL saved! Add your name and headline below.';
+        toast('LinkedIn profile linked');
+      } catch {
+        status.textContent = 'Saved your LinkedIn URL — fill in your name & headline below.';
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Import from LinkedIn';
+      }
+    }
+
+    $('#prof-autofill-btn')?.addEventListener('click', importMyLinkedIn);
+    $('#prof-linkedin')?.addEventListener('paste', () => {
+      setTimeout(() => {
+        if (/^https?:\/\//i.test($('#prof-linkedin').value.trim())) importMyLinkedIn();
+      }, 40);
+    });
+    $('#prof-save-btn')?.addEventListener('click', () => {
+      state.profile = {
+        linkedinUrl: $('#prof-linkedin').value.trim(),
+        name: $('#prof-name').value.trim(),
+        headline: $('#prof-headline').value.trim(),
+        location: $('#prof-location').value.trim(),
+        preferredMode: $('#prof-mode').value
+      };
+      saveState();
+      renderSyncView();
+      toast('Profile saved — Lumen personalized');
+    });
+
     $('#gsheets-push-btn').addEventListener('click', pushToGoogleSheets);
     $('#gsheets-pull-btn').addEventListener('click', pullFromGoogleSheets);
     $('#gsheets-script-btn').addEventListener('click', () => {
