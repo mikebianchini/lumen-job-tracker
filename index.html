@@ -1,0 +1,3392 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>Lumen — Job Tracker &amp; Career Studio</title>
+  <meta name="description" content="Lumen is a calm, Apple Liquid Glass web app for tracking job applications, networking contacts, and tailoring resumes per role." />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <link rel="manifest" href="./manifest.json" />
+  <style>
+    /* ==========================================================================
+       LUMEN — Apple Liquid Glass Design System
+       ========================================================================== */
+    :root {
+      --font-sans: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      --font-mono: ui-monospace, "SF Mono", SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+
+      /* Light Mode Palette — Pearlescent Glass */
+      --bg-canvas: #eef2f8;
+      --orb-1: rgba(110, 178, 255, 0.38);
+      --orb-2: rgba(168, 224, 245, 0.42);
+      --orb-3: rgba(255, 222, 198, 0.34);
+
+      --glass-bg: rgba(255, 255, 255, 0.58);
+      --glass-bg-elevated: rgba(255, 255, 255, 0.76);
+      --glass-bg-subtle: rgba(255, 255, 255, 0.38);
+      --glass-bg-hover: rgba(255, 255, 255, 0.84);
+      --glass-border: rgba(255, 255, 255, 0.72);
+      --glass-border-subtle: rgba(15, 23, 42, 0.08);
+      --glass-highlight: inset 0 1px 0 rgba(255, 255, 255, 0.88), inset 0 -1px 0 rgba(15, 23, 42, 0.04);
+      --glass-shadow: 0 12px 36px -8px rgba(15, 23, 42, 0.09), 0 2px 8px rgba(15, 23, 42, 0.04);
+      --glass-shadow-lg: 0 24px 64px -12px rgba(15, 23, 42, 0.16), 0 4px 16px rgba(15, 23, 42, 0.06);
+
+      --text-primary: #0f172a;
+      --text-secondary: rgba(15, 23, 42, 0.64);
+      --text-tertiary: rgba(15, 23, 42, 0.44);
+
+      --accent: #007aff;
+      --accent-soft: rgba(0, 122, 255, 0.12);
+      --accent-text: #0066d6;
+      --green: #24a148;
+      --green-soft: rgba(36, 161, 72, 0.13);
+      --amber: #d97706;
+      --amber-soft: rgba(217, 119, 6, 0.13);
+      --red: #e03131;
+      --red-soft: rgba(224, 49, 49, 0.12);
+      --teal: #0d9488;
+      --teal-soft: rgba(13, 148, 136, 0.13);
+      --slate: #475569;
+      --slate-soft: rgba(71, 85, 105, 0.12);
+
+      --input-bg: rgba(255, 255, 255, 0.62);
+      --input-border: rgba(15, 23, 42, 0.11);
+      --divider: rgba(15, 23, 42, 0.075);
+
+      --radius-xl: 26px;
+      --radius-lg: 20px;
+      --radius-md: 14px;
+      --radius-sm: 10px;
+      --radius-pill: 999px;
+
+      --ease-spring: cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    [data-theme="dark"] {
+      --bg-canvas: #0b0f17;
+      --orb-1: rgba(10, 132, 255, 0.22);
+      --orb-2: rgba(56, 189, 248, 0.14);
+      --orb-3: rgba(148, 163, 184, 0.12);
+
+      --glass-bg: rgba(24, 30, 42, 0.62);
+      --glass-bg-elevated: rgba(30, 38, 52, 0.78);
+      --glass-bg-subtle: rgba(255, 255, 255, 0.05);
+      --glass-bg-hover: rgba(255, 255, 255, 0.1);
+      --glass-border: rgba(255, 255, 255, 0.14);
+      --glass-border-subtle: rgba(255, 255, 255, 0.08);
+      --glass-highlight: inset 0 1px 0 rgba(255, 255, 255, 0.18), inset 0 -1px 0 rgba(0, 0, 0, 0.3);
+      --glass-shadow: 0 14px 40px -8px rgba(0, 0, 0, 0.45), 0 2px 8px rgba(0, 0, 0, 0.28);
+      --glass-shadow-lg: 0 28px 72px -12px rgba(0, 0, 0, 0.65), 0 4px 16px rgba(0, 0, 0, 0.4);
+
+      --text-primary: #f5f7fb;
+      --text-secondary: rgba(245, 247, 251, 0.68);
+      --text-tertiary: rgba(245, 247, 251, 0.44);
+
+      --accent: #0a84ff;
+      --accent-soft: rgba(10, 132, 255, 0.2);
+      --accent-text: #5ac8fa;
+      --green: #30d158;
+      --green-soft: rgba(48, 209, 88, 0.18);
+      --amber: #ff9f0a;
+      --amber-soft: rgba(255, 159, 10, 0.18);
+      --red: #ff453a;
+      --red-soft: rgba(255, 69, 58, 0.18);
+      --teal: #5eead4;
+      --teal-soft: rgba(94, 234, 212, 0.16);
+      --slate: #94a3b8;
+      --slate-soft: rgba(148, 163, 184, 0.16);
+
+      --input-bg: rgba(15, 20, 30, 0.55);
+      --input-border: rgba(255, 255, 255, 0.13);
+      --divider: rgba(255, 255, 255, 0.08);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html, body {
+      height: 100%;
+      font-family: var(--font-sans);
+      color: var(--text-primary);
+      background: var(--bg-canvas);
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      overflow-x: hidden;
+    }
+
+    /* Ambient Liquid Glass Canvas */
+    .ambient-backdrop {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      overflow: hidden;
+      pointer-events: none;
+      background: var(--bg-canvas);
+      transition: background 0.5s var(--ease-spring);
+    }
+
+    .ambient-orb {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(84px);
+      opacity: 0.9;
+      will-change: transform;
+      animation: drift 22s ease-in-out infinite alternate;
+    }
+
+    .orb-1 { width: 54vw; height: 54vw; max-width: 720px; max-height: 720px; top: -16%; left: -10%; background: var(--orb-1); }
+    .orb-2 { width: 48vw; height: 48vw; max-width: 660px; max-height: 660px; bottom: -18%; right: -8%; background: var(--orb-2); animation-delay: -7s; }
+    .orb-3 { width: 38vw; height: 38vw; max-width: 520px; max-height: 520px; top: 32%; left: 42%; background: var(--orb-3); animation-delay: -13s; }
+
+    @keyframes drift {
+      0% { transform: translate3d(0, 0, 0) scale(1); }
+      100% { transform: translate3d(3%, 4%, 0) scale(1.06); }
+    }
+
+    /* Liquid Glass Surface Primitive */
+    .glass {
+      background: var(--glass-bg);
+      backdrop-filter: blur(28px) saturate(185%);
+      -webkit-backdrop-filter: blur(28px) saturate(185%);
+      border: 1px solid var(--glass-border);
+      box-shadow: var(--glass-highlight), var(--glass-shadow);
+    }
+
+    .glass-elevated {
+      background: var(--glass-bg-elevated);
+      backdrop-filter: blur(36px) saturate(200%);
+      -webkit-backdrop-filter: blur(36px) saturate(200%);
+      border: 1px solid var(--glass-border);
+      box-shadow: var(--glass-highlight), var(--glass-shadow-lg);
+    }
+
+    /* App Shell */
+    .app-shell {
+      position: relative;
+      z-index: 1;
+      display: grid;
+      grid-template-columns: 244px 1fr;
+      gap: 16px;
+      height: 100vh;
+      max-width: 1600px;
+      margin: 0 auto;
+      padding: 16px;
+    }
+
+    /* Sidebar */
+    .sidebar {
+      border-radius: var(--radius-xl);
+      padding: 18px 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+      min-height: 0;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 4px 8px;
+    }
+
+    .brand-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .brand-mark {
+      width: 32px;
+      height: 32px;
+      border-radius: 10px;
+      background: linear-gradient(145deg, rgba(255,255,255,0.9), rgba(0,122,255,0.22));
+      border: 1px solid var(--glass-border);
+      box-shadow: inset 0 1px 1px rgba(255,255,255,0.9), 0 4px 12px rgba(0,122,255,0.22);
+      display: grid;
+      place-items: center;
+      color: var(--accent);
+      flex-shrink: 0;
+    }
+
+    [data-theme="dark"] .brand-mark {
+      background: linear-gradient(145deg, rgba(255,255,255,0.16), rgba(10,132,255,0.34));
+      box-shadow: inset 0 1px 1px rgba(255,255,255,0.25), 0 4px 14px rgba(10,132,255,0.28);
+    }
+
+    .brand-name {
+      font-size: 18px;
+      font-weight: 650;
+      letter-spacing: -0.025em;
+    }
+
+    .icon-btn {
+      width: 34px;
+      height: 34px;
+      border-radius: var(--radius-pill);
+      border: 1px solid var(--glass-border-subtle);
+      background: var(--glass-bg-subtle);
+      color: var(--text-secondary);
+      display: inline-grid;
+      place-items: center;
+      cursor: pointer;
+      transition: all 0.2s var(--ease-spring);
+    }
+
+    .icon-btn:hover {
+      background: var(--glass-bg-hover);
+      color: var(--text-primary);
+      transform: scale(1.04);
+    }
+
+    .nav-group {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .nav-btn {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+      padding: 10px 12px;
+      border-radius: var(--radius-md);
+      border: 1px solid transparent;
+      background: transparent;
+      color: var(--text-secondary);
+      font-family: inherit;
+      font-size: 14px;
+      font-weight: 520;
+      cursor: pointer;
+      transition: all 0.22s var(--ease-spring);
+      text-align: left;
+    }
+
+    .nav-btn-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .nav-btn:hover {
+      background: var(--glass-bg-subtle);
+      color: var(--text-primary);
+    }
+
+    .nav-btn.active {
+      background: var(--glass-bg-elevated);
+      border-color: var(--glass-border);
+      box-shadow: var(--glass-highlight), 0 4px 14px rgba(15, 23, 42, 0.06);
+      color: var(--text-primary);
+      font-weight: 600;
+    }
+
+    .nav-btn.active svg {
+      color: var(--accent);
+    }
+
+    .nav-count {
+      font-size: 12px;
+      font-weight: 600;
+      font-variant-numeric: tabular-nums;
+      color: var(--text-tertiary);
+      padding: 2px 7px;
+      border-radius: var(--radius-pill);
+      background: var(--glass-bg-subtle);
+    }
+
+    .nav-btn.active .nav-count {
+      background: var(--accent-soft);
+      color: var(--accent-text);
+    }
+
+    .sidebar-section-label {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: var(--text-tertiary);
+      padding: 0 12px;
+      margin-top: 6px;
+    }
+
+    .momentum-card {
+      margin-top: auto;
+      padding: 14px;
+      border-radius: var(--radius-lg);
+      background: var(--glass-bg-subtle);
+      border: 1px solid var(--glass-border-subtle);
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .momentum-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+    }
+
+    .momentum-title {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-secondary);
+    }
+
+    .momentum-val {
+      font-size: 18px;
+      font-weight: 650;
+      font-variant-numeric: tabular-nums;
+      letter-spacing: -0.02em;
+    }
+
+    .momentum-bar {
+      height: 6px;
+      border-radius: var(--radius-pill);
+      background: var(--divider);
+      overflow: hidden;
+    }
+
+    .momentum-fill {
+      height: 100%;
+      border-radius: var(--radius-pill);
+      background: linear-gradient(90deg, var(--accent), #38bdf8);
+      transition: width 0.5s var(--ease-spring);
+    }
+
+    .momentum-sub {
+      font-size: 12px;
+      color: var(--text-tertiary);
+      display: flex;
+      justify-content: space-between;
+    }
+
+    /* Main Workspace */
+    .workspace {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      min-width: 0;
+      min-height: 0;
+    }
+
+    /* Top Glass Header */
+    .topbar {
+      border-radius: var(--radius-xl);
+      padding: 12px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-shrink: 0;
+    }
+
+    .topbar-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-width: 0;
+    }
+
+    .page-title {
+      font-size: 20px;
+      font-weight: 680;
+      letter-spacing: -0.03em;
+      white-space: nowrap;
+    }
+
+    .search-wrap {
+      position: relative;
+      width: 280px;
+      max-width: 100%;
+    }
+
+    .search-wrap svg {
+      position: absolute;
+      left: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-tertiary);
+      pointer-events: none;
+    }
+
+    .search-input {
+      width: 100%;
+      height: 36px;
+      padding: 0 38px 0 36px;
+      border-radius: var(--radius-pill);
+      border: 1px solid var(--input-border);
+      background: var(--input-bg);
+      color: var(--text-primary);
+      font-family: inherit;
+      font-size: 13.5px;
+      outline: none;
+      transition: all 0.2s var(--ease-spring);
+    }
+
+    .search-input:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px var(--accent-soft);
+      background: var(--glass-bg-elevated);
+    }
+
+    .search-kbd {
+      position: absolute;
+      right: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 11px;
+      font-family: var(--font-mono);
+      color: var(--text-tertiary);
+      padding: 2px 5px;
+      border-radius: 5px;
+      border: 1px solid var(--divider);
+      pointer-events: none;
+    }
+
+    .topbar-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-shrink: 0;
+    }
+
+    /* Buttons */
+    .btn {
+      height: 36px;
+      padding: 0 15px;
+      border-radius: var(--radius-pill);
+      border: 1px solid var(--glass-border-subtle);
+      background: var(--glass-bg-elevated);
+      color: var(--text-primary);
+      font-family: inherit;
+      font-size: 13.5px;
+      font-weight: 560;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      cursor: pointer;
+      transition: all 0.2s var(--ease-spring);
+      white-space: nowrap;
+    }
+
+    .btn:hover {
+      transform: translateY(-1px);
+      background: var(--glass-bg-hover);
+      box-shadow: 0 6px 18px rgba(15, 23, 42, 0.08);
+    }
+
+    .btn:active {
+      transform: scale(0.98);
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      border-color: transparent;
+      color: #ffffff;
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.32), 0 6px 18px rgba(0, 122, 255, 0.32);
+    }
+
+    .btn-primary:hover {
+      background: #0070eb;
+      color: #ffffff;
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.36), 0 8px 22px rgba(0, 122, 255, 0.4);
+    }
+
+    .btn-ghost {
+      background: transparent;
+      border-color: transparent;
+      color: var(--text-secondary);
+    }
+
+    .btn-ghost:hover {
+      background: var(--glass-bg-subtle);
+      color: var(--text-primary);
+      box-shadow: none;
+    }
+
+    .btn-danger {
+      color: var(--red);
+      background: var(--red-soft);
+      border-color: transparent;
+    }
+
+    .btn-danger:hover {
+      background: rgba(224, 49, 49, 0.2);
+    }
+
+    .btn-sm {
+      height: 30px;
+      padding: 0 11px;
+      font-size: 12.5px;
+    }
+
+    /* Views */
+    .view {
+      display: none;
+      flex: 1;
+      min-height: 0;
+    }
+
+    .view.active {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    /* Filter Pills Row */
+    .filter-bar {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      overflow-x: auto;
+      padding: 2px 2px 4px;
+      scrollbar-width: none;
+      flex-shrink: 0;
+    }
+    .filter-bar::-webkit-scrollbar { display: none; }
+
+    .pill {
+      padding: 6px 13px;
+      border-radius: var(--radius-pill);
+      border: 1px solid var(--glass-border-subtle);
+      background: var(--glass-bg);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      color: var(--text-secondary);
+      font-family: inherit;
+      font-size: 12.5px;
+      font-weight: 560;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all 0.2s var(--ease-spring);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .pill:hover {
+      background: var(--glass-bg-elevated);
+      color: var(--text-primary);
+    }
+
+    .pill.active {
+      background: var(--text-primary);
+      color: var(--bg-canvas);
+      border-color: transparent;
+      box-shadow: 0 4px 12px rgba(15, 23, 42, 0.16);
+    }
+
+    .pill-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+    }
+
+    /* Master-Detail Split */
+    .split-pane {
+      display: grid;
+      grid-template-columns: minmax(320px, 410px) 1fr;
+      gap: 14px;
+      flex: 1;
+      min-height: 0;
+    }
+
+    .list-panel {
+      border-radius: var(--radius-xl);
+      padding: 10px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      min-height: 0;
+    }
+
+    .detail-panel {
+      border-radius: var(--radius-xl);
+      padding: 24px 26px;
+      overflow-y: auto;
+      min-height: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    /* List Cards */
+    .item-card {
+      padding: 14px;
+      border-radius: var(--radius-lg);
+      border: 1px solid transparent;
+      background: var(--glass-bg-subtle);
+      cursor: pointer;
+      transition: all 0.22s var(--ease-spring);
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .item-card:hover {
+      background: var(--glass-bg-elevated);
+      border-color: var(--glass-border-subtle);
+      transform: translateY(-1px);
+    }
+
+    .item-card.selected {
+      background: var(--glass-bg-elevated);
+      border-color: var(--accent);
+      box-shadow: 0 0 0 1px var(--accent-soft), 0 8px 24px rgba(0, 122, 255, 0.12);
+    }
+
+    .item-card-top {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .item-identity {
+      display: flex;
+      align-items: center;
+      gap: 11px;
+      min-width: 0;
+    }
+
+    .monogram {
+      width: 38px;
+      height: 38px;
+      border-radius: 12px;
+      display: grid;
+      place-items: center;
+      font-weight: 680;
+      font-size: 14px;
+      letter-spacing: -0.02em;
+      flex-shrink: 0;
+      border: 1px solid var(--glass-border);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.45);
+    }
+
+    .avatar-circle {
+      border-radius: 50%;
+    }
+
+    .item-title {
+      font-size: 14.5px;
+      font-weight: 630;
+      letter-spacing: -0.015em;
+      color: var(--text-primary);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .item-subtitle {
+      font-size: 12.5px;
+      color: var(--text-secondary);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      margin-top: 1px;
+    }
+
+    .item-meta-row {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      color: var(--text-secondary);
+    }
+
+    /* Badges & Status Chips */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 3px 9px;
+      border-radius: var(--radius-pill);
+      font-size: 11.5px;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+
+    .badge-saved { background: var(--slate-soft); color: var(--slate); }
+    .badge-applied { background: var(--accent-soft); color: var(--accent-text); }
+    .badge-screening { background: var(--teal-soft); color: var(--teal); }
+    .badge-interviewing { background: var(--amber-soft); color: var(--amber); }
+    .badge-offer { background: var(--green-soft); color: var(--green); }
+    .badge-archived { background: var(--red-soft); color: var(--red); }
+
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 3px 9px;
+      border-radius: var(--radius-pill);
+      background: var(--glass-bg-subtle);
+      border: 1px solid var(--divider);
+      font-size: 11.5px;
+      color: var(--text-secondary);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .chip-clickable {
+      cursor: pointer;
+      transition: all 0.18s var(--ease-spring);
+    }
+
+    .chip-clickable:hover {
+      background: var(--accent-soft);
+      border-color: transparent;
+      color: var(--accent-text);
+    }
+
+    /* Detail Inspector Sections */
+    .detail-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 16px;
+      padding-bottom: 18px;
+      border-bottom: 1px solid var(--divider);
+    }
+
+    .detail-title-group {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      min-width: 0;
+    }
+
+    .detail-monogram {
+      width: 50px;
+      height: 50px;
+      border-radius: 15px;
+      font-size: 18px;
+    }
+
+    .detail-title {
+      font-size: 22px;
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      line-height: 1.2;
+    }
+
+    .detail-company {
+      font-size: 14.5px;
+      color: var(--text-secondary);
+      margin-top: 3px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .detail-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-shrink: 0;
+    }
+
+    .meta-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 10px;
+    }
+
+    .meta-tile {
+      padding: 12px 14px;
+      border-radius: var(--radius-md);
+      background: var(--glass-bg-subtle);
+      border: 1px solid var(--divider);
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .meta-label {
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: var(--text-tertiary);
+    }
+
+    .meta-value {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-primary);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .section-block {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .section-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .section-title {
+      font-size: 13.5px;
+      font-weight: 650;
+      letter-spacing: -0.01em;
+      color: var(--text-primary);
+      display: flex;
+      align-items: center;
+      gap: 7px;
+    }
+
+    .linked-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .linked-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 7px 12px;
+      border-radius: var(--radius-pill);
+      background: var(--glass-bg-subtle);
+      border: 1px solid var(--divider);
+      font-size: 13px;
+      font-weight: 540;
+      color: var(--text-primary);
+      cursor: pointer;
+      transition: all 0.2s var(--ease-spring);
+    }
+
+    .linked-pill:hover {
+      background: var(--glass-bg-hover);
+      border-color: var(--accent);
+    }
+
+    .linked-pill .unlink-x {
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      border: none;
+      background: transparent;
+      color: var(--text-tertiary);
+      display: grid;
+      place-items: center;
+      cursor: pointer;
+      font-size: 13px;
+    }
+
+    .linked-pill .unlink-x:hover {
+      background: var(--red-soft);
+      color: var(--red);
+    }
+
+    .resume-callout {
+      padding: 16px 18px;
+      border-radius: var(--radius-lg);
+      background: linear-gradient(135deg, var(--accent-soft), var(--glass-bg-subtle));
+      border: 1px solid var(--glass-border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      flex-wrap: wrap;
+    }
+
+    .notes-area {
+      width: 100%;
+      min-height: 110px;
+      padding: 13px 15px;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--input-border);
+      background: var(--input-bg);
+      color: var(--text-primary);
+      font-family: inherit;
+      font-size: 13.5px;
+      line-height: 1.55;
+      resize: vertical;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .notes-area:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px var(--accent-soft);
+    }
+
+    /* Resume Studio Layout */
+    .studio-grid {
+      display: grid;
+      grid-template-columns: 360px 1fr;
+      gap: 14px;
+      flex: 1;
+      min-height: 0;
+    }
+
+    .studio-col {
+      border-radius: var(--radius-xl);
+      padding: 20px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      min-height: 0;
+    }
+
+    .dropzone {
+      border: 1.5px dashed var(--input-border);
+      border-radius: var(--radius-lg);
+      padding: 22px 16px;
+      text-align: center;
+      background: var(--glass-bg-subtle);
+      cursor: pointer;
+      transition: all 0.22s var(--ease-spring);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .dropzone:hover, .dropzone.dragover {
+      border-color: var(--accent);
+      background: var(--accent-soft);
+    }
+
+    .score-card {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 16px;
+      border-radius: var(--radius-lg);
+      background: var(--glass-bg-subtle);
+      border: 1px solid var(--divider);
+    }
+
+    .score-ring {
+      position: relative;
+      width: 68px;
+      height: 68px;
+      flex-shrink: 0;
+    }
+
+    .score-ring svg {
+      transform: rotate(-90deg);
+      width: 68px;
+      height: 68px;
+    }
+
+    .score-ring-val {
+      position: absolute;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      font-size: 16px;
+      font-weight: 720;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .kw-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .kw-pill {
+      padding: 4px 10px;
+      border-radius: var(--radius-pill);
+      font-size: 12px;
+      font-weight: 560;
+      border: 1px solid transparent;
+    }
+
+    .kw-match { background: var(--green-soft); color: var(--green); }
+    .kw-miss { background: var(--amber-soft); color: var(--amber); cursor: pointer; transition: transform 0.15s; }
+    .kw-miss:hover { transform: scale(1.04); }
+
+    .resume-editor {
+      flex: 1;
+      min-height: 360px;
+      width: 100%;
+      padding: 18px 20px;
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--input-border);
+      background: var(--input-bg);
+      color: var(--text-primary);
+      font-family: var(--font-sans);
+      font-size: 13.5px;
+      line-height: 1.65;
+      resize: none;
+      outline: none;
+    }
+
+    .resume-editor:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px var(--accent-soft);
+    }
+
+    /* Sync View */
+    .sync-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(310px, 1fr));
+      gap: 14px;
+      overflow-y: auto;
+      padding-bottom: 24px;
+    }
+
+    .sync-card {
+      border-radius: var(--radius-xl);
+      padding: 22px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .sync-tag {
+      font-size: 11px;
+      font-weight: 650;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      padding: 3px 9px;
+      border-radius: var(--radius-pill);
+      align-self: flex-start;
+    }
+
+    /* Forms & Modals */
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .field label {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-secondary);
+    }
+
+    .input, .select {
+      height: 38px;
+      padding: 0 12px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--input-border);
+      background: var(--input-bg);
+      color: var(--text-primary);
+      font-family: inherit;
+      font-size: 13.5px;
+      outline: none;
+      transition: all 0.2s;
+      width: 100%;
+    }
+
+    .input:focus, .select:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px var(--accent-soft);
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      z-index: 100;
+      background: rgba(10, 15, 28, 0.36);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .modal-backdrop.open {
+      display: flex;
+      animation: fadeIn 0.2s ease-out;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    .modal {
+      width: 100%;
+      max-width: 560px;
+      max-height: 88vh;
+      border-radius: var(--radius-xl);
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      overflow-y: auto;
+      animation: popUp 0.28s var(--ease-spring);
+    }
+
+    @keyframes popUp {
+      from { opacity: 0; transform: translateY(14px) scale(0.97); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    .modal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .modal-title {
+      font-size: 18px;
+      font-weight: 680;
+      letter-spacing: -0.02em;
+    }
+
+    .modal-footer {
+      display: flex;
+      justify-content: flex-end;
+      gap: 8px;
+      padding-top: 8px;
+      border-top: 1px solid var(--divider);
+    }
+
+    /* Empty States */
+    .empty-state {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      gap: 10px;
+      padding: 40px 24px;
+      color: var(--text-secondary);
+    }
+
+    .empty-icon {
+      width: 52px;
+      height: 52px;
+      border-radius: 16px;
+      background: var(--glass-bg-subtle);
+      border: 1px solid var(--divider);
+      display: grid;
+      place-items: center;
+      color: var(--text-tertiary);
+    }
+
+    /* Toast Notification */
+    .toast {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%) translateY(20px);
+      z-index: 200;
+      padding: 10px 18px;
+      border-radius: var(--radius-pill);
+      font-size: 13.5px;
+      font-weight: 560;
+      opacity: 0;
+      pointer-events: none;
+      transition: all 0.28s var(--ease-spring);
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    /* Mobile Floating Liquid Glass Tab Bar */
+    .mobile-tabbar {
+      display: none;
+    }
+
+    .mobile-back-btn {
+      display: none;
+    }
+
+    /* Code block in modal */
+    .code-box {
+      background: var(--input-bg);
+      border: 1px solid var(--input-border);
+      border-radius: var(--radius-md);
+      padding: 12px;
+      font-family: var(--font-mono);
+      font-size: 12px;
+      line-height: 1.5;
+      overflow-x: auto;
+      max-height: 260px;
+      white-space: pre;
+      color: var(--text-primary);
+    }
+
+    /* Print / PDF Export Stylesheet */
+    #print-resume-sheet {
+      display: none;
+    }
+
+    @media print {
+      body * { visibility: hidden; }
+      #print-resume-sheet, #print-resume-sheet * { visibility: visible; }
+      #print-resume-sheet {
+        display: block !important;
+        position: fixed;
+        inset: 0;
+        background: #ffffff;
+        color: #111827;
+        padding: 36px 44px;
+        font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif;
+        font-size: 11pt;
+        line-height: 1.48;
+        white-space: pre-wrap;
+      }
+    }
+
+    /* Responsive Mobile & Tablet */
+    @media (max-width: 980px) {
+      .app-shell {
+        grid-template-columns: 1fr;
+        padding: 10px 10px 88px;
+        gap: 10px;
+      }
+
+      .sidebar {
+        display: none;
+      }
+
+      .topbar {
+        padding: 10px 12px;
+        border-radius: var(--radius-lg);
+      }
+
+      .search-wrap {
+        width: 170px;
+      }
+
+      .search-kbd {
+        display: none;
+      }
+
+      .split-pane {
+        grid-template-columns: 1fr;
+      }
+
+      .split-pane.detail-open .list-panel {
+        display: none;
+      }
+
+      .split-pane:not(.detail-open) .detail-panel {
+        display: none;
+      }
+
+      .mobile-back-btn {
+        display: inline-flex;
+      }
+
+      .studio-grid {
+        grid-template-columns: 1fr;
+        overflow-y: auto;
+      }
+
+      .studio-col {
+        overflow-y: visible;
+      }
+
+      .form-row {
+        grid-template-columns: 1fr;
+      }
+
+      .mobile-tabbar {
+        position: fixed;
+        bottom: max(12px, env(safe-area-inset-bottom));
+        left: 14px;
+        right: 14px;
+        z-index: 60;
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        padding: 6px;
+        border-radius: var(--radius-pill);
+      }
+
+      .mobile-tab {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 3px;
+        padding: 7px 4px;
+        border-radius: var(--radius-pill);
+        border: none;
+        background: transparent;
+        color: var(--text-secondary);
+        font-family: inherit;
+        font-size: 11px;
+        font-weight: 580;
+        cursor: pointer;
+        transition: all 0.2s var(--ease-spring);
+      }
+
+      .mobile-tab.active {
+        background: var(--glass-bg-elevated);
+        color: var(--accent);
+        box-shadow: var(--glass-highlight), 0 4px 12px rgba(15, 23, 42, 0.1);
+      }
+
+      .toast {
+        bottom: 88px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Ambient Luminous Canvas -->
+  <div class="ambient-backdrop" aria-hidden="true">
+    <div class="ambient-orb orb-1"></div>
+    <div class="ambient-orb orb-2"></div>
+    <div class="ambient-orb orb-3"></div>
+  </div>
+
+  <!-- Main Application Shell -->
+  <div class="app-shell">
+    <!-- Desktop Liquid Glass Sidebar -->
+    <aside class="sidebar glass" aria-label="Primary navigation">
+      <div class="brand">
+        <div class="brand-left">
+          <div class="brand-mark" aria-hidden="true">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="5"></circle>
+              <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"></path>
+            </svg>
+          </div>
+          <span class="brand-name">Lumen</span>
+        </div>
+        <button class="icon-btn" id="theme-toggle-desktop" title="Toggle Light/Dark Mode" aria-label="Toggle theme">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+          </svg>
+        </button>
+      </div>
+
+      <nav class="nav-group">
+        <button class="nav-btn active" data-view="jobs">
+          <span class="nav-btn-left">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="3"></rect><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"></path></svg>
+            Jobs
+          </span>
+          <span class="nav-count" id="nav-count-jobs">0</span>
+        </button>
+        <button class="nav-btn" data-view="people">
+          <span class="nav-btn-left">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+            People
+          </span>
+          <span class="nav-count" id="nav-count-people">0</span>
+        </button>
+        <button class="nav-btn" data-view="resume">
+          <span class="nav-btn-left">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
+            Resume Studio
+          </span>
+          <span class="nav-count" id="nav-count-resumes">0</span>
+        </button>
+        <button class="nav-btn" data-view="sync">
+          <span class="nav-btn-left">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path><path d="M3 3v5h5"></path><path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16"></path><path d="M16 21h5v-5"></path></svg>
+            Sync &amp; Cloud
+          </span>
+          <span class="nav-count" id="sync-status-dot">Local</span>
+        </button>
+      </nav>
+
+      <div class="momentum-card">
+        <div class="momentum-row">
+          <span class="momentum-title">Active Pipeline</span>
+          <span class="momentum-val" id="stat-active">0</span>
+        </div>
+        <div class="momentum-bar">
+          <div class="momentum-fill" id="stat-bar" style="width: 0%"></div>
+        </div>
+        <div class="momentum-sub">
+          <span id="stat-interviews">0 interviewing</span>
+          <span id="stat-offers">0 offers</span>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Workspace -->
+    <main class="workspace">
+      <!-- Top Bar -->
+      <header class="topbar glass">
+        <div class="topbar-left">
+          <h1 class="page-title" id="page-title">Jobs</h1>
+          <div class="search-wrap" id="search-wrap">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+            <input id="global-search" class="search-input" type="search" placeholder="Search roles, companies, people…" autocomplete="off" />
+            <span class="search-kbd">⌘K</span>
+          </div>
+        </div>
+        <div class="topbar-actions">
+          <button class="icon-btn" id="theme-toggle-mobile" title="Toggle Theme" aria-label="Toggle Theme" style="display: none;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+          </button>
+          <button class="btn btn-primary" id="primary-add-btn">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+            <span id="primary-add-label">New Job</span>
+          </button>
+        </div>
+      </header>
+
+      <!-- VIEW 1: JOBS -->
+      <section class="view active" id="view-jobs" aria-label="Jobs tracker">
+        <div class="filter-bar" id="job-filters"></div>
+        <div class="split-pane" id="jobs-split">
+          <div class="list-panel glass" id="jobs-list"></div>
+          <div class="detail-panel glass" id="job-detail"></div>
+        </div>
+      </section>
+
+      <!-- VIEW 2: PEOPLE -->
+      <section class="view" id="view-people" aria-label="People CRM">
+        <div class="filter-bar" id="people-filters"></div>
+        <div class="split-pane" id="people-split">
+          <div class="list-panel glass" id="people-list"></div>
+          <div class="detail-panel glass" id="person-detail"></div>
+        </div>
+      </section>
+
+      <!-- VIEW 3: RESUME STUDIO -->
+      <section class="view" id="view-resume" aria-label="Resume Studio">
+        <div class="studio-grid">
+          <!-- Left Column: Upload & ATS Analysis -->
+          <div class="studio-col glass">
+            <div class="section-head">
+              <span class="section-title">Base Resume</span>
+              <button class="btn btn-ghost btn-sm" id="load-sample-resume-btn">Load Sample</button>
+            </div>
+
+            <div class="dropzone" id="resume-dropzone">
+              <input type="file" id="resume-file-input" accept=".txt,.md,.pdf,.docx" hidden />
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+              <div style="font-size: 13.5px; font-weight: 600;">Upload Resume</div>
+              <div style="font-size: 12px; color: var(--text-tertiary);">PDF, DOCX, TXT, or Markdown</div>
+              <div id="uploaded-file-badge" style="font-size: 11.5px; color: var(--accent-text); font-weight: 600;"></div>
+            </div>
+
+            <div class="field">
+              <label for="studio-job-select">Target Job Role</label>
+              <select id="studio-job-select" class="select"></select>
+            </div>
+
+            <div class="score-card" id="ats-score-card">
+              <div class="score-ring">
+                <svg viewBox="0 0 68 68">
+                  <circle cx="34" cy="34" r="28" fill="none" stroke="var(--divider)" stroke-width="6"></circle>
+                  <circle id="score-ring-arc" cx="34" cy="34" r="28" fill="none" stroke="var(--accent)" stroke-width="6" stroke-linecap="round" stroke-dasharray="175.9" stroke-dashoffset="175.9"></circle>
+                </svg>
+                <div class="score-ring-val" id="score-ring-val">—</div>
+              </div>
+              <div style="min-width: 0;">
+                <div style="font-size: 13.5px; font-weight: 650;">ATS Keyword Match</div>
+                <div id="score-summary" style="font-size: 12px; color: var(--text-secondary); margin-top: 2px;">Select a job with a description to analyze fit.</div>
+              </div>
+            </div>
+
+            <div class="section-block">
+              <div class="section-title" style="font-size: 12.5px; color: var(--green);">Matched Keywords</div>
+              <div class="kw-group" id="kw-matched"></div>
+            </div>
+
+            <div class="section-block">
+              <div class="section-title" style="font-size: 12.5px; color: var(--amber);">Missing Keywords <span style="font-weight: 450; color: var(--text-tertiary);">(click to weave in)</span></div>
+              <div class="kw-group" id="kw-missing"></div>
+            </div>
+
+            <div class="section-block" style="margin-top: auto; padding-top: 10px; border-top: 1px solid var(--divider);">
+              <div class="field">
+                <label for="ai-api-key">Optional AI Key (OpenAI or Gemini — stored locally)</label>
+                <input id="ai-api-key" class="input" type="password" placeholder="sk-... or AIza... (optional)" />
+              </div>
+              <div style="display: flex; gap: 8px;">
+                <button class="btn btn-primary" id="smart-tailor-btn" style="flex: 1;">Auto-Tailor</button>
+                <button class="btn" id="ai-tailor-btn" title="Uses your optional OpenAI/Gemini API key">AI Rewrite</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right Column: Tailored Resume Editor & Export -->
+          <div class="studio-col glass">
+            <div class="section-head" style="flex-wrap: wrap;">
+              <div>
+                <div class="section-title" style="font-size: 16px;" id="studio-editor-title">Master Base Resume</div>
+                <div style="font-size: 12px; color: var(--text-secondary);" id="studio-editor-sub">Edit your base resume or customize a version saved specifically for a job.</div>
+              </div>
+              <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                <button class="btn btn-sm" id="reset-to-base-btn">Reset to Base</button>
+                <button class="btn btn-sm" id="save-resume-version-btn">Save for Role</button>
+                <button class="btn btn-primary btn-sm" id="export-pdf-btn">Export PDF</button>
+              </div>
+            </div>
+
+            <textarea id="resume-editor" class="resume-editor" placeholder="Upload a resume on the left or paste your base resume here…"></textarea>
+
+            <div class="field">
+              <label for="studio-jd-preview">Target Job Description (editable — updates ATS score live)</label>
+              <textarea id="studio-jd-preview" class="notes-area" style="min-height: 92px;" placeholder="Paste the job description here to score keywords and tailor your resume…"></textarea>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- VIEW 4: SYNC & CLOUD -->
+      <section class="view" id="view-sync" aria-label="Sync and Cloud settings">
+        <div class="sync-grid">
+          <!-- Option 1: Google Sheets -->
+          <div class="sync-card glass">
+            <span class="sync-tag" style="background: var(--green-soft); color: var(--green);">Recommended · Zero Cost</span>
+            <div>
+              <h2 style="font-size: 17px; font-weight: 680; letter-spacing: -0.02em;">Google Sheets Sync</h2>
+              <p style="font-size: 13px; color: var(--text-secondary); margin-top: 4px; line-height: 1.5;">
+                Best if you want a readable spreadsheet backup accessible on desktop &amp; iPhone. Deploy a 25-line Google Apps Script Web App and paste its URL below.
+              </p>
+            </div>
+            <div class="field">
+              <label for="gsheets-url">Apps Script Web App URL</label>
+              <input id="gsheets-url" class="input" type="url" placeholder="https://script.google.com/macros/s/.../exec" />
+            </div>
+            <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+              <button class="btn btn-primary btn-sm" id="gsheets-push-btn">Push to Sheet</button>
+              <button class="btn btn-sm" id="gsheets-pull-btn">Pull from Sheet</button>
+              <button class="btn btn-ghost btn-sm" id="gsheets-script-btn">View Script</button>
+            </div>
+          </div>
+
+          <!-- Option 2: Supabase -->
+          <div class="sync-card glass">
+            <span class="sync-tag" style="background: var(--accent-soft); color: var(--accent-text);">Best for Web + Mobile PWA</span>
+            <div>
+              <h2 style="font-size: 17px; font-weight: 680; letter-spacing: -0.02em;">Supabase Cloud Sync</h2>
+              <p style="font-size: 13px; color: var(--text-secondary); margin-top: 4px; line-height: 1.5;">
+                Instant Postgres sync across laptop &amp; iPhone Home Screen PWA (free tier). Store jobs, contacts, and every tailored resume version seamlessly.
+              </p>
+            </div>
+            <div class="field">
+              <label for="supa-url">Supabase Project URL</label>
+              <input id="supa-url" class="input" type="url" placeholder="https://your-project.supabase.co" />
+            </div>
+            <div class="field">
+              <label for="supa-key">Supabase Anon Key</label>
+              <input id="supa-key" class="input" type="password" placeholder="eyJhbGciOi..." />
+            </div>
+            <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+              <button class="btn btn-primary btn-sm" id="supa-sync-btn">Sync Now</button>
+              <button class="btn btn-ghost btn-sm" id="supa-sql-btn">View SQL Setup</button>
+            </div>
+          </div>
+
+          <!-- Option 3: Local Backup & Data Controls -->
+          <div class="sync-card glass">
+            <span class="sync-tag" style="background: var(--slate-soft); color: var(--slate);">Instant · Offline-First</span>
+            <div>
+              <h2 style="font-size: 17px; font-weight: 680; letter-spacing: -0.02em;">Local Backup &amp; Portability</h2>
+              <p style="font-size: 13px; color: var(--text-secondary); margin-top: 4px; line-height: 1.5;">
+                Everything saves automatically in your browser. Export clean JSON or CSV anytime, or reset sample data to start fresh.
+              </p>
+            </div>
+            <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+              <button class="btn btn-sm" id="export-json-btn">Export JSON</button>
+              <button class="btn btn-sm" id="export-csv-btn">Export Jobs CSV</button>
+              <button class="btn btn-sm" id="import-json-btn">Import JSON</button>
+              <input type="file" id="import-json-input" accept=".json" hidden />
+            </div>
+            <div style="margin-top: auto; padding-top: 12px; border-top: 1px solid var(--divider); display: flex; justify-content: space-between; align-items: center;">
+              <span style="font-size: 12px; color: var(--text-tertiary);">Want a clean slate?</span>
+              <button class="btn btn-danger btn-sm" id="clear-data-btn">Clear All Data</button>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- Mobile Floating Liquid Glass Tab Bar -->
+  <nav class="mobile-tabbar glass-elevated" aria-label="Mobile navigation">
+    <button class="mobile-tab active" data-view="jobs">
+      <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="3"></rect><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"></path></svg>
+      Jobs
+    </button>
+    <button class="mobile-tab" data-view="people">
+      <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle></svg>
+      People
+    </button>
+    <button class="mobile-tab" data-view="resume">
+      <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
+      Resume
+    </button>
+    <button class="mobile-tab" data-view="sync">
+      <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path><path d="M3 3v5h5"></path></svg>
+      Sync
+    </button>
+  </nav>
+
+  <!-- Modal Backdrop -->
+  <div class="modal-backdrop" id="modal-backdrop" role="dialog" aria-modal="true">
+    <div class="modal glass-elevated" id="modal-content"></div>
+  </div>
+
+  <!-- Toast -->
+  <div class="toast glass-elevated" id="toast"></div>
+
+  <!-- Print-Only Resume Sheet -->
+  <div id="print-resume-sheet"></div>
+
+  <script>
+    /* ==========================================================================
+       LUMEN — Application State, Sample Data & Persistence
+       ========================================================================== */
+    const STORAGE_KEY = 'lumen_career_studio_v1';
+
+    const JOB_STATUSES = [
+      { id: 'Saved', color: '#64748b' },
+      { id: 'Applied', color: '#007aff' },
+      { id: 'Screening', color: '#0d9488' },
+      { id: 'Interviewing', color: '#d97706' },
+      { id: 'Offer', color: '#24a148' },
+      { id: 'Archived', color: '#e03131' }
+    ];
+
+    const PEOPLE_ROLES = ['Recruiter', 'Hiring Manager', 'Referral', 'Peer / Coffee Chat'];
+
+    const SAMPLE_RESUME = `ALEX RIVERA
+San Francisco, CA · alex.rivera@email.com · linkedin.com/in/alexrivera · portfolio.alexrivera.design
+
+SUMMARY
+Senior Product Designer with 8+ years of experience crafting human-centered consumer and productivity software. Specialized in design systems, spatial & translucent UI craft, prototyping, and cross-functional leadership with engineering and product partners.
+
+EXPERIENCE
+Stripe — Staff Product Designer (2022 – Present)
+• Led end-to-end redesign of Checkout & Billing workflows used by 1.2M+ businesses, improving conversion by 4.8%.
+• Architected a unified cross-platform design system across web and iOS, reducing UI engineering defects by 35%.
+• Partnered with PM and Staff Engineers to ship real-time analytics dashboards and accessible dark/light theming.
+
+Airbnb — Senior Product Designer (2019 – 2022)
+• Designed host onboarding and pricing tools, increasing new listing completion by 18% globally.
+• Conducted 60+ qualitative user research sessions and rapid Figma/HTML interactive prototypes to validate mental models.
+• Mentored 4 product designers and established weekly design critique rituals.
+
+SKILLS
+Product Design, Design Systems, Interaction Design, Prototyping, Figma, User Research, Accessibility (WCAG), iOS Human Interface Guidelines, Information Architecture, Cross-Functional Leadership, HTML/CSS, Motion Design`;
+
+    function getDefaultState() {
+      return {
+        theme: window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light',
+        jobs: [
+          {
+            id: 'job-1',
+            company: 'Apple',
+            role: 'Senior Product Designer, Productivity Apps',
+            level: 'ICT4 / Senior',
+            status: 'Interviewing',
+            comp: '$210k – $245k + RSU',
+            location: 'Cupertino, CA',
+            workMode: 'Hybrid',
+            url: 'https://jobs.apple.com',
+            appliedDate: '2026-11-10',
+            nextStepDate: '2026-11-26',
+            jd: 'We are looking for a Senior Product Designer to shape next-generation productivity applications across macOS, iPadOS, and iOS. You will own interaction design, typography, Liquid Glass visual craft, design systems, interactive prototyping, accessibility, and cross-functional collaboration with Human Interface and engineering teams.',
+            notes: 'Portfolio review went really well. Team loved the design systems case study.\n\nNext: 45-min craft deep dive with hiring manager on Nov 26.',
+            personIds: ['person-1', 'person-2'],
+            tailoredResume: ''
+          },
+          {
+            id: 'job-2',
+            company: 'Linear',
+            role: 'Staff Product Designer',
+            level: 'Staff / L6',
+            status: 'Screening',
+            comp: '$220k – $260k + Equity',
+            location: 'San Francisco, CA',
+            workMode: 'Remote',
+            url: 'https://linear.app/careers',
+            appliedDate: '2026-11-14',
+            nextStepDate: '2026-11-25',
+            jd: 'Join Linear to craft fast, keyboard-first software for high-performing product teams. Strong systems thinking, interaction design, motion choreography, frontend prototyping (HTML/CSS/TypeScript), and taste for minimalism required.',
+            notes: 'Referred by Maya. Intro call scheduled for Tuesday.',
+            personIds: ['person-3'],
+            tailoredResume: ''
+          },
+          {
+            id: 'job-3',
+            company: 'Figma',
+            role: 'Lead Designer, Design Systems',
+            level: 'L5 / Lead',
+            status: 'Applied',
+            comp: '$205k – $235k + Equity',
+            location: 'San Francisco, CA',
+            workMode: 'Hybrid',
+            url: 'https://figma.com/careers',
+            appliedDate: '2026-11-18',
+            nextStepDate: '',
+            jd: 'Lead the evolution of component architecture, design tokens, variables, and developer handoff workflows. Deep expertise in design systems, user research, prototyping, and enterprise workflows.',
+            notes: 'Applied directly with tailored resume highlighting Stripe design system work.',
+            personIds: [],
+            tailoredResume: ''
+          }
+        ],
+        people: [
+          {
+            id: 'person-1',
+            name: 'Claire Bennett',
+            title: 'Design Recruiting Lead',
+            company: 'Apple',
+            roleType: 'Recruiter',
+            email: 'c.bennett@apple.com',
+            linkedin: 'https://linkedin.com',
+            warmth: 'Active',
+            lastContact: '2026-11-19',
+            followUpDate: '2026-11-25',
+            notes: 'Super responsive and transparent about the interview loop. Send thank-you note after the craft deep dive.'
+          },
+          {
+            id: 'person-2',
+            name: 'Daniel Park',
+            title: 'Design Manager, Apps',
+            company: 'Apple',
+            roleType: 'Hiring Manager',
+            email: 'dpark@apple.com',
+            linkedin: 'https://linkedin.com',
+            warmth: 'Warm',
+            lastContact: '2026-11-15',
+            followUpDate: '2026-11-27',
+            notes: 'Met during portfolio review. Cares deeply about typography, motion restraint, and shipping with engineering.'
+          },
+          {
+            id: 'person-3',
+            name: 'Maya Lin',
+            title: 'Principal Designer',
+            company: 'Linear',
+            roleType: 'Referral',
+            email: 'maya@linear.app',
+            linkedin: 'https://linkedin.com',
+            warmth: 'Warm',
+            lastContact: '2026-11-12',
+            followUpDate: '',
+            notes: 'Former colleague from Airbnb. Put in a strong internal referral and shared tips on the work trial.'
+          }
+        ],
+        baseResume: SAMPLE_RESUME,
+        baseResumeName: 'Sample_Resume.txt',
+        updatedAt: new Date(0).toISOString(),
+        sync: {
+          autoSync: true,
+          gsheetsUrl: '',
+          supaUrl: '',
+          supaKey: '',
+          aiApiKey: ''
+        }
+      };
+    }
+
+    let state = loadState();
+    let ui = {
+      view: 'jobs',
+      search: '',
+      jobFilter: 'All',
+      peopleFilter: 'All',
+      selectedJobId: state.jobs[0]?.id || null,
+      selectedPersonId: state.people[0]?.id || null,
+      studioJobId: state.jobs[0]?.id || '',
+      mobileDetailOpen: false
+    };
+
+    function loadState() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (!raw) return getDefaultState();
+        const parsed = JSON.parse(raw);
+        return {
+          ...getDefaultState(),
+          ...parsed,
+          sync: { ...getDefaultState().sync, ...(parsed.sync || {}) }
+        };
+      } catch {
+        return getDefaultState();
+      }
+    }
+
+    let _autoSyncTimer = null;
+    function saveState(skipCloud = false) {
+      if (!skipCloud) {
+        state.updatedAt = new Date().toISOString();
+      }
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+      } catch (e) {
+        console.warn('Storage save failed:', e);
+      }
+      updateSidebarStats();
+      if (!skipCloud && typeof scheduleAutoSync === 'function') {
+        scheduleAutoSync();
+      }
+    }
+
+    /* ==========================================================================
+       Utilities
+       ========================================================================== */
+    const $ = (sel) => document.querySelector(sel);
+    const $$ = (sel) => Array.from(document.querySelectorAll(sel));
+
+    function esc(str) {
+      return String(str || '').replace(/[&<>"']/g, (m) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m]));
+    }
+
+    function uid(prefix) {
+      return `${prefix}-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 6)}`;
+    }
+
+    function initials(text) {
+      const words = (text || '?').trim().split(/\s+/);
+      return (words[0]?.[0] || '') + (words[1]?.[0] || words[0]?.[1] || '');
+    }
+
+    function tintFor(str) {
+      const palette = [
+        ['rgba(0, 122, 255, 0.16)', '#007aff'],
+        ['rgba(13, 148, 136, 0.16)', '#0d9488'],
+        ['rgba(217, 119, 6, 0.16)', '#d97706'],
+        ['rgba(36, 161, 72, 0.16)', '#24a148'],
+        ['rgba(71, 85, 105, 0.16)', '#475569'],
+        ['rgba(225, 29, 72, 0.15)', '#e11d48']
+      ];
+      let hash = 0;
+      for (let i = 0; i < (str || '').length; i++) hash = str.charCodeAt(i) + ((hash << 5) - hash);
+      return palette[Math.abs(hash) % palette.length];
+    }
+
+    function toast(msg) {
+      const el = $('#toast');
+      el.textContent = msg;
+      el.classList.add('show');
+      clearTimeout(toast._t);
+      toast._t = setTimeout(() => el.classList.remove('show'), 2600);
+    }
+
+    function statusClass(status) {
+      return `badge-${(status || 'saved').toLowerCase()}`;
+    }
+
+    function formatDate(d) {
+      if (!d) return '—';
+      try {
+        const dt = new Date(d + 'T00:00:00');
+        return dt.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+      } catch {
+        return d;
+      }
+    }
+
+    /* ==========================================================================
+       Theme & Navigation
+       ========================================================================== */
+    function applyTheme() {
+      document.documentElement.setAttribute('data-theme', state.theme);
+      const isDark = state.theme === 'dark';
+      const sunIcon = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>`;
+      const moonIcon = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>`;
+      $('#theme-toggle-desktop').innerHTML = isDark ? sunIcon : moonIcon;
+      $('#theme-toggle-mobile').innerHTML = isDark ? sunIcon : moonIcon;
+    }
+
+    function toggleTheme() {
+      state.theme = state.theme === 'dark' ? 'light' : 'dark';
+      applyTheme();
+      saveState();
+    }
+
+    function switchView(viewName) {
+      ui.view = viewName;
+      ui.mobileDetailOpen = false;
+      $$('.view').forEach((v) => v.classList.toggle('active', v.id === `view-${viewName}`));
+      $$('.nav-btn').forEach((b) => b.classList.toggle('active', b.dataset.view === viewName));
+      $$('.mobile-tab').forEach((b) => b.classList.toggle('active', b.dataset.view === viewName));
+
+      const titles = { jobs: 'Jobs', people: 'People', resume: 'Resume Studio', sync: 'Sync & Cloud' };
+      $('#page-title').textContent = titles[viewName];
+
+      const searchVisible = viewName === 'jobs' || viewName === 'people';
+      $('#search-wrap').style.display = searchVisible ? '' : 'none';
+
+      const addBtn = $('#primary-add-btn');
+      if (viewName === 'jobs') {
+        addBtn.style.display = '';
+        $('#primary-add-label').textContent = 'New Job';
+      } else if (viewName === 'people') {
+        addBtn.style.display = '';
+        $('#primary-add-label').textContent = 'New Person';
+      } else {
+        addBtn.style.display = 'none';
+      }
+
+      renderCurrentView();
+    }
+
+    function updateSidebarStats() {
+      $('#nav-count-jobs').textContent = state.jobs.length;
+      $('#nav-count-people').textContent = state.people.length;
+      const tailoredCount = state.jobs.filter((j) => j.tailoredResume && j.tailoredResume.trim()).length;
+      $('#nav-count-resumes').textContent = tailoredCount;
+
+      const active = state.jobs.filter((j) => !['Archived'].includes(j.status)).length;
+      const interviewing = state.jobs.filter((j) => j.status === 'Interviewing').length;
+      const offers = state.jobs.filter((j) => j.status === 'Offer').length;
+      $('#stat-active').textContent = active;
+      $('#stat-interviews').textContent = `${interviewing} interviewing`;
+      $('#stat-offers').textContent = `${offers} offer${offers === 1 ? '' : 's'}`;
+      const pct = state.jobs.length ? Math.min(100, Math.round(((interviewing + offers * 2) / Math.max(1, active)) * 100)) : 0;
+      $('#stat-bar').style.width = `${Math.max(active ? 14 : 0, pct)}%`;
+
+      const hasCloud = Boolean(state.sync.gsheetsUrl || (state.sync.supaUrl && state.sync.supaKey));
+      $('#sync-status-dot').textContent = hasCloud ? 'Cloud' : 'Local';
+    }
+
+    function renderCurrentView() {
+      if (ui.view === 'jobs') renderJobs();
+      else if (ui.view === 'people') renderPeople();
+      else if (ui.view === 'resume') renderResumeStudio();
+      else if (ui.view === 'sync') renderSyncView();
+    }
+
+    /* ==========================================================================
+       VIEW 1: JOBS TRACKER
+       ========================================================================== */
+    function renderJobs() {
+      // Filters
+      const counts = { All: state.jobs.length };
+      JOB_STATUSES.forEach((s) => (counts[s.id] = state.jobs.filter((j) => j.status === s.id).length));
+      $('#job-filters').innerHTML = [
+        `<button class="pill ${ui.jobFilter === 'All' ? 'active' : ''}" data-jfilter="All">All <span style="opacity:0.65">${counts.All}</span></button>`,
+        ...JOB_STATUSES.map(
+          (s) =>
+            `<button class="pill ${ui.jobFilter === s.id ? 'active' : ''}" data-jfilter="${s.id}"><span class="pill-dot" style="background:${s.color}"></span>${s.id} <span style="opacity:0.65">${counts[s.id]}</span></button>`
+        )
+      ].join('');
+
+      $$('[data-jfilter]').forEach((btn) =>
+        btn.addEventListener('click', () => {
+          ui.jobFilter = btn.dataset.jfilter;
+          renderJobs();
+        })
+      );
+
+      // Filtered list
+      const q = ui.search.trim().toLowerCase();
+      const filtered = state.jobs.filter((j) => {
+        if (ui.jobFilter !== 'All' && j.status !== ui.jobFilter) return false;
+        if (!q) return true;
+        return [j.company, j.role, j.level, j.location, j.comp, j.notes].some((f) => (f || '').toLowerCase().includes(q));
+      });
+
+      if (filtered.length && !filtered.some((j) => j.id === ui.selectedJobId)) {
+        ui.selectedJobId = filtered[0].id;
+      }
+
+      const listEl = $('#jobs-list');
+      if (!filtered.length) {
+        listEl.innerHTML = `
+          <div class="empty-state">
+            <div class="empty-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="7" width="20" height="14" rx="3"></rect><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"></path></svg></div>
+            <div style="font-weight:600; color:var(--text-primary)">No matching jobs</div>
+            <div style="font-size:13px">Add a role or adjust your filter to see applications.</div>
+            <button class="btn btn-primary btn-sm" onclick="openJobModal()">+ Add Job</button>
+          </div>`;
+      } else {
+        listEl.innerHTML = filtered
+          .map((j) => {
+            const [bg, fg] = tintFor(j.company);
+            const linkedCount = (j.personIds || []).filter((pid) => state.people.some((p) => p.id === pid)).length;
+            const hasResume = Boolean(j.tailoredResume && j.tailoredResume.trim());
+            return `
+              <div class="item-card ${j.id === ui.selectedJobId ? 'selected' : ''}" data-job-id="${j.id}">
+                <div class="item-card-top">
+                  <div class="item-identity">
+                    <div class="monogram" style="background:${bg}; color:${fg}">${esc(initials(j.company))}</div>
+                    <div style="min-width:0">
+                      <div class="item-title">${esc(j.role)}</div>
+                      <div class="item-subtitle">${esc(j.company)}${j.level ? ' · ' + esc(j.level) : ''}</div>
+                    </div>
+                  </div>
+                  <span class="badge ${statusClass(j.status)}">${esc(j.status)}</span>
+                </div>
+                <div class="item-meta-row">
+                  ${j.comp ? `<span class="chip">${esc(j.comp)}</span>` : ''}
+                  ${j.workMode ? `<span class="chip">${esc(j.workMode)}</span>` : ''}
+                  ${linkedCount ? `<span class="chip">${linkedCount} contact${linkedCount > 1 ? 's' : ''}</span>` : ''}
+                  ${hasResume ? `<span class="chip" style="color:var(--green); border-color:transparent; background:var(--green-soft)">Tailored CV</span>` : ''}
+                </div>
+              </div>`;
+          })
+          .join('');
+
+        $$('[data-job-id]').forEach((card) =>
+          card.addEventListener('click', () => {
+            ui.selectedJobId = card.dataset.jobId;
+            ui.mobileDetailOpen = true;
+            renderJobs();
+          })
+        );
+      }
+
+      $('#jobs-split').classList.toggle('detail-open', ui.mobileDetailOpen);
+      renderJobDetail();
+    }
+
+    function renderJobDetail() {
+      const detailEl = $('#job-detail');
+      const job = state.jobs.find((j) => j.id === ui.selectedJobId);
+      if (!job) {
+        detailEl.innerHTML = `
+          <div class="empty-state">
+            <div class="empty-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"></circle><path d="M12 8v4l3 2"></path></svg></div>
+            <div style="font-weight:620; color:var(--text-primary)">Select a job application</div>
+            <div style="font-size:13px">Track compensation, link contacts, and tailor your resume per role.</div>
+          </div>`;
+        return;
+      }
+
+      const [bg, fg] = tintFor(job.company);
+      const linkedPeople = (job.personIds || []).map((id) => state.people.find((p) => p.id === id)).filter(Boolean);
+      const ats = computeATS(job.tailoredResume || state.baseResume, job.jd);
+      const hasTailored = Boolean(job.tailoredResume && job.tailoredResume.trim());
+
+      detailEl.innerHTML = `
+        <button class="btn btn-ghost btn-sm mobile-back-btn" id="job-mobile-back" style="align-self:flex-start; margin-bottom:-8px;">← Back to Jobs</button>
+
+        <div class="detail-header">
+          <div class="detail-title-group">
+            <div class="monogram detail-monogram" style="background:${bg}; color:${fg}">${esc(initials(job.company))}</div>
+            <div style="min-width:0">
+              <h2 class="detail-title">${esc(job.role)}</h2>
+              <div class="detail-company">
+                <strong style="color:var(--text-primary)">${esc(job.company)}</strong>
+                ${job.location ? `<span>· ${esc(job.location)}</span>` : ''}
+                ${job.url ? `<a href="${esc(job.url)}" target="_blank" rel="noopener" style="color:var(--accent-text); text-decoration:none; font-weight:560;">View Posting ↗</a>` : ''}
+              </div>
+            </div>
+          </div>
+          <div class="detail-actions">
+            <select id="detail-job-status" class="select" style="width:auto; height:34px; font-weight:600; border-radius:999px;">
+              ${JOB_STATUSES.map((s) => `<option value="${s.id}" ${s.id === job.status ? 'selected' : ''}>${s.id}</option>`).join('')}
+            </select>
+            <button class="btn btn-sm" id="edit-job-btn">Edit</button>
+            <button class="btn btn-danger btn-sm" id="delete-job-btn">Delete</button>
+          </div>
+        </div>
+
+        <div class="meta-grid">
+          <div class="meta-tile">
+            <span class="meta-label">Compensation</span>
+            <span class="meta-value">${esc(job.comp || 'Not set')}</span>
+          </div>
+          <div class="meta-tile">
+            <span class="meta-label">Role Level</span>
+            <span class="meta-value">${esc(job.level || 'Not set')}</span>
+          </div>
+          <div class="meta-tile">
+            <span class="meta-label">Work Mode</span>
+            <span class="meta-value">${esc(job.workMode || 'Not set')}</span>
+          </div>
+          <div class="meta-tile">
+            <span class="meta-label">Applied / Next Step</span>
+            <span class="meta-value">${formatDate(job.appliedDate)} · ${formatDate(job.nextStepDate)}</span>
+          </div>
+        </div>
+
+        <!-- Linked People -->
+        <div class="section-block">
+          <div class="section-head">
+            <span class="section-title">Linked People (${linkedPeople.length})</span>
+            <button class="btn btn-sm" id="link-person-btn">+ Link Person</button>
+          </div>
+          <div class="linked-list">
+            ${
+              linkedPeople.length
+                ? linkedPeople
+                    .map(
+                      (p) => `
+                <div class="linked-pill" data-jump-person="${p.id}">
+                  <span>${esc(p.name)}</span>
+                  <span style="font-size:11.5px; color:var(--text-tertiary)">${esc(p.roleType)}</span>
+                  <button class="unlink-x" data-unlink-person="${p.id}" title="Unlink">×</button>
+                </div>`
+                    )
+                    .join('')
+                : `<span style="font-size:13px; color:var(--text-tertiary)">No contacts linked yet. Connect a recruiter, referral, or hiring manager.</span>`
+            }
+          </div>
+        </div>
+
+        <!-- Resume Tailoring Callout -->
+        <div class="resume-callout">
+          <div>
+            <div style="font-size:14px; font-weight:650; display:flex; align-items:center; gap:8px;">
+              Resume for this Role
+              ${ats.total ? `<span class="badge ${ats.score >= 70 ? 'badge-offer' : 'badge-interviewing'}">${ats.score}% ATS Match</span>` : ''}
+              ${hasTailored ? `<span class="badge badge-applied">Saved Version</span>` : ''}
+            </div>
+            <div style="font-size:12.5px; color:var(--text-secondary); margin-top:3px;">
+              ${hasTailored ? 'You have a customized resume saved for this role.' : 'Tailor your base resume against this job description and export a clean PDF.'}
+            </div>
+          </div>
+          <button class="btn btn-primary btn-sm" id="open-studio-for-job">Customize Resume →</button>
+        </div>
+
+        <!-- Job Description -->
+        <div class="section-block">
+          <div class="section-head">
+            <span class="section-title">Job Description</span>
+            <span style="font-size:12px; color:var(--text-tertiary)">Powers ATS keyword matching</span>
+          </div>
+          <textarea class="notes-area" id="detail-job-jd" placeholder="Paste the job description here…">${esc(job.jd)}</textarea>
+        </div>
+
+        <!-- Notes -->
+        <div class="section-block">
+          <div class="section-head">
+            <span class="section-title">Interview Notes &amp; Timeline</span>
+          </div>
+          <textarea class="notes-area" id="detail-job-notes" placeholder="Log recruiter screens, portfolio feedback, or follow-up questions…">${esc(job.notes)}</textarea>
+        </div>
+      `;
+
+      $('#job-mobile-back')?.addEventListener('click', () => {
+        ui.mobileDetailOpen = false;
+        renderJobs();
+      });
+
+      $('#detail-job-status').addEventListener('change', (e) => {
+        job.status = e.target.value;
+        saveState();
+        renderJobs();
+        toast(`Status updated to ${job.status}`);
+      });
+
+      $('#edit-job-btn').addEventListener('click', () => openJobModal(job));
+      $('#delete-job-btn').addEventListener('click', () => {
+        if (!confirm(`Delete ${job.role} at ${job.company}?`)) return;
+        state.jobs = state.jobs.filter((j) => j.id !== job.id);
+        ui.selectedJobId = state.jobs[0]?.id || null;
+        ui.mobileDetailOpen = false;
+        saveState();
+        renderJobs();
+        toast('Job deleted');
+      });
+
+      $('#link-person-btn').addEventListener('click', () => openLinkPersonModal(job));
+
+      $$('[data-jump-person]').forEach((el) =>
+        el.addEventListener('click', (e) => {
+          if (e.target.closest('[data-unlink-person]')) return;
+          ui.selectedPersonId = el.dataset.jumpPerson;
+          switchView('people');
+          ui.mobileDetailOpen = true;
+          renderPeople();
+        })
+      );
+
+      $$('[data-unlink-person]').forEach((btn) =>
+        btn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          job.personIds = (job.personIds || []).filter((id) => id !== btn.dataset.unlinkPerson);
+          saveState();
+          renderJobs();
+          toast('Contact unlinked');
+        })
+      );
+
+      $('#open-studio-for-job').addEventListener('click', () => {
+        ui.studioJobId = job.id;
+        switchView('resume');
+      });
+
+      $('#detail-job-jd').addEventListener('input', (e) => {
+        job.jd = e.target.value;
+        saveState();
+      });
+
+      $('#detail-job-notes').addEventListener('input', (e) => {
+        job.notes = e.target.value;
+        saveState();
+      });
+    }
+
+    /* ==========================================================================
+       VIEW 2: PEOPLE CRM
+       ========================================================================== */
+    function renderPeople() {
+      const counts = { All: state.people.length };
+      PEOPLE_ROLES.forEach((r) => (counts[r] = state.people.filter((p) => p.roleType === r).length));
+
+      $('#people-filters').innerHTML = [
+        `<button class="pill ${ui.peopleFilter === 'All' ? 'active' : ''}" data-pfilter="All">All <span style="opacity:0.65">${counts.All}</span></button>`,
+        ...PEOPLE_ROLES.map(
+          (r) =>
+            `<button class="pill ${ui.peopleFilter === r ? 'active' : ''}" data-pfilter="${r}">${r} <span style="opacity:0.65">${counts[r]}</span></button>`
+        )
+      ].join('');
+
+      $$('[data-pfilter]').forEach((btn) =>
+        btn.addEventListener('click', () => {
+          ui.peopleFilter = btn.dataset.pfilter;
+          renderPeople();
+        })
+      );
+
+      const q = ui.search.trim().toLowerCase();
+      const filtered = state.people.filter((p) => {
+        if (ui.peopleFilter !== 'All' && p.roleType !== ui.peopleFilter) return false;
+        if (!q) return true;
+        return [p.name, p.company, p.title, p.roleType, p.notes].some((f) => (f || '').toLowerCase().includes(q));
+      });
+
+      if (filtered.length && !filtered.some((p) => p.id === ui.selectedPersonId)) {
+        ui.selectedPersonId = filtered[0].id;
+      }
+
+      const listEl = $('#people-list');
+      if (!filtered.length) {
+        listEl.innerHTML = `
+          <div class="empty-state">
+            <div class="empty-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle></svg></div>
+            <div style="font-weight:600; color:var(--text-primary)">No contacts yet</div>
+            <div style="font-size:13px">Keep track of recruiters, referrals, and coffee chats.</div>
+            <button class="btn btn-primary btn-sm" onclick="openPersonModal()">+ Add Person</button>
+          </div>`;
+      } else {
+        listEl.innerHTML = filtered
+          .map((p) => {
+            const [bg, fg] = tintFor(p.name);
+            const linkedJobs = state.jobs.filter((j) => (j.personIds || []).includes(p.id));
+            return `
+              <div class="item-card ${p.id === ui.selectedPersonId ? 'selected' : ''}" data-person-id="${p.id}">
+                <div class="item-card-top">
+                  <div class="item-identity">
+                    <div class="monogram avatar-circle" style="background:${bg}; color:${fg}">${esc(initials(p.name))}</div>
+                    <div style="min-width:0">
+                      <div class="item-title">${esc(p.name)}</div>
+                      <div class="item-subtitle">${esc(p.title)}${p.company ? ' · ' + esc(p.company) : ''}</div>
+                    </div>
+                  </div>
+                  <span class="badge badge-applied">${esc(p.roleType)}</span>
+                </div>
+                <div class="item-meta-row">
+                  ${p.warmth ? `<span class="chip">${esc(p.warmth)}</span>` : ''}
+                  ${p.followUpDate ? `<span class="chip">Follow-up ${formatDate(p.followUpDate)}</span>` : ''}
+                  ${linkedJobs.length ? `<span class="chip">${linkedJobs.length} linked job${linkedJobs.length > 1 ? 's' : ''}</span>` : ''}
+                </div>
+              </div>`;
+          })
+          .join('');
+
+        $$('[data-person-id]').forEach((card) =>
+          card.addEventListener('click', () => {
+            ui.selectedPersonId = card.dataset.personId;
+            ui.mobileDetailOpen = true;
+            renderPeople();
+          })
+        );
+      }
+
+      $('#people-split').classList.toggle('detail-open', ui.mobileDetailOpen);
+      renderPersonDetail();
+    }
+
+    function renderPersonDetail() {
+      const detailEl = $('#person-detail');
+      const person = state.people.find((p) => p.id === ui.selectedPersonId);
+      if (!person) {
+        detailEl.innerHTML = `
+          <div class="empty-state">
+            <div class="empty-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="7" r="4"></circle><path d="M5.5 21a6.5 6.5 0 0 1 13 0"></path></svg></div>
+            <div style="font-weight:620; color:var(--text-primary)">Select a contact</div>
+            <div style="font-size:13px">View conversation history, follow-up dates, and linked applications.</div>
+          </div>`;
+        return;
+      }
+
+      const [bg, fg] = tintFor(person.name);
+      const linkedJobs = state.jobs.filter((j) => (j.personIds || []).includes(person.id));
+
+      detailEl.innerHTML = `
+        <button class="btn btn-ghost btn-sm mobile-back-btn" id="person-mobile-back" style="align-self:flex-start; margin-bottom:-8px;">← Back to People</button>
+
+        <div class="detail-header">
+          <div class="detail-title-group">
+            <div class="monogram detail-monogram avatar-circle" style="background:${bg}; color:${fg}">${esc(initials(person.name))}</div>
+            <div style="min-width:0">
+              <h2 class="detail-title">${esc(person.name)}</h2>
+              <div class="detail-company">
+                <span>${esc(person.title)}</span>
+                ${person.company ? `<strong style="color:var(--text-primary)">· ${esc(person.company)}</strong>` : ''}
+              </div>
+            </div>
+          </div>
+          <div class="detail-actions">
+            <button class="btn btn-sm" id="edit-person-btn">Edit</button>
+            <button class="btn btn-danger btn-sm" id="delete-person-btn">Delete</button>
+          </div>
+        </div>
+
+        <div class="meta-grid">
+          <div class="meta-tile">
+            <span class="meta-label">Role</span>
+            <span class="meta-value">${esc(person.roleType)}</span>
+          </div>
+          <div class="meta-tile">
+            <span class="meta-label">Relationship</span>
+            <span class="meta-value">${esc(person.warmth || 'Warm')}</span>
+          </div>
+          <div class="meta-tile">
+            <span class="meta-label">Last Talked</span>
+            <span class="meta-value">${formatDate(person.lastContact)}</span>
+          </div>
+          <div class="meta-tile">
+            <span class="meta-label">Next Follow-Up</span>
+            <span class="meta-value">${formatDate(person.followUpDate)}</span>
+          </div>
+        </div>
+
+        <div style="display:flex; gap:10px; flex-wrap:wrap;">
+          ${person.email ? `<a class="btn btn-sm" href="mailto:${esc(person.email)}" style="text-decoration:none;">✉ ${esc(person.email)}</a>` : ''}
+          ${person.linkedin ? `<a class="btn btn-sm" href="${esc(person.linkedin)}" target="_blank" rel="noopener" style="text-decoration:none;">LinkedIn ↗</a>` : ''}
+        </div>
+
+        <!-- Linked Jobs -->
+        <div class="section-block">
+          <div class="section-head">
+            <span class="section-title">Linked Job Applications (${linkedJobs.length})</span>
+            <button class="btn btn-sm" id="link-job-to-person-btn">+ Link Job</button>
+          </div>
+          <div class="linked-list">
+            ${
+              linkedJobs.length
+                ? linkedJobs
+                    .map(
+                      (j) => `
+                <div class="linked-pill" data-jump-job="${j.id}">
+                  <span><strong>${esc(j.company)}</strong> · ${esc(j.role)}</span>
+                  <span class="badge ${statusClass(j.status)}">${esc(j.status)}</span>
+                  <button class="unlink-x" data-unlink-job="${j.id}" title="Unlink">×</button>
+                </div>`
+                    )
+                    .join('')
+                : `<span style="font-size:13px; color:var(--text-tertiary)">No jobs linked yet. Link an application to connect this conversation.</span>`
+            }
+          </div>
+        </div>
+
+        <!-- Conversation Notes -->
+        <div class="section-block">
+          <div class="section-head">
+            <span class="section-title">Conversation Notes</span>
+          </div>
+          <textarea class="notes-area" id="detail-person-notes" style="min-height:150px;" placeholder="Key takeaways, team insights, referral details…">${esc(person.notes)}</textarea>
+        </div>
+      `;
+
+      $('#person-mobile-back')?.addEventListener('click', () => {
+        ui.mobileDetailOpen = false;
+        renderPeople();
+      });
+
+      $('#edit-person-btn').addEventListener('click', () => openPersonModal(person));
+      $('#delete-person-btn').addEventListener('click', () => {
+        if (!confirm(`Delete ${person.name}?`)) return;
+        state.people = state.people.filter((p) => p.id !== person.id);
+        state.jobs.forEach((j) => (j.personIds = (j.personIds || []).filter((id) => id !== person.id)));
+        ui.selectedPersonId = state.people[0]?.id || null;
+        ui.mobileDetailOpen = false;
+        saveState();
+        renderPeople();
+        toast('Contact deleted');
+      });
+
+      $('#link-job-to-person-btn').addEventListener('click', () => openLinkJobModal(person));
+
+      $$('[data-jump-job]').forEach((el) =>
+        el.addEventListener('click', (e) => {
+          if (e.target.closest('[data-unlink-job]')) return;
+          ui.selectedJobId = el.dataset.jumpJob;
+          switchView('jobs');
+          ui.mobileDetailOpen = true;
+          renderJobs();
+        })
+      );
+
+      $$('[data-unlink-job]').forEach((btn) =>
+        btn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const job = state.jobs.find((j) => j.id === btn.dataset.unlinkJob);
+          if (job) job.personIds = (job.personIds || []).filter((id) => id !== person.id);
+          saveState();
+          renderPeople();
+          toast('Job unlinked');
+        })
+      );
+
+      $('#detail-person-notes').addEventListener('input', (e) => {
+        person.notes = e.target.value;
+        saveState();
+      });
+    }
+
+    /* ==========================================================================
+       VIEW 3: RESUME STUDIO (Upload, ATS Match, Local & AI Tailor, PDF Export)
+       ========================================================================== */
+    const STOP_WORDS = new Set([
+      'about','above','across','after','again','against','almost','alone','along','already','also','although','always','among','and','another','any','around','because','been','before','being','between','both','build','building','built','company','could','create','cross','deep','design','each','either','every','experience','from','have','having','help','high','into','join','just','lead','leading','like','looking','make','more','most','much','must','need','next','only','other','over','own','part','people','product','required','role','same','shape','should','some','strong','such','team','teams','than','that','their','them','then','there','these','they','this','through','time','under','used','using','very','want','well','were','what','when','where','which','while','will','with','within','work','working','years','your'
+    ]);
+
+    function extractKeywords(jdText) {
+      if (!jdText || !jdText.trim()) return [];
+      const phrases = [
+        'design systems', 'interaction design', 'user research', 'information architecture',
+        'product design', 'motion design', 'visual craft', 'design tokens', 'human interface',
+        'liquid glass', 'figma', 'prototyping', 'accessibility', 'wcag', 'typescript',
+        'javascript', 'react', 'html/css', 'ios', 'macos', 'ipados', 'android',
+        'typography', 'cross-functional', 'enterprise', 'analytics', 'b2b', 'saas',
+        'mobile', 'web', 'mentorship', 'leadership', 'roadmap', 'strategy', 'metrics',
+        'a/b testing', 'usability', 'wireframing', 'component architecture', 'developer handoff',
+        'systems thinking', 'minimalism', 'keyboard-first', 'sql', 'python', 'ai'
+      ];
+      const lower = jdText.toLowerCase();
+      const found = [];
+      phrases.forEach((p) => {
+        if (lower.includes(p)) found.push(p);
+      });
+
+      // Supplement with high-signal single words from JD
+      const tokens = lower.match(/[a-z][a-z0-9+#/-]{3,}/g) || [];
+      const freq = {};
+      tokens.forEach((t) => {
+        if (!STOP_WORDS.has(t) && !found.some((f) => f.includes(t))) {
+          freq[t] = (freq[t] || 0) + 1;
+        }
+      });
+      const extra = Object.entries(freq)
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, Math.max(0, 14 - found.length))
+        .map(([w]) => w);
+
+      return [...new Set([...found, ...extra])].slice(0, 16);
+    }
+
+    function computeATS(resumeText, jdText) {
+      const keywords = extractKeywords(jdText);
+      if (!keywords.length) return { score: 0, matched: [], missing: [], total: 0 };
+      const lowerRes = (resumeText || '').toLowerCase();
+      const matched = keywords.filter((k) => lowerRes.includes(k));
+      const missing = keywords.filter((k) => !lowerRes.includes(k));
+      const score = Math.round((matched.length / keywords.length) * 100);
+      return { score, matched, missing, total: keywords.length };
+    }
+
+    function renderResumeStudio() {
+      const sel = $('#studio-job-select');
+      sel.innerHTML = [
+        `<option value="">Master Base Resume (No Specific Role)</option>`,
+        ...state.jobs.map((j) => `<option value="${j.id}" ${j.id === ui.studioJobId ? 'selected' : ''}>${esc(j.company)} — ${esc(j.role)}</option>`)
+      ].join('');
+
+      $('#uploaded-file-badge').textContent = state.baseResumeName ? `Active base: ${state.baseResumeName}` : '';
+      $('#ai-api-key').value = state.sync.aiApiKey || '';
+
+      const job = state.jobs.find((j) => j.id === ui.studioJobId);
+      if (job) {
+        $('#studio-editor-title').textContent = `${job.company} — ${job.role}`;
+        $('#studio-editor-sub').textContent = job.tailoredResume
+          ? 'Editing saved tailored version for this role.'
+          : 'Starting from your base resume. Tailor & save for this role.';
+        $('#resume-editor').value = job.tailoredResume || state.baseResume || '';
+        $('#studio-jd-preview').value = job.jd || '';
+      } else {
+        $('#studio-editor-title').textContent = 'Master Base Resume';
+        $('#studio-editor-sub').textContent = 'Your canonical resume used as the foundation for every tailored role.';
+        $('#resume-editor').value = state.baseResume || '';
+        $('#studio-jd-preview').value = '';
+      }
+
+      updateATSDisplay();
+    }
+
+    function updateATSDisplay() {
+      const resumeText = $('#resume-editor').value;
+      const jdText = $('#studio-jd-preview').value;
+      const ats = computeATS(resumeText, jdText);
+
+      const circ = 175.9;
+      const arc = $('#score-ring-arc');
+      if (!ats.total) {
+        $('#score-ring-val').textContent = '—';
+        arc.style.strokeDashoffset = circ;
+        $('#score-summary').textContent = 'Select a job or paste a job description to score ATS match.';
+        $('#kw-matched').innerHTML = `<span style="font-size:12px; color:var(--text-tertiary)">No keywords analyzed yet.</span>`;
+        $('#kw-missing').innerHTML = `<span style="font-size:12px; color:var(--text-tertiary)">Paste a job description below.</span>`;
+        return;
+      }
+
+      $('#score-ring-val').textContent = `${ats.score}%`;
+      arc.style.strokeDashoffset = circ - (circ * ats.score) / 100;
+      arc.style.stroke = ats.score >= 75 ? 'var(--green)' : ats.score >= 45 ? 'var(--accent)' : 'var(--amber)';
+      $('#score-summary').textContent = `${ats.matched.length} of ${ats.total} key role terms covered.`;
+
+      $('#kw-matched').innerHTML = ats.matched.length
+        ? ats.matched.map((k) => `<span class="kw-pill kw-match">✓ ${esc(k)}</span>`).join('')
+        : `<span style="font-size:12px; color:var(--text-tertiary)">None matched yet.</span>`;
+
+      $('#kw-missing').innerHTML = ats.missing.length
+        ? ats.missing.map((k) => `<span class="kw-pill kw-miss" data-add-kw="${esc(k)}" title="Click to add to Skills">+ ${esc(k)}</span>`).join('')
+        : `<span style="font-size:12px; color:var(--green)">All key terms covered!</span>`;
+
+      $$('[data-add-kw]').forEach((el) =>
+        el.addEventListener('click', () => {
+          const kw = el.dataset.addKw;
+          const editor = $('#resume-editor');
+          const formatted = kw.replace(/\b\w/g, (c) => c.toUpperCase());
+          if (/SKILLS\n/i.test(editor.value)) {
+            editor.value = editor.value.replace(/(SKILLS\n[^\n]*)/i, `$1, ${formatted}`);
+          } else {
+            editor.value = editor.value.trimEnd() + `\n\nSKILLS\n${formatted}`;
+          }
+          persistStudioEditor();
+          updateATSDisplay();
+          toast(`Added "${formatted}" to Skills`);
+        })
+      );
+    }
+
+    function persistStudioEditor() {
+      const job = state.jobs.find((j) => j.id === ui.studioJobId);
+      if (job) {
+        job.tailoredResume = $('#resume-editor').value;
+        job.jd = $('#studio-jd-preview').value;
+      } else {
+        state.baseResume = $('#resume-editor').value;
+      }
+      saveState();
+    }
+
+    function smartAutoTailor() {
+      const job = state.jobs.find((j) => j.id === ui.studioJobId);
+      const jdText = $('#studio-jd-preview').value.trim();
+      if (!jdText) {
+        toast('Add a job description first to auto-tailor');
+        return;
+      }
+      let text = $('#resume-editor').value.trim() || state.baseResume || '';
+      if (!text) {
+        toast('Upload or paste your base resume first');
+        return;
+      }
+
+      const ats = computeATS(text, jdText);
+      const topMissing = ats.missing.slice(0, 5).map((k) => k.replace(/\b\w/g, (c) => c.toUpperCase()));
+
+      // Tailor Summary line if present
+      if (job && /SUMMARY\n([^\n]+)/i.test(text)) {
+        const focusTerms = [...ats.matched.slice(0, 3), ...ats.missing.slice(0, 2)]
+          .map((k) => k.replace(/\b\w/g, (c) => c.toUpperCase()))
+          .join(', ');
+        text = text.replace(
+          /SUMMARY\n([^\n]+)/i,
+          `SUMMARY\nTargeted for ${job.role} at ${job.company}. $1 Core focus areas: ${focusTerms}.`
+        );
+      }
+
+      // Append missing high-signal skills
+      if (topMissing.length) {
+        if (/SKILLS\n/i.test(text)) {
+          text = text.replace(/(SKILLS\n[^\n]*)/i, `$1, ${topMissing.join(', ')}`);
+        } else {
+          text += `\n\nCORE SKILLS\n${topMissing.join(', ')}`;
+        }
+      }
+
+      $('#resume-editor').value = text;
+      persistStudioEditor();
+      updateATSDisplay();
+      toast('Resume tailored for this role');
+    }
+
+    async function aiRewriteResume() {
+      const apiKey = $('#ai-api-key').value.trim();
+      state.sync.aiApiKey = apiKey;
+      saveState();
+
+      if (!apiKey) {
+        toast('Add an OpenAI (sk-...) or Gemini (AIza...) key, or use Auto-Tailor');
+        return;
+      }
+
+      const resume = $('#resume-editor').value.trim();
+      const jd = $('#studio-jd-preview').value.trim();
+      if (!resume || !jd) {
+        toast('Need both a resume and a job description');
+        return;
+      }
+
+      const btn = $('#ai-tailor-btn');
+      const orig = btn.textContent;
+      btn.textContent = 'Rewriting…';
+      btn.disabled = true;
+
+      const prompt = `You are a senior career coach and executive resume writer. Rewrite and tailor the following resume for the target job description. Keep all facts truthful, tighten impact metrics, weave in relevant keywords naturally, and return ONLY clean plain-text resume formatting.\n\nTARGET JOB DESCRIPTION:\n${jd}\n\nBASE RESUME:\n${resume}`;
+
+      try {
+        let rewritten = '';
+        if (apiKey.startsWith('sk-')) {
+          const res = await fetch('https://api.openai.com/v1/chat/completions', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${apiKey}` },
+            body: JSON.stringify({ model: 'gpt-4o-mini', messages: [{ role: 'user', content: prompt }], temperature: 0.4 })
+          });
+          const data = await res.json();
+          if (data.error) throw new Error(data.error.message);
+          rewritten = data.choices?.[0]?.message?.content || '';
+        } else {
+          const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${encodeURIComponent(apiKey)}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
+          });
+          const data = await res.json();
+          if (data.error) throw new Error(data.error.message);
+          rewritten = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
+        }
+
+        if (rewritten.trim()) {
+          $('#resume-editor').value = rewritten.trim();
+          persistStudioEditor();
+          updateATSDisplay();
+          toast('AI tailored resume ready');
+        }
+      } catch (err) {
+        toast(`AI rewrite failed: ${err.message}`);
+      } finally {
+        btn.textContent = orig;
+        btn.disabled = false;
+      }
+    }
+
+    /* Lightweight Client-Side File Extraction (.txt, .md, .docx, .pdf) */
+    async function handleResumeFile(file) {
+      if (!file) return;
+      const ext = file.name.split('.').pop().toLowerCase();
+      let extracted = '';
+
+      try {
+        if (ext === 'txt' || ext === 'md') {
+          extracted = await file.text();
+        } else if (ext === 'docx') {
+          extracted = await extractDocxText(file);
+        } else if (ext === 'pdf') {
+          extracted = await extractPdfText(file);
+        } else {
+          toast('Please upload a .pdf, .docx, .txt, or .md file');
+          return;
+        }
+
+        if (!extracted || extracted.trim().length < 20) {
+          toast('Uploaded! If PDF text is image-scanned, paste text directly in the editor.');
+          state.baseResumeName = file.name;
+          saveState();
+          renderResumeStudio();
+          return;
+        }
+
+        state.baseResume = extracted.trim();
+        state.baseResumeName = file.name;
+        saveState();
+        renderResumeStudio();
+        toast(`Loaded ${file.name}`);
+      } catch (e) {
+        toast('Could not parse file automatically — paste your resume text into the editor.');
+      }
+    }
+
+    async function extractDocxText(file) {
+      const buf = new Uint8Array(await file.arrayBuffer());
+      const view = new DataView(buf.buffer);
+      let offset = 0;
+      while (offset + 30 < buf.length) {
+        if (view.getUint32(offset, true) !== 0x04034b50) break;
+        const compMethod = view.getUint16(offset + 8, true);
+        const compSize = view.getUint32(offset + 18, true);
+        const nameLen = view.getUint16(offset + 26, true);
+        const extraLen = view.getUint16(offset + 28, true);
+        const name = new TextDecoder().decode(buf.slice(offset + 30, offset + 30 + nameLen));
+        const dataStart = offset + 30 + nameLen + extraLen;
+        const dataEnd = dataStart + compSize;
+
+        if (name === 'word/document.xml') {
+          let xmlBytes = buf.slice(dataStart, dataEnd);
+          if (compMethod === 8 && typeof DecompressionStream !== 'undefined') {
+            const ds = new DecompressionStream('deflate-raw');
+            const stream = new Blob([xmlBytes]).stream().pipeThrough(ds);
+            xmlBytes = new Uint8Array(await new Response(stream).arrayBuffer());
+          }
+          const xml = new TextDecoder().decode(xmlBytes);
+          return xml
+            .replace(/<\/w:p>/g, '\n')
+            .replace(/<[^>]+>/g, '')
+            .replace(/&amp;/g, '&')
+            .replace(/&lt;/g, '<')
+            .replace(/&gt;/g, '>')
+            .replace(/\n{3,}/g, '\n\n');
+        }
+        offset = dataEnd;
+      }
+      return '';
+    }
+
+    async function extractPdfText(file) {
+      const raw = new TextDecoder('latin1').decode(await file.arrayBuffer());
+      const matches = [];
+      const regex = /\(([^()\\]{2,}|\\.)+\)\s*Tj/g;
+      let m;
+      while ((m = regex.exec(raw)) !== null) {
+        matches.push(m[0].replace(/^\(|\)\s*Tj$/g, '').replace(/\\([()\\])/g, '$1'));
+      }
+      return matches.join(' ').replace(/\s{2,}/g, '\n');
+    }
+
+    /* ==========================================================================
+       VIEW 4: SYNC & CLOUD (Automatic Two-Way Background Sync)
+       ========================================================================== */
+    function hasCloudConfig() {
+      return Boolean(state.sync.gsheetsUrl || (state.sync.supaUrl && state.sync.supaKey));
+    }
+
+    function setSyncBadge(text, colorVar = '') {
+      const el = $('#sync-status-dot');
+      if (!el) return;
+      el.textContent = text;
+      el.style.color = colorVar ? `var(${colorVar})` : '';
+    }
+
+    function getSyncPayload() {
+      return {
+        jobs: state.jobs,
+        people: state.people,
+        baseResume: state.baseResume,
+        baseResumeName: state.baseResumeName,
+        updatedAt: state.updatedAt || new Date().toISOString()
+      };
+    }
+
+    function applyCloudPayload(data, silent = false) {
+      if (!data || typeof data !== 'object') return false;
+      const cloudTime = data.updatedAt ? new Date(data.updatedAt).getTime() : 0;
+      const localTime = state.updatedAt ? new Date(state.updatedAt).getTime() : 0;
+      if (silent && cloudTime && localTime && cloudTime <= localTime) return false;
+
+      if (Array.isArray(data.jobs)) state.jobs = data.jobs;
+      if (Array.isArray(data.people)) state.people = data.people;
+      if (typeof data.baseResume === 'string') state.baseResume = data.baseResume;
+      if (typeof data.baseResumeName === 'string') state.baseResumeName = data.baseResumeName;
+      state.updatedAt = data.updatedAt || new Date().toISOString();
+      saveState(true);
+      renderCurrentView();
+      return true;
+    }
+
+    function scheduleAutoSync() {
+      if (!state.sync.autoSync || !hasCloudConfig()) return;
+      if (!navigator.onLine) {
+        setSyncBadge('Offline', '--amber');
+        return;
+      }
+      setSyncBadge('Syncing…', '--accent');
+      clearTimeout(_autoSyncTimer);
+      _autoSyncTimer = setTimeout(() => {
+        autoPushToCloud(true);
+      }, 1200);
+    }
+
+    async function autoPushToCloud(silent = false) {
+      if (!hasCloudConfig()) return;
+      setSyncBadge('Syncing…', '--accent');
+      try {
+        if (state.sync.supaUrl && state.sync.supaKey) {
+          const url = state.sync.supaUrl.trim().replace(/\/$/, '');
+          const key = state.sync.supaKey.trim();
+          const res = await fetch(`${url}/rest/v1/lumen_state?id=eq.default`, {
+            method: 'POST',
+            headers: {
+              apikey: key,
+              Authorization: `Bearer ${key}`,
+              'Content-Type': 'application/json',
+              Prefer: 'resolution=merge-duplicates'
+            },
+            body: JSON.stringify({ id: 'default', payload: getSyncPayload(), updated_at: state.updatedAt })
+          });
+          if (!res.ok) throw new Error(res.statusText);
+        } else if (state.sync.gsheetsUrl) {
+          await fetch(state.sync.gsheetsUrl.trim(), {
+            method: 'POST',
+            mode: 'no-cors',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(getSyncPayload())
+          });
+        }
+        setSyncBadge('Synced ✓', '--green');
+        if (!silent) toast('Synced to cloud');
+      } catch (e) {
+        setSyncBadge('Retry', '--amber');
+        if (!silent) toast(`Sync failed: ${e.message}`);
+      }
+    }
+
+    async function autoPullFromCloud(silent = true) {
+      if (!hasCloudConfig() || !navigator.onLine) return;
+      setSyncBadge('Syncing…', '--accent');
+      try {
+        let data = null;
+        if (state.sync.supaUrl && state.sync.supaKey) {
+          const url = state.sync.supaUrl.trim().replace(/\/$/, '');
+          const key = state.sync.supaKey.trim();
+          const res = await fetch(`${url}/rest/v1/lumen_state?id=eq.default&select=payload,updated_at`, {
+            headers: { apikey: key, Authorization: `Bearer ${key}` }
+          });
+          if (res.ok) {
+            const rows = await res.json();
+            if (rows?.[0]?.payload) {
+              data = { ...rows[0].payload, updatedAt: rows[0].updated_at || rows[0].payload.updatedAt };
+            }
+          }
+        } else if (state.sync.gsheetsUrl) {
+          const res = await fetch(state.sync.gsheetsUrl.trim());
+          data = await res.json();
+        }
+        const updated = applyCloudPayload(data, silent);
+        setSyncBadge('Synced ✓', '--green');
+        if (updated && !silent) toast('Pulled latest from cloud');
+        else if (updated && silent) toast('Auto-synced latest changes');
+      } catch (e) {
+        setSyncBadge(hasCloudConfig() ? 'Cloud' : 'Local');
+        if (!silent) toast('Pull failed — verify your sync URL/key');
+      }
+    }
+
+    function renderSyncView() {
+      $('#gsheets-url').value = state.sync.gsheetsUrl || '';
+      $('#supa-url').value = state.sync.supaUrl || '';
+      $('#supa-key').value = state.sync.supaKey || '';
+    }
+
+    async function pushToGoogleSheets() {
+      const url = $('#gsheets-url').value.trim();
+      state.sync.gsheetsUrl = url;
+      saveState(true);
+      if (!url) return toast('Paste your Google Apps Script Web App URL first');
+      await autoPushToCloud(false);
+    }
+
+    async function pullFromGoogleSheets() {
+      const url = $('#gsheets-url').value.trim();
+      state.sync.gsheetsUrl = url;
+      saveState(true);
+      if (!url) return toast('Paste your Google Apps Script Web App URL first');
+      await autoPullFromCloud(false);
+    }
+
+    async function syncSupabase() {
+      const url = $('#supa-url').value.trim().replace(/\/$/, '');
+      const key = $('#supa-key').value.trim();
+      state.sync.supaUrl = url;
+      state.sync.supaKey = key;
+      saveState(true);
+      if (!url || !key) return toast('Enter both Supabase Project URL and Anon Key');
+      await autoPullFromCloud(true);
+      await autoPushToCloud(false);
+    }
+
+    /* ==========================================================================
+       MODALS (Add/Edit Job, Add/Edit Person, Link Entities, Scripts)
+       ========================================================================== */
+    function openModal(html) {
+      $('#modal-content').innerHTML = html;
+      $('#modal-backdrop').classList.add('open');
+    }
+
+    function closeModal() {
+      $('#modal-backdrop').classList.remove('open');
+    }
+
+    window.openJobModal = function (existing = null) {
+      const j = existing || {
+        company: '', role: '', level: '', status: 'Applied', comp: '', location: '', workMode: 'Hybrid',
+        url: '', appliedDate: new Date().toISOString().slice(0, 10), nextStepDate: '', jd: '', notes: ''
+      };
+      openModal(`
+        <div class="modal-header">
+          <h3 class="modal-title">${existing ? 'Edit Job Application' : 'New Job Application'}</h3>
+          <button class="icon-btn" onclick="closeModal()">✕</button>
+        </div>
+        <div class="form-row">
+          <div class="field"><label>Company *</label><input id="m-j-company" class="input" value="${esc(j.company)}" placeholder="Apple" /></div>
+          <div class="field"><label>Role Title *</label><input id="m-j-role" class="input" value="${esc(j.role)}" placeholder="Senior Product Designer" /></div>
+        </div>
+        <div class="form-row">
+          <div class="field"><label>Status</label>
+            <select id="m-j-status" class="select">${JOB_STATUSES.map((s) => `<option value="${s.id}" ${s.id === j.status ? 'selected' : ''}>${s.id}</option>`).join('')}</select>
+          </div>
+          <div class="field"><label>Role Level</label><input id="m-j-level" class="input" value="${esc(j.level)}" placeholder="Senior / L5 / Staff" /></div>
+        </div>
+        <div class="form-row">
+          <div class="field"><label>Compensation</label><input id="m-j-comp" class="input" value="${esc(j.comp)}" placeholder="$200k – $240k + Equity" /></div>
+          <div class="field"><label>Work Mode</label>
+            <select id="m-j-mode" class="select">
+              ${['Remote', 'Hybrid', 'On-site'].map((m) => `<option value="${m}" ${m === j.workMode ? 'selected' : ''}>${m}</option>`).join('')}
+            </select>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="field"><label>Location</label><input id="m-j-loc" class="input" value="${esc(j.location)}" placeholder="San Francisco, CA" /></div>
+          <div class="field"><label>Job Posting Link</label><input id="m-j-url" class="input" type="url" value="${esc(j.url)}" placeholder="https://..." /></div>
+        </div>
+        <div class="form-row">
+          <div class="field"><label>Applied Date</label><input id="m-j-applied" class="input" type="date" value="${esc(j.appliedDate)}" /></div>
+          <div class="field"><label>Next Step Date</label><input id="m-j-next" class="input" type="date" value="${esc(j.nextStepDate)}" /></div>
+        </div>
+        <div class="field"><label>Job Description (for Resume ATS Match)</label><textarea id="m-j-jd" class="notes-area" style="min-height:80px;" placeholder="Paste key requirements…">${esc(j.jd)}</textarea></div>
+        <div class="modal-footer">
+          <button class="btn" onclick="closeModal()">Cancel</button>
+          <button class="btn btn-primary" id="save-job-modal-btn">${existing ? 'Save Changes' : 'Add Job'}</button>
+        </div>
+      `);
+
+      $('#save-job-modal-btn').addEventListener('click', () => {
+        const company = $('#m-j-company').value.trim();
+        const role = $('#m-j-role').value.trim();
+        if (!company || !role) return toast('Company and Role are required');
+
+        const payload = {
+          company,
+          role,
+          status: $('#m-j-status').value,
+          level: $('#m-j-level').value.trim(),
+          comp: $('#m-j-comp').value.trim(),
+          workMode: $('#m-j-mode').value,
+          location: $('#m-j-loc').value.trim(),
+          url: $('#m-j-url').value.trim(),
+          appliedDate: $('#m-j-applied').value,
+          nextStepDate: $('#m-j-next').value,
+          jd: $('#m-j-jd').value.trim()
+        };
+
+        if (existing) {
+          Object.assign(existing, payload);
+          toast('Job updated');
+        } else {
+          const newJob = { id: uid('job'), ...payload, notes: '', personIds: [], tailoredResume: '' };
+          state.jobs.unshift(newJob);
+          ui.selectedJobId = newJob.id;
+          toast('Job added');
+        }
+        saveState();
+        closeModal();
+        renderJobs();
+      });
+    };
+
+    window.openPersonModal = function (existing = null) {
+      const p = existing || {
+        name: '', title: '', company: '', roleType: 'Recruiter', email: '', linkedin: '',
+        warmth: 'Warm', lastContact: new Date().toISOString().slice(0, 10), followUpDate: '', notes: ''
+      };
+      openModal(`
+        <div class="modal-header">
+          <h3 class="modal-title">${existing ? 'Edit Person' : 'New Contact'}</h3>
+          <button class="icon-btn" onclick="closeModal()">✕</button>
+        </div>
+        <div class="form-row">
+          <div class="field"><label>Full Name *</label><input id="m-p-name" class="input" value="${esc(p.name)}" placeholder="Jordan Lee" /></div>
+          <div class="field"><label>Company</label><input id="m-p-company" class="input" value="${esc(p.company)}" placeholder="Apple" /></div>
+        </div>
+        <div class="form-row">
+          <div class="field"><label>Title</label><input id="m-p-title" class="input" value="${esc(p.title)}" placeholder="Design Manager" /></div>
+          <div class="field"><label>Category</label>
+            <select id="m-p-role" class="select">${PEOPLE_ROLES.map((r) => `<option value="${r}" ${r === p.roleType ? 'selected' : ''}>${r}</option>`).join('')}</select>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="field"><label>Email</label><input id="m-p-email" class="input" type="email" value="${esc(p.email)}" placeholder="name@company.com" /></div>
+          <div class="field"><label>LinkedIn URL</label><input id="m-p-linkedin" class="input" type="url" value="${esc(p.linkedin)}" placeholder="https://linkedin.com/in/..." /></div>
+        </div>
+        <div class="form-row">
+          <div class="field"><label>Last Contacted</label><input id="m-p-last" class="input" type="date" value="${esc(p.lastContact)}" /></div>
+          <div class="field"><label>Follow-Up Date</label><input id="m-p-follow" class="input" type="date" value="${esc(p.followUpDate)}" /></div>
+        </div>
+        <div class="field"><label>Notes</label><textarea id="m-p-notes" class="notes-area" style="min-height:76px;" placeholder="How you met, what you discussed…">${esc(p.notes)}</textarea></div>
+        <div class="modal-footer">
+          <button class="btn" onclick="closeModal()">Cancel</button>
+          <button class="btn btn-primary" id="save-person-modal-btn">${existing ? 'Save Changes' : 'Add Contact'}</button>
+        </div>
+      `);
+
+      $('#save-person-modal-btn').addEventListener('click', () => {
+        const name = $('#m-p-name').value.trim();
+        if (!name) return toast('Name is required');
+        const payload = {
+          name,
+          company: $('#m-p-company').value.trim(),
+          title: $('#m-p-title').value.trim(),
+          roleType: $('#m-p-role').value,
+          email: $('#m-p-email').value.trim(),
+          linkedin: $('#m-p-linkedin').value.trim(),
+          lastContact: $('#m-p-last').value,
+          followUpDate: $('#m-p-follow').value,
+          notes: $('#m-p-notes').value.trim()
+        };
+
+        if (existing) {
+          Object.assign(existing, payload);
+          toast('Contact updated');
+        } else {
+          const newPerson = { id: uid('person'), warmth: 'Warm', ...payload };
+          state.people.unshift(newPerson);
+          // Auto-link if company matches an existing job
+          state.jobs.forEach((j) => {
+            if (payload.company && j.company.toLowerCase() === payload.company.toLowerCase()) {
+              j.personIds = [...new Set([...(j.personIds || []), newPerson.id])];
+            }
+          });
+          ui.selectedPersonId = newPerson.id;
+          toast('Contact added');
+        }
+        saveState();
+        closeModal();
+        renderCurrentView();
+      });
+    };
+
+    function openLinkPersonModal(job) {
+      const available = state.people.filter((p) => !(job.personIds || []).includes(p.id));
+      openModal(`
+        <div class="modal-header">
+          <h3 class="modal-title">Link Person to ${esc(job.company)}</h3>
+          <button class="icon-btn" onclick="closeModal()">✕</button>
+        </div>
+        ${
+          available.length
+            ? `<div style="display:flex; flex-direction:column; gap:8px;">
+                ${available
+                  .map(
+                    (p) => `
+                  <button class="item-card" style="text-align:left; border:1px solid var(--divider);" data-pick-person="${p.id}">
+                    <div style="font-weight:620; font-size:14px;">${esc(p.name)}</div>
+                    <div style="font-size:12.5px; color:var(--text-secondary)">${esc(p.title)} · ${esc(p.company)} (${esc(p.roleType)})</div>
+                  </button>`
+                  )
+                  .join('')}
+              </div>`
+            : `<p style="font-size:13.5px; color:var(--text-secondary)">All existing contacts are already linked to this job.</p>`
+        }
+        <div class="modal-footer">
+          <button class="btn" onclick="closeModal()">Close</button>
+          <button class="btn btn-primary" id="create-and-link-person">+ New Contact</button>
+        </div>
+      `);
+
+      $$('[data-pick-person]').forEach((btn) =>
+        btn.addEventListener('click', () => {
+          job.personIds = [...new Set([...(job.personIds || []), btn.dataset.pickPerson])];
+          saveState();
+          closeModal();
+          renderJobs();
+          toast('Contact linked');
+        })
+      );
+
+      $('#create-and-link-person').addEventListener('click', () => {
+        closeModal();
+        openPersonModal();
+      });
+    }
+
+    function openLinkJobModal(person) {
+      const available = state.jobs.filter((j) => !(j.personIds || []).includes(person.id));
+      openModal(`
+        <div class="modal-header">
+          <h3 class="modal-title">Link Job to ${esc(person.name)}</h3>
+          <button class="icon-btn" onclick="closeModal()">✕</button>
+        </div>
+        ${
+          available.length
+            ? `<div style="display:flex; flex-direction:column; gap:8px;">
+                ${available
+                  .map(
+                    (j) => `
+                  <button class="item-card" style="text-align:left; border:1px solid var(--divider);" data-pick-job="${j.id}">
+                    <div style="font-weight:620; font-size:14px;">${esc(j.role)}</div>
+                    <div style="font-size:12.5px; color:var(--text-secondary)">${esc(j.company)} · ${esc(j.status)}</div>
+                  </button>`
+                  )
+                  .join('')}
+              </div>`
+            : `<p style="font-size:13.5px; color:var(--text-secondary)">All tracked jobs are already linked to this contact.</p>`
+        }
+        <div class="modal-footer">
+          <button class="btn" onclick="closeModal()">Close</button>
+        </div>
+      `);
+
+      $$('[data-pick-job]').forEach((btn) =>
+        btn.addEventListener('click', () => {
+          const job = state.jobs.find((j) => j.id === btn.dataset.pickJob);
+          if (job) job.personIds = [...new Set([...(job.personIds || []), person.id])];
+          saveState();
+          closeModal();
+          renderPeople();
+          toast('Job linked');
+        })
+      );
+    }
+
+    /* ==========================================================================
+       EVENT BINDINGS & INIT
+       ========================================================================== */
+    $$('.nav-btn, .mobile-tab').forEach((btn) =>
+      btn.addEventListener('click', () => switchView(btn.dataset.view))
+    );
+
+    $('#theme-toggle-desktop').addEventListener('click', toggleTheme);
+    $('#theme-toggle-mobile').addEventListener('click', toggleTheme);
+
+    $('#global-search').addEventListener('input', (e) => {
+      ui.search = e.target.value;
+      renderCurrentView();
+    });
+
+    $('#primary-add-btn').addEventListener('click', () => {
+      if (ui.view === 'people') openPersonModal();
+      else openJobModal();
+    });
+
+    $('#modal-backdrop').addEventListener('click', (e) => {
+      if (e.target.id === 'modal-backdrop') closeModal();
+    });
+
+    document.addEventListener('keydown', (e) => {
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
+        e.preventDefault();
+        $('#global-search').focus();
+      } else if (e.key === 'Escape') {
+        closeModal();
+      }
+    });
+
+    // Resume Studio events
+    const dz = $('#resume-dropzone');
+    dz.addEventListener('click', () => $('#resume-file-input').click());
+    dz.addEventListener('dragover', (e) => { e.preventDefault(); dz.classList.add('dragover'); });
+    dz.addEventListener('dragleave', () => dz.classList.remove('dragover'));
+    dz.addEventListener('drop', (e) => {
+      e.preventDefault();
+      dz.classList.remove('dragover');
+      handleResumeFile(e.dataTransfer.files[0]);
+    });
+    $('#resume-file-input').addEventListener('change', (e) => handleResumeFile(e.target.files[0]));
+
+    $('#load-sample-resume-btn').addEventListener('click', () => {
+      state.baseResume = SAMPLE_RESUME;
+      state.baseResumeName = 'Sample_Resume.txt';
+      saveState();
+      renderResumeStudio();
+      toast('Sample resume loaded');
+    });
+
+    $('#studio-job-select').addEventListener('change', (e) => {
+      ui.studioJobId = e.target.value;
+      renderResumeStudio();
+    });
+
+    $('#resume-editor').addEventListener('input', () => {
+      persistStudioEditor();
+      updateATSDisplay();
+    });
+
+    $('#studio-jd-preview').addEventListener('input', () => {
+      persistStudioEditor();
+      updateATSDisplay();
+    });
+
+    $('#reset-to-base-btn').addEventListener('click', () => {
+      $('#resume-editor').value = state.baseResume || '';
+      persistStudioEditor();
+      updateATSDisplay();
+      toast('Reset to base resume');
+    });
+
+    $('#save-resume-version-btn').addEventListener('click', () => {
+      persistStudioEditor();
+      toast(ui.studioJobId ? 'Saved tailored resume for this role' : 'Saved master base resume');
+    });
+
+    $('#smart-tailor-btn').addEventListener('click', smartAutoTailor);
+    $('#ai-tailor-btn').addEventListener('click', aiRewriteResume);
+
+    $('#export-pdf-btn').addEventListener('click', () => {
+      const content = $('#resume-editor').value.trim();
+      if (!content) return toast('Resume is empty');
+      $('#print-resume-sheet').textContent = content;
+      window.print();
+    });
+
+    // Sync events
+    $('#gsheets-push-btn').addEventListener('click', pushToGoogleSheets);
+    $('#gsheets-pull-btn').addEventListener('click', pullFromGoogleSheets);
+    $('#gsheets-script-btn').addEventListener('click', () => {
+      openModal(`
+        <div class="modal-header">
+          <h3 class="modal-title">Google Apps Script Setup</h3>
+          <button class="icon-btn" onclick="closeModal()">✕</button>
+        </div>
+        <p style="font-size:13px; color:var(--text-secondary); line-height:1.5;">
+          Open a Google Sheet → <strong>Extensions → Apps Script</strong>, paste this code, and click <strong>Deploy → Web App (Anyone)</strong>.
+        </p>
+        <div class="code-box">function doGet() {
+  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('LumenData')
+    || SpreadsheetApp.getActiveSpreadsheet().insertSheet('LumenData');
+  const raw = sheet.getRange('A1').getValue() || '{"jobs":[],"people":[]}';
+  return ContentService.createTextOutput(raw).setMimeType(ContentService.MimeType.JSON);
+}
+
+function doPost(e) {
+  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('LumenData')
+    || SpreadsheetApp.getActiveSpreadsheet().insertSheet('LumenData');
+  sheet.getRange('A1').setValue(e.postData.contents);
+  return ContentService.createTextOutput('{"ok":true}').setMimeType(ContentService.MimeType.JSON);
+}</div>
+        <div class="modal-footer"><button class="btn btn-primary" onclick="closeModal()">Done</button></div>
+      `);
+    });
+
+    $('#supa-sync-btn').addEventListener('click', syncSupabase);
+    $('#supa-sql-btn').addEventListener('click', () => {
+      openModal(`
+        <div class="modal-header">
+          <h3 class="modal-title">Supabase Table SQL</h3>
+          <button class="icon-btn" onclick="closeModal()">✕</button>
+        </div>
+        <p style="font-size:13px; color:var(--text-secondary);">Run this once in your Supabase SQL Editor:</p>
+        <div class="code-box">create table if not exists lumen_state (
+  id text primary key,
+  payload jsonb not null,
+  updated_at timestamptz default now()
+);</div>
+        <div class="modal-footer"><button class="btn btn-primary" onclick="closeModal()">Done</button></div>
+      `);
+    });
+
+    $('#export-json-btn').addEventListener('click', () => {
+      const blob = new Blob([JSON.stringify(state, null, 2)], { type: 'application/json' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = `lumen-backup-${new Date().toISOString().slice(0, 10)}.json`;
+      a.click();
+      toast('Exported JSON backup');
+    });
+
+    $('#export-csv-btn').addEventListener('click', () => {
+      const headers = ['Company', 'Role', 'Level', 'Status', 'Compensation', 'WorkMode', 'Location', 'AppliedDate', 'URL'];
+      const rows = state.jobs.map((j) =>
+        [j.company, j.role, j.level, j.status, j.comp, j.workMode, j.location, j.appliedDate, j.url]
+          .map((v) => `"${String(v || '').replace(/"/g, '""')}"`)
+          .join(',')
+      );
+      const blob = new Blob([[headers.join(','), ...rows].join('\n')], { type: 'text/csv' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = `lumen-jobs-${new Date().toISOString().slice(0, 10)}.csv`;
+      a.click();
+      toast('Exported Jobs CSV');
+    });
+
+    $('#import-json-btn').addEventListener('click', () => $('#import-json-input').click());
+    $('#import-json-input').addEventListener('change', async (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+      try {
+        const parsed = JSON.parse(await file.text());
+        if (Array.isArray(parsed.jobs)) state.jobs = parsed.jobs;
+        if (Array.isArray(parsed.people)) state.people = parsed.people;
+        if (typeof parsed.baseResume === 'string') state.baseResume = parsed.baseResume;
+        saveState();
+        renderCurrentView();
+        toast('Backup imported');
+      } catch {
+        toast('Invalid JSON backup file');
+      }
+    });
+
+    $('#clear-data-btn').addEventListener('click', () => {
+      if (!confirm('Clear all sample/saved jobs and contacts?')) return;
+      state.jobs = [];
+      state.people = [];
+      ui.selectedJobId = null;
+      ui.selectedPersonId = null;
+      ui.studioJobId = '';
+      saveState();
+      renderCurrentView();
+      toast('Workspace cleared');
+    });
+
+    // Show mobile theme button on narrow viewports
+    function handleResize() {
+      $('#theme-toggle-mobile').style.display = window.innerWidth <= 980 ? 'inline-grid' : 'none';
+    }
+    window.addEventListener('resize', handleResize);
+    handleResize();
+
+    // Auto-save sync config on input change & trigger immediate sync
+    $('#gsheets-url').addEventListener('change', (e) => {
+      state.sync.gsheetsUrl = e.target.value.trim();
+      saveState(true);
+      if (state.sync.gsheetsUrl) {
+        autoPullFromCloud(true).then(() => toast('Auto-Sync enabled with Google Sheets'));
+      }
+    });
+    ['#supa-url', '#supa-key'].forEach((sel) =>
+      $(sel).addEventListener('change', () => {
+        state.sync.supaUrl = $('#supa-url').value.trim().replace(/\/$/, '');
+        state.sync.supaKey = $('#supa-key').value.trim();
+        saveState(true);
+        if (state.sync.supaUrl && state.sync.supaKey) {
+          autoPullFromCloud(true).then(() => toast('Auto-Sync enabled with Supabase'));
+        }
+      })
+    );
+
+    // Auto-pull when returning to Lumen on phone/desktop or coming back online
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'visible') autoPullFromCloud(true);
+    });
+    window.addEventListener('online', () => {
+      autoPullFromCloud(true);
+      scheduleAutoSync();
+    });
+
+    // Boot
+    applyTheme();
+    updateSidebarStats();
+    renderJobs();
+    if (hasCloudConfig()) autoPullFromCloud(true);
+  </script>
+</body>
+</html>
