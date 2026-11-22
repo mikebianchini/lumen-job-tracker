@@ -7,121 +7,120 @@
   <meta name="description" content="Lumen is a calm, Apple Liquid Glass web app for tracking job applications, networking contacts, and tailoring resumes per role." />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <meta name="theme-color" content="#007aff" />
-  <link rel="icon" type="image/png" sizes="64x64" href="./assets/favicon.png?v=4" />
-  <link rel="apple-touch-icon" sizes="180x180" href="./assets/apple-touch-icon.png?v=4" />
-  <link rel="manifest" href="./manifest.json?v=4" />
+  <meta name="theme-color" content="#ff385c" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="icon" type="image/png" sizes="64x64" href="./assets/favicon.png?v=5" />
+  <link rel="apple-touch-icon" sizes="180x180" href="./assets/apple-touch-icon.png?v=5" />
+  <link rel="manifest" href="./manifest.json?v=5" />
   <style>
     /* ==========================================================================
-       LUMEN — High-Clarity Apple Design System & Curated App Backgrounds
+       LUMEN — Warm Airbnb-Inspired Hospitality Design System
        ========================================================================== */
     :root {
-      --font-sans: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      --font-sans: "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
       --font-mono: ui-monospace, "SF Mono", SFMono-Regular, Menlo, Monaco, Consolas, monospace;
 
-      /* Light Mode Palette — Crisp Apple Clarity */
-      --bg-canvas: #f5f5f7;
+      /* Light Mode Palette — Sunlit Warm Hospitality */
+      --bg-canvas: #faf8f5;
       --bg-pattern: none;
 
-      --glass-bg: rgba(255, 255, 255, 0.92);
+      --glass-bg: #ffffff;
       --glass-bg-elevated: #ffffff;
-      --glass-bg-subtle: rgba(15, 23, 42, 0.038);
-      --glass-bg-hover: rgba(15, 23, 42, 0.065);
-      --glass-border: rgba(15, 23, 42, 0.09);
-      --glass-border-subtle: rgba(15, 23, 42, 0.08);
-      --glass-highlight: inset 0 1px 0 rgba(255, 255, 255, 0.95);
-      --glass-shadow: 0 2px 10px rgba(15, 23, 42, 0.04), 0 1px 2px rgba(15, 23, 42, 0.03);
-      --glass-shadow-lg: 0 18px 48px -12px rgba(15, 23, 42, 0.14), 0 4px 12px rgba(15, 23, 42, 0.05);
+      --glass-bg-subtle: #f7f4ef;
+      --glass-bg-hover: #f2ede6;
+      --glass-border: #ebe6df;
+      --glass-border-subtle: #e7e1d8;
+      --glass-highlight: inset 0 1px 0 rgba(255, 255, 255, 1);
+      --glass-shadow: 0 2px 10px rgba(34, 34, 34, 0.04), 0 1px 2px rgba(34, 34, 34, 0.03);
+      --glass-shadow-lg: 0 20px 52px -12px rgba(34, 34, 34, 0.14), 0 4px 14px rgba(34, 34, 34, 0.05);
 
-      --text-primary: #111827;
-      --text-secondary: #4b5563;
-      --text-tertiary: #6b7280;
+      --text-primary: #222222;
+      --text-secondary: #5a5550;
+      --text-tertiary: #7a746e;
 
-      --accent: #007aff;
-      --accent-soft: rgba(0, 122, 255, 0.11);
-      --accent-text: #0062cc;
-      --green: #1f8f41;
-      --green-soft: rgba(31, 143, 65, 0.12);
+      --accent: #ff385c;
+      --accent-gradient: linear-gradient(135deg, #ff385c 0%, #e31c5f 100%);
+      --accent-soft: rgba(255, 56, 92, 0.1);
+      --accent-text: #d91e48;
+      --green: #1e7e5b;
+      --green-soft: rgba(30, 126, 91, 0.11);
       --amber: #c26500;
       --amber-soft: rgba(217, 119, 6, 0.12);
-      --red: #d92d20;
-      --red-soft: rgba(217, 45, 32, 0.11);
+      --red: #c92a2a;
+      --red-soft: rgba(201, 42, 42, 0.1);
       --teal: #0f766e;
-      --teal-soft: rgba(15, 118, 110, 0.12);
-      --slate: #475569;
-      --slate-soft: rgba(71, 85, 105, 0.11);
+      --teal-soft: rgba(15, 118, 110, 0.11);
+      --slate: #57534e;
+      --slate-soft: rgba(87, 83, 78, 0.1);
 
       --input-bg: #ffffff;
-      --input-border: rgba(15, 23, 42, 0.14);
-      --divider: rgba(15, 23, 42, 0.085);
+      --input-border: #ddd6cd;
+      --divider: #eee9e2;
 
       --radius-xl: 22px;
       --radius-lg: 16px;
       --radius-md: 12px;
-      --radius-sm: 9px;
+      --radius-sm: 10px;
       --radius-pill: 999px;
 
       --ease-spring: cubic-bezier(0.22, 1, 0.36, 1);
     }
 
     [data-theme="dark"] {
-      --bg-canvas: #0f1117;
+      --bg-canvas: #171514;
       --bg-pattern: none;
 
-      --glass-bg: rgba(24, 27, 35, 0.94);
-      --glass-bg-elevated: #202430;
-      --glass-bg-subtle: rgba(255, 255, 255, 0.055);
-      --glass-bg-hover: rgba(255, 255, 255, 0.095);
-      --glass-border: rgba(255, 255, 255, 0.11);
-      --glass-border-subtle: rgba(255, 255, 255, 0.09);
-      --glass-highlight: inset 0 1px 0 rgba(255, 255, 255, 0.08);
-      --glass-shadow: 0 4px 18px rgba(0, 0, 0, 0.32), 0 1px 3px rgba(0, 0, 0, 0.24);
+      --glass-bg: #221f1d;
+      --glass-bg-elevated: #2a2624;
+      --glass-bg-subtle: #2c2826;
+      --glass-bg-hover: #342f2c;
+      --glass-border: rgba(255, 245, 235, 0.1);
+      --glass-border-subtle: rgba(255, 245, 235, 0.08);
+      --glass-highlight: inset 0 1px 0 rgba(255, 245, 235, 0.06);
+      --glass-shadow: 0 4px 18px rgba(0, 0, 0, 0.34), 0 1px 3px rgba(0, 0, 0, 0.24);
       --glass-shadow-lg: 0 24px 60px -12px rgba(0, 0, 0, 0.62);
 
-      --text-primary: #f8fafc;
-      --text-secondary: #cbd5e1;
-      --text-tertiary: #94a3b8;
+      --text-primary: #f7f4f0;
+      --text-secondary: #d4ccc4;
+      --text-tertiary: #a19890;
 
-      --accent: #0a84ff;
-      --accent-soft: rgba(10, 132, 255, 0.2);
-      --accent-text: #60a5fa;
+      --accent: #ff4d6d;
+      --accent-gradient: linear-gradient(135deg, #ff4d6d 0%, #e31c5f 100%);
+      --accent-soft: rgba(255, 77, 109, 0.18);
+      --accent-text: #ff758f;
       --green: #34d399;
-      --green-soft: rgba(52, 211, 153, 0.17);
+      --green-soft: rgba(52, 211, 153, 0.16);
       --amber: #fbbf24;
-      --amber-soft: rgba(251, 191, 36, 0.17);
+      --amber-soft: rgba(251, 191, 36, 0.16);
       --red: #f87171;
-      --red-soft: rgba(248, 113, 113, 0.17);
+      --red-soft: rgba(248, 113, 113, 0.16);
       --teal: #5eead4;
-      --teal-soft: rgba(94, 234, 212, 0.16);
-      --slate: #cbd5e1;
-      --slate-soft: rgba(148, 163, 184, 0.16);
+      --teal-soft: rgba(94, 234, 212, 0.15);
+      --slate: #d6cfc7;
+      --slate-soft: rgba(214, 207, 199, 0.14);
 
-      --input-bg: #141720;
-      --input-border: rgba(255, 255, 255, 0.16);
-      --divider: rgba(255, 255, 255, 0.09);
+      --input-bg: #1a1716;
+      --input-border: rgba(255, 245, 235, 0.15);
+      --divider: rgba(255, 245, 235, 0.09);
     }
 
-    /* Curated App Backgrounds (Light & Dark Adaptive) */
-    [data-bg="studio"] { --bg-canvas: #f5f5f7; }
-    [data-theme="dark"][data-bg="studio"] { --bg-canvas: #0f1117; }
+    /* 5 Warm Curated Hospitality Backgrounds */
+    [data-bg="linen"] { --bg-canvas: #faf8f5; }
+    [data-theme="dark"][data-bg="linen"] { --bg-canvas: #171514; }
 
-    [data-bg="paper"] { --bg-canvas: #f5f2eb; }
-    [data-theme="dark"][data-bg="paper"] { --bg-canvas: #151311; }
+    [data-bg="white"] { --bg-canvas: #ffffff; }
+    [data-theme="dark"][data-bg="white"] { --bg-canvas: #131212; }
 
-    [data-bg="mist"] { --bg-canvas: linear-gradient(180deg, #e8f1fb 0%, #f4f7fb 100%); }
-    [data-theme="dark"][data-bg="mist"] { --bg-canvas: linear-gradient(180deg, #0d1626 0%, #0b0f18 100%); }
+    [data-bg="sand"] { --bg-canvas: #f4eee5; }
+    [data-theme="dark"][data-bg="sand"] { --bg-canvas: #1c1814; }
 
-    [data-bg="sage"] { --bg-canvas: linear-gradient(180deg, #e8f2ec 0%, #f4f7f5 100%); }
-    [data-theme="dark"][data-bg="sage"] { --bg-canvas: linear-gradient(180deg, #0d1915 0%, #0b100e 100%); }
+    [data-bg="sage"] { --bg-canvas: #f0f4f0; }
+    [data-theme="dark"][data-bg="sage"] { --bg-canvas: #131916; }
 
-    [data-bg="graphite"] {
-      --bg-canvas: #eef0f4;
-      --bg-pattern: radial-gradient(rgba(15, 23, 42, 0.09) 1px, transparent 1px);
-    }
-    [data-theme="dark"][data-bg="graphite"] {
-      --bg-canvas: #11131a;
-      --bg-pattern: radial-gradient(rgba(255, 255, 255, 0.08) 1px, transparent 1px);
-    }
+    [data-bg="blush"] { --bg-canvas: #fbf3f1; }
+    [data-theme="dark"][data-bg="blush"] { --bg-canvas: #1c1415; }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -135,7 +134,7 @@
       overflow-x: hidden;
     }
 
-    /* Clean App Canvas */
+    /* Clean Warm Canvas */
     .ambient-backdrop {
       position: fixed;
       inset: 0;
@@ -145,28 +144,15 @@
       transition: background 0.3s ease;
     }
 
-    .ambient-backdrop::after {
-      content: "";
-      position: absolute;
-      inset: 0;
-      background-image: var(--bg-pattern);
-      background-size: 20px 20px;
-      pointer-events: none;
-    }
-
-    /* Crisp Surface Primitive */
+    /* Warm Tactile Card Surface */
     .glass {
       background: var(--glass-bg);
-      backdrop-filter: blur(18px) saturate(140%);
-      -webkit-backdrop-filter: blur(18px) saturate(140%);
       border: 1px solid var(--glass-border);
       box-shadow: var(--glass-highlight), var(--glass-shadow);
     }
 
     .glass-elevated {
       background: var(--glass-bg-elevated);
-      backdrop-filter: blur(22px) saturate(150%);
-      -webkit-backdrop-filter: blur(22px) saturate(150%);
       border: 1px solid var(--glass-border);
       box-shadow: var(--glass-highlight), var(--glass-shadow-lg);
     }
@@ -394,7 +380,7 @@
     .momentum-fill {
       height: 100%;
       border-radius: var(--radius-pill);
-      background: linear-gradient(90deg, var(--accent), #38bdf8);
+      background: linear-gradient(90deg, var(--accent), #ff8a4c);
       transition: width 0.5s var(--ease-spring);
     }
 
@@ -526,16 +512,16 @@
     }
 
     .btn-primary {
-      background: var(--accent);
+      background: var(--accent-gradient);
       border-color: transparent;
       color: #ffffff;
-      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.32), 0 6px 18px rgba(0, 122, 255, 0.32);
+      box-shadow: 0 4px 14px rgba(255, 56, 92, 0.28);
     }
 
     .btn-primary:hover {
-      background: #0070eb;
+      background: linear-gradient(135deg, #e61e4d 0%, #d70466 100%);
       color: #ffffff;
-      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.36), 0 8px 22px rgba(0, 122, 255, 0.4);
+      box-shadow: 0 6px 20px rgba(255, 56, 92, 0.36);
     }
 
     .btn-ghost {
@@ -679,7 +665,7 @@
     .item-card.selected {
       background: var(--glass-bg-elevated);
       border-color: var(--accent);
-      box-shadow: 0 0 0 1px var(--accent-soft), 0 8px 24px rgba(0, 122, 255, 0.12);
+      box-shadow: 0 0 0 1px var(--accent-soft), 0 8px 22px rgba(255, 56, 92, 0.1);
     }
 
     .item-card-top {
@@ -1395,7 +1381,7 @@
       border-radius: 10px;
       object-fit: cover;
       border: 1px solid var(--glass-border);
-      box-shadow: 0 4px 14px rgba(0, 122, 255, 0.24), inset 0 1px 0 rgba(255, 255, 255, 0.8);
+      box-shadow: 0 4px 14px rgba(255, 56, 92, 0.22), inset 0 1px 0 rgba(255, 255, 255, 0.8);
       flex-shrink: 0;
     }
 
@@ -1561,7 +1547,7 @@
       height: 56px;
       border-radius: 16px;
       border: 1px solid var(--glass-border);
-      box-shadow: 0 10px 26px rgba(0, 122, 255, 0.26);
+      box-shadow: 0 10px 26px rgba(255, 56, 92, 0.24);
       flex-shrink: 0;
     }
 
@@ -1756,7 +1742,7 @@
     <aside class="sidebar glass" aria-label="Primary navigation">
       <div class="brand">
         <div class="brand-left">
-          <img src="./assets/icon-192.png?v=4" class="brand-icon-img" alt="Lumen" />
+          <img src="./assets/icon-192.png?v=5" class="brand-icon-img" alt="Lumen" />
           <span class="brand-name">Lumen</span>
         </div>
         <button class="icon-btn" id="theme-toggle-desktop" title="Toggle Light/Dark Mode" aria-label="Toggle theme">
@@ -1807,11 +1793,11 @@
         <div class="bg-picker" title="Choose App Background">
           <span style="font-size: 11px; font-weight: 600; color: var(--text-tertiary);">Canvas</span>
           <div style="display: flex; gap: 6px;">
-            <button class="bg-swatch" data-bg-pick="studio" title="Clean Studio" style="background: #f5f5f7;"></button>
-            <button class="bg-swatch" data-bg-pick="paper" title="Warm Paper" style="background: #f2ece0;"></button>
-            <button class="bg-swatch" data-bg-pick="mist" title="Mist Blue" style="background: linear-gradient(135deg, #dceafb, #f2f6fb);"></button>
-            <button class="bg-swatch" data-bg-pick="sage" title="Sage Silk" style="background: linear-gradient(135deg, #dcece3, #f2f7f4);"></button>
-            <button class="bg-swatch" data-bg-pick="graphite" title="Graphite Dot Grid" style="background: radial-gradient(#64748b 1px, #e5e7eb 1px); background-size: 6px 6px;"></button>
+            <button class="bg-swatch" data-bg-pick="linen" title="Warm Linen" style="background: #faf8f5;"></button>
+            <button class="bg-swatch" data-bg-pick="white" title="Pure Gallery" style="background: #ffffff;"></button>
+            <button class="bg-swatch" data-bg-pick="sand" title="Sunlit Sand" style="background: #efe6d8;"></button>
+            <button class="bg-swatch" data-bg-pick="sage" title="Morning Sage" style="background: #e4ede6;"></button>
+            <button class="bg-swatch" data-bg-pick="blush" title="Soft Blush" style="background: #f9e6e2;"></button>
           </div>
         </div>
 
@@ -1907,9 +1893,9 @@
                 <svg viewBox="0 0 68 68">
                   <defs>
                     <linearGradient id="atsPrismGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                      <stop offset="0%" stop-color="#007aff" />
-                      <stop offset="55%" stop-color="#38bdf8" />
-                      <stop offset="100%" stop-color="#30d158" />
+                      <stop offset="0%" stop-color="#ff385c" />
+                      <stop offset="55%" stop-color="#ff8a4c" />
+                      <stop offset="100%" stop-color="#1e7e5b" />
                     </linearGradient>
                   </defs>
                   <circle cx="34" cy="34" r="28" fill="none" stroke="var(--divider)" stroke-width="6"></circle>
@@ -1973,21 +1959,21 @@
       <section class="view" id="view-sync" aria-label="Sync and Cloud settings">
         <div class="visual-hero glass sync-hero">
           <div class="sync-app-showcase">
-            <img src="./assets/icon-192.png?v=4" class="sync-app-icon-lg" alt="Lumen App Icon" />
+            <img src="./assets/icon-192.png?v=5" class="sync-app-icon-lg" alt="Lumen App Icon" />
             <div>
               <div class="hero-kicker">Installable Web &amp; iOS App</div>
-              <div style="font-size: 17px; font-weight: 680; letter-spacing: -0.02em; margin-top: 2px;">Lumen Automatic Cloud Sync</div>
-              <div style="font-size: 12.5px; color: var(--text-secondary); margin-top: 2px;">Add Lumen to your iPhone Home Screen (Safari → Share → Add to Home Screen) to get the native app icon &amp; seamless background sync.</div>
+              <div style="font-size: 17px; font-weight: 700; letter-spacing: -0.02em; margin-top: 2px;">Lumen Automatic Cloud Sync</div>
+              <div style="font-size: 12.5px; color: var(--text-secondary); margin-top: 2px;">Add Lumen to your iPhone Home Screen (Safari → Share → Add to Home Screen) to keep your search right at your fingertips.</div>
             </div>
           </div>
           <div class="bg-picker" title="Choose App Background" style="flex-shrink:0;">
             <span style="font-size: 11px; font-weight: 600; color: var(--text-tertiary);">Canvas</span>
             <div style="display: flex; gap: 6px;">
-              <button class="bg-swatch" data-bg-pick="studio" title="Clean Studio" style="background: #f5f5f7;"></button>
-              <button class="bg-swatch" data-bg-pick="paper" title="Warm Paper" style="background: #f2ece0;"></button>
-              <button class="bg-swatch" data-bg-pick="mist" title="Mist Blue" style="background: linear-gradient(135deg, #dceafb, #f2f6fb);"></button>
-              <button class="bg-swatch" data-bg-pick="sage" title="Sage Silk" style="background: linear-gradient(135deg, #dcece3, #f2f7f4);"></button>
-              <button class="bg-swatch" data-bg-pick="graphite" title="Graphite Dot Grid" style="background: radial-gradient(#64748b 1px, #e5e7eb 1px); background-size: 6px 6px;"></button>
+              <button class="bg-swatch" data-bg-pick="linen" title="Warm Linen" style="background: #faf8f5;"></button>
+              <button class="bg-swatch" data-bg-pick="white" title="Pure Gallery" style="background: #ffffff;"></button>
+              <button class="bg-swatch" data-bg-pick="sand" title="Sunlit Sand" style="background: #efe6d8;"></button>
+              <button class="bg-swatch" data-bg-pick="sage" title="Morning Sage" style="background: #e4ede6;"></button>
+              <button class="bg-swatch" data-bg-pick="blush" title="Soft Blush" style="background: #f9e6e2;"></button>
             </div>
           </div>
         </div>
@@ -2102,12 +2088,12 @@
     const STORAGE_KEY = 'lumen_career_studio_v1';
 
     const JOB_STATUSES = [
-      { id: 'Saved', color: '#64748b' },
-      { id: 'Applied', color: '#007aff' },
-      { id: 'Screening', color: '#0d9488' },
+      { id: 'Saved', color: '#78716c' },
+      { id: 'Applied', color: '#ff385c' },
+      { id: 'Screening', color: '#0f766e' },
       { id: 'Interviewing', color: '#d97706' },
-      { id: 'Offer', color: '#24a148' },
-      { id: 'Archived', color: '#e03131' }
+      { id: 'Offer', color: '#1e7e5b' },
+      { id: 'Archived', color: '#c92a2a' }
     ];
 
     const PEOPLE_ROLES = ['Recruiter', 'Hiring Manager', 'Referral', 'Peer / Coffee Chat'];
@@ -2135,7 +2121,7 @@ Product Design, Design Systems, Interaction Design, Prototyping, Figma, User Res
     function getDefaultState() {
       return {
         theme: window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light',
-        bg: 'studio',
+        bg: 'linen',
         jobs: [
           {
             id: 'job-1',
@@ -2307,7 +2293,7 @@ Product Design, Design Systems, Interaction Design, Prototyping, Figma, User Res
 
     function tintFor(str) {
       const palette = [
-        ['rgba(0, 122, 255, 0.16)', '#007aff'],
+        ['rgba(255, 56, 92, 0.14)', '#ff385c'],
         ['rgba(13, 148, 136, 0.16)', '#0d9488'],
         ['rgba(217, 119, 6, 0.16)', '#d97706'],
         ['rgba(36, 161, 72, 0.16)', '#24a148'],
@@ -2346,8 +2332,10 @@ Product Design, Design Systems, Interaction Design, Prototyping, Figma, User Res
        ========================================================================== */
     function applyTheme() {
       document.documentElement.setAttribute('data-theme', state.theme);
-      document.documentElement.setAttribute('data-bg', state.bg || 'studio');
-      $$('[data-bg-pick]').forEach((b) => b.classList.toggle('active', b.dataset.bgPick === (state.bg || 'studio')));
+      const validBgs = ['linen', 'white', 'sand', 'sage', 'blush'];
+      const activeBg = validBgs.includes(state.bg) ? state.bg : 'linen';
+      document.documentElement.setAttribute('data-bg', activeBg);
+      $$('[data-bg-pick]').forEach((b) => b.classList.toggle('active', b.dataset.bgPick === activeBg));
       const isDark = state.theme === 'dark';
       const sunIcon = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>`;
       const moonIcon = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>`;
@@ -2420,7 +2408,12 @@ Product Design, Design Systems, Interaction Design, Prototyping, Figma, User Res
        ========================================================================== */
     function renderHome() {
       const hour = new Date().getHours();
-      const greeting = hour < 12 ? 'Good morning' : hour < 18 ? 'Good afternoon' : 'Good evening';
+      const greeting =
+        hour < 12
+          ? "Good morning — let's find your next home."
+          : hour < 18
+          ? 'Good afternoon — one thoughtful step at a time.'
+          : "Good evening — celebrate how far you've come.";
       const todayLabel = new Date().toLocaleDateString(undefined, { weekday: 'long', month: 'long', day: 'numeric' });
 
       const activeJobs = state.jobs.filter((j) => j.status !== 'Archived');
@@ -2471,7 +2464,7 @@ Product Design, Design Systems, Interaction Design, Prototyping, Figma, User Res
         <div class="visual-hero glass home-hero">
           <div style="display:flex; flex-direction:column; gap:10px; min-width:0;">
             <div class="hero-kicker">${esc(todayLabel)}</div>
-            <h2 class="home-greeting">${greeting}.</h2>
+            <h2 class="home-greeting">${greeting}</h2>
             <p style="font-size:13.5px; color:var(--text-secondary); max-width:520px; line-height:1.45;">
               You have <strong style="color:var(--text-primary)">${activeJobs.length}</strong> active role${activeJobs.length === 1 ? '' : 's'}, <strong style="color:var(--text-primary)">${interviewing}</strong> interview loop${interviewing === 1 ? '' : 's'}, and <strong style="color:var(--text-primary)">${agenda.length}</strong> upcoming action${agenda.length === 1 ? '' : 's'}.
             </p>
@@ -2486,8 +2479,8 @@ Product Design, Design Systems, Interaction Design, Prototyping, Figma, User Res
               <svg viewBox="0 0 50 50">
                 <defs>
                   <linearGradient id="homeRingGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                    <stop offset="0%" stop-color="#007aff" />
-                    <stop offset="100%" stop-color="#30d158" />
+                    <stop offset="0%" stop-color="#ff385c" />
+                    <stop offset="100%" stop-color="#1e7e5b" />
                   </linearGradient>
                 </defs>
                 <circle cx="25" cy="25" r="20" fill="none" stroke="var(--divider)" stroke-width="5"></circle>
@@ -2698,8 +2691,8 @@ Product Design, Design Systems, Interaction Design, Prototyping, Figma, User Res
             <svg viewBox="0 0 50 50">
               <defs>
                 <linearGradient id="heroRingGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                  <stop offset="0%" stop-color="#007aff" />
-                  <stop offset="100%" stop-color="#30d158" />
+                  <stop offset="0%" stop-color="#ff385c" />
+                  <stop offset="100%" stop-color="#1e7e5b" />
                 </linearGradient>
               </defs>
               <circle cx="25" cy="25" r="20" fill="none" stroke="var(--divider)" stroke-width="5"></circle>
