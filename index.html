@@ -3262,25 +3262,6 @@ Product Design, Design Systems, Interaction Design, Prototyping, Figma, User Res
               <button class="btn btn-sm" id="home-open-resume">Tailor Resume</button>
             </div>
           </div>
-          <div class="hero-gauge" style="padding:12px 16px;">
-            <div class="hero-gauge-ring">
-              <svg viewBox="0 0 50 50">
-                <defs>
-                  <linearGradient id="homeRingGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                    <stop offset="0%" stop-color="#ff385c" />
-                    <stop offset="100%" stop-color="#1e7e5b" />
-                  </linearGradient>
-                </defs>
-                <circle cx="25" cy="25" r="20" fill="none" stroke="var(--divider)" stroke-width="5"></circle>
-                <circle cx="25" cy="25" r="20" fill="none" stroke="url(#homeRingGrad)" stroke-width="5" stroke-linecap="round" stroke-dasharray="${circ}" stroke-dashoffset="${offset}"></circle>
-              </svg>
-              <div class="hero-gauge-val">${momentumPct}%</div>
-            </div>
-            <div>
-              <div style="font-size:13.5px; font-weight:660;">Pipeline Momentum</div>
-              <div style="font-size:12px; color:var(--text-secondary); margin-top:2px;">${advanced} of ${activeJobs.length || 0} advanced</div>
-            </div>
-          </div>
         </div>
 
         <!-- 4 Clean KPI Glass Cards -->
@@ -3561,25 +3542,6 @@ Product Design, Design Systems, Interaction Design, Prototyping, Figma, User Res
                   `<span class="funnel-legend-item" data-hero-stage="${s.id}"><span class="pill-dot" style="background:${s.color}"></span>${s.id} <strong style="color:var(--text-primary)">${counts[s.id]}</strong></span>`
               )
               .join('')}
-          </div>
-        </div>
-        <div class="hero-gauge">
-          <div class="hero-gauge-ring">
-            <svg viewBox="0 0 50 50">
-              <defs>
-                <linearGradient id="heroRingGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                  <stop offset="0%" stop-color="#ff385c" />
-                  <stop offset="100%" stop-color="#1e7e5b" />
-                </linearGradient>
-              </defs>
-              <circle cx="25" cy="25" r="20" fill="none" stroke="var(--divider)" stroke-width="5"></circle>
-              <circle cx="25" cy="25" r="20" fill="none" stroke="url(#heroRingGrad)" stroke-width="5" stroke-linecap="round" stroke-dasharray="${ringCirc}" stroke-dashoffset="${ringOffset}"></circle>
-            </svg>
-            <div class="hero-gauge-val">${momentumPct}%</div>
-          </div>
-          <div>
-            <div style="font-size:13px; font-weight:650;">Interview Momentum</div>
-            <div style="font-size:11.5px; color:var(--text-secondary); margin-top:1px;">${advanced} in active loops</div>
           </div>
         </div>
       `;
