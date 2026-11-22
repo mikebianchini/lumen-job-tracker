@@ -3246,7 +3246,7 @@ Product Design, Design Systems, Interaction Design, Prototyping, Figma, User Res
           .join('');
 
         let draggedJobId = null;
-        $('[data-kcard-id]').forEach((el) => {
+        $$('[data-kcard-id]').forEach((el) => {
           el.addEventListener('dragstart', (e) => {
             draggedJobId = el.dataset.kcardId;
             el.classList.add('dragging');
@@ -3255,11 +3255,11 @@ Product Design, Design Systems, Interaction Design, Prototyping, Figma, User Res
           });
           el.addEventListener('dragend', () => {
             el.classList.remove('dragging');
-            $('[data-kcol-stage]').forEach((c) => c.classList.remove('drag-over'));
+            $$('[data-kcol-stage]').forEach((c) => c.classList.remove('drag-over'));
           });
         });
 
-        $('[data-kcol-stage]').forEach((col) => {
+        $$('[data-kcol-stage]').forEach((col) => {
           col.addEventListener('dragover', (e) => {
             e.preventDefault();
             e.dataTransfer.dropEffect = 'move';
@@ -3283,7 +3283,7 @@ Product Design, Design Systems, Interaction Design, Prototyping, Figma, User Res
           });
         });
 
-        $('[data-kcard-id]').forEach((el) =>
+        $$('[data-kcard-id]').forEach((el) =>
           el.addEventListener('click', (e) => {
             if (e.target.closest('[data-kadvance-id]')) return;
             ui.selectedJobId = el.dataset.kcardId;
