@@ -13,96 +13,114 @@
   <link rel="manifest" href="./manifest.json?v=4" />
   <style>
     /* ==========================================================================
-       LUMEN — Apple Liquid Glass Design System
+       LUMEN — High-Clarity Apple Design System & Curated App Backgrounds
        ========================================================================== */
     :root {
       --font-sans: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
       --font-mono: ui-monospace, "SF Mono", SFMono-Regular, Menlo, Monaco, Consolas, monospace;
 
-      /* Light Mode Palette — Pearlescent Glass */
-      --bg-canvas: #eef2f8;
-      --orb-1: rgba(110, 178, 255, 0.38);
-      --orb-2: rgba(168, 224, 245, 0.42);
-      --orb-3: rgba(255, 222, 198, 0.34);
+      /* Light Mode Palette — Crisp Apple Clarity */
+      --bg-canvas: #f5f5f7;
+      --bg-pattern: none;
 
-      --glass-bg: rgba(255, 255, 255, 0.58);
-      --glass-bg-elevated: rgba(255, 255, 255, 0.76);
-      --glass-bg-subtle: rgba(255, 255, 255, 0.38);
-      --glass-bg-hover: rgba(255, 255, 255, 0.84);
-      --glass-border: rgba(255, 255, 255, 0.72);
+      --glass-bg: rgba(255, 255, 255, 0.92);
+      --glass-bg-elevated: #ffffff;
+      --glass-bg-subtle: rgba(15, 23, 42, 0.038);
+      --glass-bg-hover: rgba(15, 23, 42, 0.065);
+      --glass-border: rgba(15, 23, 42, 0.09);
       --glass-border-subtle: rgba(15, 23, 42, 0.08);
-      --glass-highlight: inset 0 1px 0 rgba(255, 255, 255, 0.88), inset 0 -1px 0 rgba(15, 23, 42, 0.04);
-      --glass-shadow: 0 12px 36px -8px rgba(15, 23, 42, 0.09), 0 2px 8px rgba(15, 23, 42, 0.04);
-      --glass-shadow-lg: 0 24px 64px -12px rgba(15, 23, 42, 0.16), 0 4px 16px rgba(15, 23, 42, 0.06);
+      --glass-highlight: inset 0 1px 0 rgba(255, 255, 255, 0.95);
+      --glass-shadow: 0 2px 10px rgba(15, 23, 42, 0.04), 0 1px 2px rgba(15, 23, 42, 0.03);
+      --glass-shadow-lg: 0 18px 48px -12px rgba(15, 23, 42, 0.14), 0 4px 12px rgba(15, 23, 42, 0.05);
 
-      --text-primary: #0f172a;
-      --text-secondary: rgba(15, 23, 42, 0.64);
-      --text-tertiary: rgba(15, 23, 42, 0.44);
+      --text-primary: #111827;
+      --text-secondary: #4b5563;
+      --text-tertiary: #6b7280;
 
       --accent: #007aff;
-      --accent-soft: rgba(0, 122, 255, 0.12);
-      --accent-text: #0066d6;
-      --green: #24a148;
-      --green-soft: rgba(36, 161, 72, 0.13);
-      --amber: #d97706;
-      --amber-soft: rgba(217, 119, 6, 0.13);
-      --red: #e03131;
-      --red-soft: rgba(224, 49, 49, 0.12);
-      --teal: #0d9488;
-      --teal-soft: rgba(13, 148, 136, 0.13);
+      --accent-soft: rgba(0, 122, 255, 0.11);
+      --accent-text: #0062cc;
+      --green: #1f8f41;
+      --green-soft: rgba(31, 143, 65, 0.12);
+      --amber: #c26500;
+      --amber-soft: rgba(217, 119, 6, 0.12);
+      --red: #d92d20;
+      --red-soft: rgba(217, 45, 32, 0.11);
+      --teal: #0f766e;
+      --teal-soft: rgba(15, 118, 110, 0.12);
       --slate: #475569;
-      --slate-soft: rgba(71, 85, 105, 0.12);
+      --slate-soft: rgba(71, 85, 105, 0.11);
 
-      --input-bg: rgba(255, 255, 255, 0.62);
-      --input-border: rgba(15, 23, 42, 0.11);
-      --divider: rgba(15, 23, 42, 0.075);
+      --input-bg: #ffffff;
+      --input-border: rgba(15, 23, 42, 0.14);
+      --divider: rgba(15, 23, 42, 0.085);
 
-      --radius-xl: 26px;
-      --radius-lg: 20px;
-      --radius-md: 14px;
-      --radius-sm: 10px;
+      --radius-xl: 22px;
+      --radius-lg: 16px;
+      --radius-md: 12px;
+      --radius-sm: 9px;
       --radius-pill: 999px;
 
       --ease-spring: cubic-bezier(0.22, 1, 0.36, 1);
     }
 
     [data-theme="dark"] {
-      --bg-canvas: #0b0f17;
-      --orb-1: rgba(10, 132, 255, 0.22);
-      --orb-2: rgba(56, 189, 248, 0.14);
-      --orb-3: rgba(148, 163, 184, 0.12);
+      --bg-canvas: #0f1117;
+      --bg-pattern: none;
 
-      --glass-bg: rgba(24, 30, 42, 0.62);
-      --glass-bg-elevated: rgba(30, 38, 52, 0.78);
-      --glass-bg-subtle: rgba(255, 255, 255, 0.05);
-      --glass-bg-hover: rgba(255, 255, 255, 0.1);
-      --glass-border: rgba(255, 255, 255, 0.14);
-      --glass-border-subtle: rgba(255, 255, 255, 0.08);
-      --glass-highlight: inset 0 1px 0 rgba(255, 255, 255, 0.18), inset 0 -1px 0 rgba(0, 0, 0, 0.3);
-      --glass-shadow: 0 14px 40px -8px rgba(0, 0, 0, 0.45), 0 2px 8px rgba(0, 0, 0, 0.28);
-      --glass-shadow-lg: 0 28px 72px -12px rgba(0, 0, 0, 0.65), 0 4px 16px rgba(0, 0, 0, 0.4);
+      --glass-bg: rgba(24, 27, 35, 0.94);
+      --glass-bg-elevated: #202430;
+      --glass-bg-subtle: rgba(255, 255, 255, 0.055);
+      --glass-bg-hover: rgba(255, 255, 255, 0.095);
+      --glass-border: rgba(255, 255, 255, 0.11);
+      --glass-border-subtle: rgba(255, 255, 255, 0.09);
+      --glass-highlight: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+      --glass-shadow: 0 4px 18px rgba(0, 0, 0, 0.32), 0 1px 3px rgba(0, 0, 0, 0.24);
+      --glass-shadow-lg: 0 24px 60px -12px rgba(0, 0, 0, 0.62);
 
-      --text-primary: #f5f7fb;
-      --text-secondary: rgba(245, 247, 251, 0.68);
-      --text-tertiary: rgba(245, 247, 251, 0.44);
+      --text-primary: #f8fafc;
+      --text-secondary: #cbd5e1;
+      --text-tertiary: #94a3b8;
 
       --accent: #0a84ff;
       --accent-soft: rgba(10, 132, 255, 0.2);
-      --accent-text: #5ac8fa;
-      --green: #30d158;
-      --green-soft: rgba(48, 209, 88, 0.18);
-      --amber: #ff9f0a;
-      --amber-soft: rgba(255, 159, 10, 0.18);
-      --red: #ff453a;
-      --red-soft: rgba(255, 69, 58, 0.18);
+      --accent-text: #60a5fa;
+      --green: #34d399;
+      --green-soft: rgba(52, 211, 153, 0.17);
+      --amber: #fbbf24;
+      --amber-soft: rgba(251, 191, 36, 0.17);
+      --red: #f87171;
+      --red-soft: rgba(248, 113, 113, 0.17);
       --teal: #5eead4;
       --teal-soft: rgba(94, 234, 212, 0.16);
-      --slate: #94a3b8;
+      --slate: #cbd5e1;
       --slate-soft: rgba(148, 163, 184, 0.16);
 
-      --input-bg: rgba(15, 20, 30, 0.55);
-      --input-border: rgba(255, 255, 255, 0.13);
-      --divider: rgba(255, 255, 255, 0.08);
+      --input-bg: #141720;
+      --input-border: rgba(255, 255, 255, 0.16);
+      --divider: rgba(255, 255, 255, 0.09);
+    }
+
+    /* Curated App Backgrounds (Light & Dark Adaptive) */
+    [data-bg="studio"] { --bg-canvas: #f5f5f7; }
+    [data-theme="dark"][data-bg="studio"] { --bg-canvas: #0f1117; }
+
+    [data-bg="paper"] { --bg-canvas: #f5f2eb; }
+    [data-theme="dark"][data-bg="paper"] { --bg-canvas: #151311; }
+
+    [data-bg="mist"] { --bg-canvas: linear-gradient(180deg, #e8f1fb 0%, #f4f7fb 100%); }
+    [data-theme="dark"][data-bg="mist"] { --bg-canvas: linear-gradient(180deg, #0d1626 0%, #0b0f18 100%); }
+
+    [data-bg="sage"] { --bg-canvas: linear-gradient(180deg, #e8f2ec 0%, #f4f7f5 100%); }
+    [data-theme="dark"][data-bg="sage"] { --bg-canvas: linear-gradient(180deg, #0d1915 0%, #0b100e 100%); }
+
+    [data-bg="graphite"] {
+      --bg-canvas: #eef0f4;
+      --bg-pattern: radial-gradient(rgba(15, 23, 42, 0.09) 1px, transparent 1px);
+    }
+    [data-theme="dark"][data-bg="graphite"] {
+      --bg-canvas: #11131a;
+      --bg-pattern: radial-gradient(rgba(255, 255, 255, 0.08) 1px, transparent 1px);
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -117,50 +135,72 @@
       overflow-x: hidden;
     }
 
-    /* Ambient Liquid Glass Canvas */
+    /* Clean App Canvas */
     .ambient-backdrop {
       position: fixed;
       inset: 0;
       z-index: 0;
-      overflow: hidden;
       pointer-events: none;
       background: var(--bg-canvas);
-      transition: background 0.5s var(--ease-spring);
+      transition: background 0.3s ease;
     }
 
-    .ambient-orb {
+    .ambient-backdrop::after {
+      content: "";
       position: absolute;
-      border-radius: 50%;
-      filter: blur(84px);
-      opacity: 0.9;
-      will-change: transform;
-      animation: drift 22s ease-in-out infinite alternate;
+      inset: 0;
+      background-image: var(--bg-pattern);
+      background-size: 20px 20px;
+      pointer-events: none;
     }
 
-    .orb-1 { width: 54vw; height: 54vw; max-width: 720px; max-height: 720px; top: -16%; left: -10%; background: var(--orb-1); }
-    .orb-2 { width: 48vw; height: 48vw; max-width: 660px; max-height: 660px; bottom: -18%; right: -8%; background: var(--orb-2); animation-delay: -7s; }
-    .orb-3 { width: 38vw; height: 38vw; max-width: 520px; max-height: 520px; top: 32%; left: 42%; background: var(--orb-3); animation-delay: -13s; }
-
-    @keyframes drift {
-      0% { transform: translate3d(0, 0, 0) scale(1); }
-      100% { transform: translate3d(3%, 4%, 0) scale(1.06); }
-    }
-
-    /* Liquid Glass Surface Primitive */
+    /* Crisp Surface Primitive */
     .glass {
       background: var(--glass-bg);
-      backdrop-filter: blur(28px) saturate(185%);
-      -webkit-backdrop-filter: blur(28px) saturate(185%);
+      backdrop-filter: blur(18px) saturate(140%);
+      -webkit-backdrop-filter: blur(18px) saturate(140%);
       border: 1px solid var(--glass-border);
       box-shadow: var(--glass-highlight), var(--glass-shadow);
     }
 
     .glass-elevated {
       background: var(--glass-bg-elevated);
-      backdrop-filter: blur(36px) saturate(200%);
-      -webkit-backdrop-filter: blur(36px) saturate(200%);
+      backdrop-filter: blur(22px) saturate(150%);
+      -webkit-backdrop-filter: blur(22px) saturate(150%);
       border: 1px solid var(--glass-border);
       box-shadow: var(--glass-highlight), var(--glass-shadow-lg);
+    }
+
+    /* Background Swatch Picker */
+    .bg-picker {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 6px;
+      padding: 8px 10px;
+      border-radius: var(--radius-md);
+      background: var(--glass-bg-subtle);
+      border: 1px solid var(--divider);
+    }
+
+    .bg-swatch {
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      border: 2px solid var(--glass-border);
+      cursor: pointer;
+      transition: transform 0.18s var(--ease-spring), box-shadow 0.18s;
+      padding: 0;
+    }
+
+    .bg-swatch:hover {
+      transform: scale(1.12);
+    }
+
+    .bg-swatch.active {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 2px var(--accent-soft);
+      transform: scale(1.1);
     }
 
     /* App Shell */
@@ -1371,23 +1411,6 @@
       flex-shrink: 0;
     }
 
-    .visual-hero::before {
-      content: "";
-      position: absolute;
-      inset: 0;
-      background: url('./assets/glass-ribbon.jpg') center/cover no-repeat;
-      opacity: 0.28;
-      pointer-events: none;
-      mix-blend-mode: multiply;
-      transition: opacity 0.4s ease;
-    }
-
-    [data-theme="dark"] .visual-hero::before {
-      opacity: 0.16;
-      mix-blend-mode: screen;
-      filter: hue-rotate(10deg) saturate(1.2);
-    }
-
     .visual-hero > * {
       position: relative;
       z-index: 1;
@@ -1724,16 +1747,12 @@
   </style>
 </head>
 <body>
-  <!-- Ambient Luminous Canvas -->
-  <div class="ambient-backdrop" aria-hidden="true">
-    <div class="ambient-orb orb-1"></div>
-    <div class="ambient-orb orb-2"></div>
-    <div class="ambient-orb orb-3"></div>
-  </div>
+  <!-- Clean App Canvas -->
+  <div class="ambient-backdrop" aria-hidden="true"></div>
 
   <!-- Main Application Shell -->
   <div class="app-shell">
-    <!-- Desktop Liquid Glass Sidebar -->
+    <!-- Desktop Sidebar -->
     <aside class="sidebar glass" aria-label="Primary navigation">
       <div class="brand">
         <div class="brand-left">
@@ -1784,7 +1803,19 @@
         </button>
       </nav>
 
-      <div class="momentum-card">
+      <div style="margin-top: auto; display: flex; flex-direction: column; gap: 10px;">
+        <div class="bg-picker" title="Choose App Background">
+          <span style="font-size: 11px; font-weight: 600; color: var(--text-tertiary);">Canvas</span>
+          <div style="display: flex; gap: 6px;">
+            <button class="bg-swatch" data-bg-pick="studio" title="Clean Studio" style="background: #f5f5f7;"></button>
+            <button class="bg-swatch" data-bg-pick="paper" title="Warm Paper" style="background: #f2ece0;"></button>
+            <button class="bg-swatch" data-bg-pick="mist" title="Mist Blue" style="background: linear-gradient(135deg, #dceafb, #f2f6fb);"></button>
+            <button class="bg-swatch" data-bg-pick="sage" title="Sage Silk" style="background: linear-gradient(135deg, #dcece3, #f2f7f4);"></button>
+            <button class="bg-swatch" data-bg-pick="graphite" title="Graphite Dot Grid" style="background: radial-gradient(#64748b 1px, #e5e7eb 1px); background-size: 6px 6px;"></button>
+          </div>
+        </div>
+
+        <div class="momentum-card" style="margin-top: 0;">
         <div class="momentum-row">
           <span class="momentum-title">Active Pipeline</span>
           <span class="momentum-val" id="stat-active">0</span>
@@ -1795,6 +1826,7 @@
         <div class="momentum-sub">
           <span id="stat-interviews">0 interviewing</span>
           <span id="stat-offers">0 offers</span>
+        </div>
         </div>
       </div>
     </aside>
@@ -1945,7 +1977,17 @@
             <div>
               <div class="hero-kicker">Installable Web &amp; iOS App</div>
               <div style="font-size: 17px; font-weight: 680; letter-spacing: -0.02em; margin-top: 2px;">Lumen Automatic Cloud Sync</div>
-              <div style="font-size: 12.5px; color: var(--text-secondary); margin-top: 2px;">Add Lumen to your iPhone Home Screen (Safari → Share → Add to Home Screen) to get the native Liquid Glass icon &amp; seamless background sync.</div>
+              <div style="font-size: 12.5px; color: var(--text-secondary); margin-top: 2px;">Add Lumen to your iPhone Home Screen (Safari → Share → Add to Home Screen) to get the native app icon &amp; seamless background sync.</div>
+            </div>
+          </div>
+          <div class="bg-picker" title="Choose App Background" style="flex-shrink:0;">
+            <span style="font-size: 11px; font-weight: 600; color: var(--text-tertiary);">Canvas</span>
+            <div style="display: flex; gap: 6px;">
+              <button class="bg-swatch" data-bg-pick="studio" title="Clean Studio" style="background: #f5f5f7;"></button>
+              <button class="bg-swatch" data-bg-pick="paper" title="Warm Paper" style="background: #f2ece0;"></button>
+              <button class="bg-swatch" data-bg-pick="mist" title="Mist Blue" style="background: linear-gradient(135deg, #dceafb, #f2f6fb);"></button>
+              <button class="bg-swatch" data-bg-pick="sage" title="Sage Silk" style="background: linear-gradient(135deg, #dcece3, #f2f7f4);"></button>
+              <button class="bg-swatch" data-bg-pick="graphite" title="Graphite Dot Grid" style="background: radial-gradient(#64748b 1px, #e5e7eb 1px); background-size: 6px 6px;"></button>
             </div>
           </div>
         </div>
@@ -2093,6 +2135,7 @@ Product Design, Design Systems, Interaction Design, Prototyping, Figma, User Res
     function getDefaultState() {
       return {
         theme: window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light',
+        bg: 'studio',
         jobs: [
           {
             id: 'job-1',
@@ -2303,6 +2346,8 @@ Product Design, Design Systems, Interaction Design, Prototyping, Figma, User Res
        ========================================================================== */
     function applyTheme() {
       document.documentElement.setAttribute('data-theme', state.theme);
+      document.documentElement.setAttribute('data-bg', state.bg || 'studio');
+      $$('[data-bg-pick]').forEach((b) => b.classList.toggle('active', b.dataset.bgPick === (state.bg || 'studio')));
       const isDark = state.theme === 'dark';
       const sunIcon = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>`;
       const moonIcon = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>`;
@@ -4289,6 +4334,14 @@ Product Design, Design Systems, Interaction Design, Prototyping, Figma, User Res
 
     $('#theme-toggle-desktop').addEventListener('click', toggleTheme);
     $('#theme-toggle-mobile').addEventListener('click', toggleTheme);
+    $$('[data-bg-pick]').forEach((btn) =>
+      btn.addEventListener('click', () => {
+        state.bg = btn.dataset.bgPick;
+        applyTheme();
+        saveState(true);
+        toast(`Background: ${btn.title}`);
+      })
+    );
 
     $('#global-search').addEventListener('input', (e) => {
       ui.search = e.target.value;
