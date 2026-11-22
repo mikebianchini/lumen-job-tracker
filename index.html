@@ -1863,12 +1863,18 @@
       font-weight: 700;
     }
 
+    .kanban-col.drag-over {
+      border-color: var(--accent);
+      background: var(--accent-soft);
+    }
+
     .kanban-card {
       padding: 13px;
       border-radius: var(--radius-lg);
       background: var(--glass-bg-subtle);
       border: 1px solid var(--divider);
-      cursor: pointer;
+      cursor: grab;
+      user-select: none;
       display: flex;
       flex-direction: column;
       gap: 8px;
@@ -1879,6 +1885,11 @@
       background: var(--glass-bg-elevated);
       border-color: var(--accent);
       box-shadow: var(--glass-shadow);
+    }
+
+    .kanban-card.dragging {
+      opacity: 0.45;
+      cursor: grabbing;
     }
 
     .prep-chips {
@@ -3044,7 +3055,7 @@ Product Design, Design Systems, Interaction Design, Prototyping, Figma, User Res
         })
       );
 
-      $('[data-nudge-action]').forEach((btn) =>
+      $$('[data-nudge-action]').forEach((btn) =>
         btn.addEventListener('click', () => {
           const job = state.jobs.find((j) => j.id === btn.dataset.nudgeJob);
           if (!job) return;
@@ -3216,13 +3227,13 @@ Product Design, Design Systems, Interaction Design, Prototyping, Figma, User Res
             const colJobs = filtered.filter((j) => j.status === stage.id);
             const nextStage = boardStages[idx + 1]?.id;
             return `
-              <div class="kanban-col glass">
+              <div class="kanban-col glass" data-kcol-stage="${stage.id}">
                 <div class="kanban-col-head">
                   <span style="display:inline-flex; align-items:center; gap:6px;"><span class="pill-dot" style="background:${stage.color}"></span>${stage.id}</span>
                   <span class="nav-count">${colJobs.length}</span>
                 </div>
                 ${colJobs.length ? colJobs.map((j) => `
-                  <div class="kanban-card" data-kcard-id="${j.id}">
+                  <div class="kanban-card" draggable="true" data-kcard-id="${j.id}">
                     <div style="font-size:13.5px; font-weight:650; line-height:1.3;">${esc(j.role)}</div>
                     <div style="font-size:12px; color:var(--text-secondary);">${esc(j.company)}${j.comp ? ' · ' + esc(j.comp) : ''}</div>
                     <div style="display:flex; align-items:center; justify-content:space-between; gap:6px; margin-top:2px;">
@@ -3234,6 +3245,44 @@ Product Design, Design Systems, Interaction Design, Prototyping, Figma, User Res
           })
           .join('');
 
+        let draggedJobId = null;
+        $('[data-kcard-id]').forEach((el) => {
+          el.addEventListener('dragstart', (e) => {
+            draggedJobId = el.dataset.kcardId;
+            el.classList.add('dragging');
+            e.dataTransfer.effectAllowed = 'move';
+            e.dataTransfer.setData('text/plain', draggedJobId);
+          });
+          el.addEventListener('dragend', () => {
+            el.classList.remove('dragging');
+            $('[data-kcol-stage]').forEach((c) => c.classList.remove('drag-over'));
+          });
+        });
+
+        $('[data-kcol-stage]').forEach((col) => {
+          col.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            e.dataTransfer.dropEffect = 'move';
+            col.classList.add('drag-over');
+          });
+          col.addEventListener('dragleave', (e) => {
+            if (!col.contains(e.relatedTarget)) col.classList.remove('drag-over');
+          });
+          col.addEventListener('drop', (e) => {
+            e.preventDefault();
+            col.classList.remove('drag-over');
+            const jobId = e.dataTransfer.getData('text/plain') || draggedJobId;
+            const targetStage = col.dataset.kcolStage;
+            const job = state.jobs.find((j) => j.id === jobId);
+            if (job && targetStage && job.status !== targetStage) {
+              job.status = targetStage;
+              saveState();
+              renderJobs();
+              toast(`Moved ${job.company} to ${targetStage}`);
+            }
+          });
+        });
+
         $('[data-kcard-id]').forEach((el) =>
           el.addEventListener('click', (e) => {
             if (e.target.closest('[data-kadvance-id]')) return;
@@ -3243,7 +3292,7 @@ Product Design, Design Systems, Interaction Design, Prototyping, Figma, User Res
             renderJobs();
           })
         );
-        $('[data-kadvance-id]').forEach((btn) =>
+        $$('[data-kadvance-id]').forEach((btn) =>
           btn.addEventListener('click', (e) => {
             e.stopPropagation();
             const job = state.jobs.find((j) => j.id === btn.dataset.kadvanceId);
@@ -3443,14 +3492,14 @@ Product Design, Design Systems, Interaction Design, Prototyping, Figma, User Res
         })
       );
 
-      $('[data-job-star]').forEach((btn) =>
+      $$('[data-job-star]').forEach((btn) =>
         btn.addEventListener('click', () => {
           job.rating = Number(btn.dataset.jobStar);
           saveState();
           renderJobDetail();
         })
       );
-      $('[data-prep-step]').forEach((btn) =>
+      $$('[data-prep-step]').forEach((btn) =>
         btn.addEventListener('click', () => {
           const step = btn.dataset.prepStep;
           job.prepDone = Array.isArray(job.prepDone) ? job.prepDone : [];
