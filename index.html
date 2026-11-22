@@ -3132,7 +3132,7 @@ Product Design, Design Systems, Interaction Design, Prototyping, Figma, User Res
       ui.view = viewName;
       ui.mobileDetailOpen = false;
       $$('.view').forEach((v) => v.classList.toggle('active', v.id === `view-${viewName}`));
-      $('.nav-btn').forEach((b) => { const on = b.dataset.view === viewName; b.classList.toggle('active', on); if (on) b.setAttribute('aria-current', 'page'); else b.removeAttribute('aria-current'); });
+      $$('.nav-btn').forEach((b) => { const on = b.dataset.view === viewName; b.classList.toggle('active', on); if (on) b.setAttribute('aria-current', 'page'); else b.removeAttribute('aria-current'); });
       $$('.mobile-tab').forEach((b) => b.classList.toggle('active', b.dataset.view === viewName));
 
       const titles = { home: 'Home', jobs: 'Jobs', people: 'People', resume: 'Resume Studio', sync: 'Settings' };
@@ -4002,10 +4002,10 @@ Product Design, Design Systems, Interaction Design, Prototyping, Figma, User Res
         saveState();
       });
 
-      $('[data-comment-tag]').forEach((btn) =>
+      $$('[data-comment-tag]').forEach((btn) =>
         btn.addEventListener('click', () => {
           ui.commentTag = btn.dataset.commentTag;
-          $('[data-comment-tag]').forEach((b) => b.classList.toggle('active', b.dataset.commentTag === ui.commentTag));
+          $$('[data-comment-tag]').forEach((b) => b.classList.toggle('active', b.dataset.commentTag === ui.commentTag));
         })
       );
 
@@ -4033,7 +4033,7 @@ Product Design, Design Systems, Interaction Design, Prototyping, Figma, User Res
         }
       });
 
-      $('[data-pin-comment]').forEach((btn) =>
+      $$('[data-pin-comment]').forEach((btn) =>
         btn.addEventListener('click', () => {
           const c = job.comments.find((x) => x.id === btn.dataset.pinComment);
           if (c) {
@@ -4044,7 +4044,7 @@ Product Design, Design Systems, Interaction Design, Prototyping, Figma, User Res
         })
       );
 
-      $('[data-del-comment]').forEach((btn) =>
+      $$('[data-del-comment]').forEach((btn) =>
         btn.addEventListener('click', () => {
           job.comments = job.comments.filter((x) => x.id !== btn.dataset.delComment);
           saveState();
