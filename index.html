@@ -1794,6 +1794,177 @@
         scroll-behavior: auto !important;
       }
     }
+
+    /* ==========================================================================
+       Career-Coach Pro Features (Board View, Prep Checklist, Stars, Nudges, Templates)
+       ========================================================================== */
+    .filter-row-wrap {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      flex-shrink: 0;
+    }
+
+    .view-seg {
+      display: inline-flex;
+      padding: 3px;
+      border-radius: var(--radius-pill);
+      background: var(--glass-bg);
+      border: 1px solid var(--glass-border);
+      flex-shrink: 0;
+    }
+
+    .view-seg-btn {
+      padding: 5px 12px;
+      border-radius: var(--radius-pill);
+      border: none;
+      background: transparent;
+      color: var(--text-secondary);
+      font-family: inherit;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.18s ease;
+    }
+
+    .view-seg-btn.active {
+      background: var(--text-primary);
+      color: var(--bg-canvas);
+    }
+
+    .kanban-board {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(230px, 1fr));
+      gap: 12px;
+      flex: 1;
+      min-height: 0;
+      overflow-x: auto;
+      padding-bottom: 12px;
+    }
+
+    .kanban-col {
+      border-radius: var(--radius-xl);
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      min-height: 0;
+      overflow-y: auto;
+    }
+
+    .kanban-col-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 2px 4px 6px;
+      border-bottom: 1px solid var(--divider);
+      font-size: 12.5px;
+      font-weight: 700;
+    }
+
+    .kanban-card {
+      padding: 13px;
+      border-radius: var(--radius-lg);
+      background: var(--glass-bg-subtle);
+      border: 1px solid var(--divider);
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      transition: all 0.18s ease;
+    }
+
+    .kanban-card:hover {
+      background: var(--glass-bg-elevated);
+      border-color: var(--accent);
+      box-shadow: var(--glass-shadow);
+    }
+
+    .prep-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+    }
+
+    .prep-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 11px;
+      border-radius: var(--radius-pill);
+      border: 1px solid var(--divider);
+      background: var(--glass-bg-subtle);
+      color: var(--text-secondary);
+      font-family: inherit;
+      font-size: 12px;
+      font-weight: 560;
+      cursor: pointer;
+      transition: all 0.16s ease;
+    }
+
+    .prep-chip:hover {
+      border-color: var(--accent);
+      color: var(--text-primary);
+    }
+
+    .prep-chip.done {
+      background: var(--green-soft);
+      border-color: transparent;
+      color: var(--green);
+    }
+
+    .star-row {
+      display: inline-flex;
+      align-items: center;
+      gap: 2px;
+    }
+
+    .star-btn {
+      background: transparent;
+      border: none;
+      padding: 2px;
+      cursor: pointer;
+      color: var(--divider);
+      transition: color 0.15s ease;
+      display: inline-grid;
+      place-items: center;
+    }
+
+    .star-btn.on {
+      color: #f59e0b;
+    }
+
+    .nudge-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 11px 13px;
+      border-radius: var(--radius-md);
+      background: var(--glass-bg-subtle);
+      border: 1px solid var(--divider);
+    }
+
+    .goal-track {
+      height: 8px;
+      border-radius: var(--radius-pill);
+      background: var(--divider);
+      overflow: hidden;
+    }
+
+    .goal-fill {
+      height: 100%;
+      border-radius: var(--radius-pill);
+      background: var(--accent-gradient);
+      transition: width 0.4s var(--ease-spring);
+    }
+
+    .template-tabs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
   </style>
 </head>
 <body>
@@ -1912,11 +2083,18 @@
       <!-- VIEW 1: JOBS -->
       <section class="view" id="view-jobs" aria-label="Jobs tracker">
         <div class="visual-hero glass" id="jobs-visual-hero"></div>
-        <div class="filter-bar" id="job-filters"></div>
+        <div class="filter-row-wrap">
+          <div class="filter-bar" id="job-filters" style="flex:1;"></div>
+          <div class="view-seg" role="tablist" aria-label="Jobs view mode">
+            <button class="view-seg-btn active" id="jobs-mode-list" role="tab" aria-selected="true">List</button>
+            <button class="view-seg-btn" id="jobs-mode-board" role="tab" aria-selected="false">Board</button>
+          </div>
+        </div>
         <div class="split-pane" id="jobs-split">
           <div class="list-panel glass" id="jobs-list"></div>
           <div class="detail-panel glass" id="job-detail"></div>
         </div>
+        <div class="kanban-board" id="jobs-board" style="display: none;"></div>
       </section>
 
       <!-- VIEW 2: PEOPLE -->
@@ -2289,13 +2467,23 @@ Product Design, Design Systems, Interaction Design, Prototyping, Figma, User Res
           supaUrl: '',
           supaKey: '',
           aiApiKey: ''
-        }
+        },
+        weeklyGoal: 5
       };
     }
+
+    const PREP_STEPS = [
+      'Research company & product',
+      'Tailor resume to JD',
+      'Find 1–2 referrals',
+      'Prep 3 STAR stories',
+      'Send thank-you note'
+    ];
 
     let state = loadState();
     let ui = {
       view: 'home',
+      jobsViewMode: 'list',
       search: '',
       jobFilter: 'All',
       peopleFilter: 'All',
@@ -2303,6 +2491,82 @@ Product Design, Design Systems, Interaction Design, Prototyping, Figma, User Res
       selectedPersonId: state.people[0]?.id || null,
       studioJobId: state.jobs[0]?.id || '',
       mobileDetailOpen: false
+    };
+
+    window.openOutreachModal = function ({ name = 'there', company = 'your team', role = 'this role', email = '' } = {}) {
+      const firstName = (name || 'there').split(/\s+/)[0];
+      const templates = [
+        {
+          id: 'referral',
+          label: 'Warm Referral Ask',
+          subject: `Quick question about ${role} at ${company}`,
+          body: `Hi ${firstName},\n\nHope you're doing well! I saw the ${role} opening at ${company} and it feels like a really strong match for my background.\n\nSince you're on the team, I'd love to hear your honest take on the group — and if it feels comfortable, I'd be grateful for a referral. Totally understand either way, and happy to send over my tailored resume!\n\nBest,`
+        },
+        {
+          id: 'recruiter',
+          label: 'Recruiter Follow-Up',
+          subject: `Following up — ${role} at ${company}`,
+          body: `Hi ${firstName},\n\nI recently applied for the ${role} position at ${company} and wanted to briefly follow up. I'm especially excited about the team's direction and believe my experience aligns closely with what you're looking for.\n\nWould love to connect for a quick 10-minute intro whenever you have a moment.\n\nWarm regards,`
+        },
+        {
+          id: 'coffee',
+          label: 'Coffee Chat (15 min)',
+          subject: `Quick 15-min chat about your work at ${company}?`,
+          body: `Hi ${firstName},\n\nI've been following your work at ${company} and really admire what your team has been shipping. I'm currently exploring ${role} opportunities and would love to ask 2–3 quick questions about your experience there.\n\nNo pressure at all — if you have 15 minutes over the next couple weeks, I'd really appreciate it!\n\nBest,`
+        },
+        {
+          id: 'thankyou',
+          label: 'Post-Interview Thank You',
+          subject: `Thank you — ${role} conversation`,
+          body: `Hi ${firstName},\n\nThank you so much for taking the time to speak with me about the ${role} role at ${company}. I really enjoyed learning more about the team's priorities and walked away even more excited about the opportunity.\n\nPlease let me know if there's any additional context or work samples I can share. Looking forward to staying in touch!\n\nBest,`
+        }
+      ];
+
+      let activeId = templates[0].id;
+      const renderModalBody = () => {
+        const cur = templates.find((t) => t.id === activeId) || templates[0];
+        openModal(`
+          <div class="modal-header">
+            <h3 class="modal-title">Draft Outreach Message</h3>
+            <button class="icon-btn" onclick="closeModal()" aria-label="Close dialog"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></button>
+          </div>
+          <div class="template-tabs">
+            ${templates.map((t) => `<button type="button" class="pill ${t.id === activeId ? 'active' : ''}" data-tpl-id="${t.id}">${t.label}</button>`).join('')}
+          </div>
+          <div class="field">
+            <label for="tpl-subject">Subject Line</label>
+            <input id="tpl-subject" class="input" value="${esc(cur.subject)}" />
+          </div>
+          <div class="field">
+            <label for="tpl-body">Message (personalized — edit freely)</label>
+            <textarea id="tpl-body" class="notes-area" style="min-height: 170px;">${esc(cur.body)}</textarea>
+          </div>
+          <div class="modal-footer">
+            ${email ? `<a class="btn btn-sm" id="tpl-mailto" href="mailto:${encodeURIComponent(email)}?subject=${encodeURIComponent(cur.subject)}&body=${encodeURIComponent(cur.body)}" style="text-decoration:none;">Open in Mail</a>` : ''}
+            <button class="btn btn-primary" id="tpl-copy-btn">Copy Message</button>
+          </div>
+        `);
+
+        $$('[data-tpl-id]').forEach((b) =>
+          b.addEventListener('click', () => {
+            activeId = b.dataset.tplId;
+            renderModalBody();
+          })
+        );
+
+        $('#tpl-copy-btn').addEventListener('click', async () => {
+          const text = $('#tpl-body').value;
+          try {
+            await navigator.clipboard.writeText(text);
+            toast('Message copied to clipboard');
+          } catch {
+            $('#tpl-body').select();
+            document.execCommand('copy');
+            toast('Message copied');
+          }
+        });
+      };
+      renderModalBody();
     };
 
     function loadState() {
@@ -2585,37 +2849,111 @@ Product Design, Design Systems, Interaction Design, Prototyping, Figma, User Res
 
         <!-- Two-Column Actionable Split -->
         <div class="home-two-col">
-          <!-- Upcoming Focus -->
-          <div class="home-panel glass">
-            <div class="section-head">
-              <span class="section-title">Upcoming Focus &amp; Follow-Ups</span>
-              <span class="chip">${agenda.length} scheduled</span>
+          <!-- Left: Upcoming Focus + Weekly Goal + Smart Career Nudges -->
+          <div style="display:flex; flex-direction:column; gap:14px;">
+            <div class="home-panel glass">
+              <div class="section-head">
+                <span class="section-title">Upcoming Focus &amp; Follow-Ups</span>
+                <span class="chip">${agenda.length} scheduled</span>
+              </div>
+              <div class="agenda-list">
+                ${
+                  agenda.length
+                    ? agenda
+                        .slice(0, 5)
+                        .map((item) => {
+                          const isOverdue = item.date < todayStr;
+                          const isToday = item.date === todayStr;
+                          const dateBadge = isOverdue
+                            ? `<span class="badge badge-archived">Overdue · ${formatDate(item.date)}</span>`
+                            : isToday
+                            ? `<span class="badge badge-interviewing">Today</span>`
+                            : `<span class="badge badge-applied">${formatDate(item.date)}</span>`;
+                          return `
+                            <div class="agenda-row" data-agenda-type="${item.type}" data-agenda-id="${item.id}">
+                              <div style="min-width:0;">
+                                <div style="font-size:13.5px; font-weight:620; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${esc(item.title)}</div>
+                                <div style="font-size:12px; color:var(--text-secondary); margin-top:2px;">${esc(item.sub)}</div>
+                              </div>
+                              ${dateBadge}
+                            </div>`;
+                        })
+                        .join('')
+                    : `<div style="padding:18px 10px; text-align:center; color:var(--text-secondary); font-size:13px;">No upcoming dates yet. Add a Next Step date on a job or a Follow-Up date on a contact.</div>`
+                }
+              </div>
             </div>
-            <div class="agenda-list">
-              ${
-                agenda.length
-                  ? agenda
-                      .slice(0, 6)
-                      .map((item) => {
-                        const isOverdue = item.date < todayStr;
-                        const isToday = item.date === todayStr;
-                        const dateBadge = isOverdue
-                          ? `<span class="badge badge-archived">Overdue · ${formatDate(item.date)}</span>`
-                          : isToday
-                          ? `<span class="badge badge-interviewing">Today</span>`
-                          : `<span class="badge badge-applied">${formatDate(item.date)}</span>`;
-                        return `
-                          <div class="agenda-row" data-agenda-type="${item.type}" data-agenda-id="${item.id}">
-                            <div style="min-width:0;">
-                              <div style="font-size:13.5px; font-weight:620; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${esc(item.title)}</div>
-                              <div style="font-size:12px; color:var(--text-secondary); margin-top:2px;">${esc(item.sub)}</div>
-                            </div>
-                            ${dateBadge}
-                          </div>`;
-                      })
-                      .join('')
-                  : `<div style="padding:22px 10px; text-align:center; color:var(--text-secondary); font-size:13px;">No upcoming dates yet. Add a Next Step date on a job or a Follow-Up date on a contact to stay ahead.</div>`
-              }
+
+            <!-- Weekly Cadence & Smart Nudges -->
+            <div class="home-panel glass">
+              ${(() => {
+                const weekAgo = new Date(Date.now() - 7 * 86400000).toISOString().slice(0, 10);
+                const appliedThisWeek = state.jobs.filter((j) => j.appliedDate && j.appliedDate >= weekAgo).length;
+                const goal = Math.max(1, Number(state.weeklyGoal) || 5);
+                const goalPct = Math.min(100, Math.round((appliedThisWeek / goal) * 100));
+
+                const nudges = [];
+                state.jobs.forEach((j) => {
+                  if (j.status === 'Applied' && j.appliedDate && j.appliedDate < weekAgo && !j.nextStepDate) {
+                    nudges.push({
+                      title: `Follow up with ${j.company}`,
+                      sub: `Applied ${formatDate(j.appliedDate)} — a polite nudge doubles response rates.`,
+                      cta: 'Draft Note',
+                      action: 'outreach',
+                      jobId: j.id
+                    });
+                  }
+                  if (!['Archived', 'Offer'].includes(j.status) && !(j.personIds && j.personIds.length)) {
+                    nudges.push({
+                      title: `Find a referral at ${j.company}`,
+                      sub: `Referred candidates are 4× more likely to land interviews for ${j.role}.`,
+                      cta: 'Add Contact',
+                      action: 'person',
+                      jobId: j.id
+                    });
+                  }
+                  if (!['Archived', 'Offer'].includes(j.status) && !(j.tailoredResume && j.tailoredResume.trim())) {
+                    nudges.push({
+                      title: `Tailor resume for ${j.company}`,
+                      sub: `Boost ATS keyword match for ${j.role}.`,
+                      cta: 'Tailor',
+                      action: 'resume',
+                      jobId: j.id
+                    });
+                  }
+                });
+
+                return `
+                  <div class="section-head">
+                    <span class="section-title">Weekly Cadence</span>
+                    <span style="font-size:12px; font-weight:650; color:var(--accent-text); font-variant-numeric:tabular-nums;">${appliedThisWeek} / ${goal} apps this week</span>
+                  </div>
+                  <div class="goal-track"><div class="goal-fill" style="width:${goalPct}%;"></div></div>
+                  <div class="section-head" style="margin-top:6px;">
+                    <span class="section-title">Smart Career Nudges</span>
+                    <span class="chip">${Math.min(3, nudges.length)} high-impact</span>
+                  </div>
+                  <div class="agenda-list">
+                    ${
+                      nudges.length
+                        ? nudges
+                            .slice(0, 3)
+                            .map(
+                              (n) => `
+                            <div class="nudge-item">
+                              <div style="min-width:0;">
+                                <div style="font-size:13px; font-weight:630;">${esc(n.title)}</div>
+                                <div style="font-size:12px; color:var(--text-secondary); margin-top:2px;">${esc(n.sub)}</div>
+                              </div>
+                              <button class="btn btn-sm" data-nudge-action="${n.action}" data-nudge-job="${n.jobId}">${n.cta}</button>
+                            </div>`
+                            )
+                            .join('')
+                        : `<div style="font-size:12.5px; color:var(--green); padding:6px 2px;">All active roles have contacts and tailored resumes — strong momentum!</div>`
+                    }
+                  </div>
+                `;
+              })()}
             </div>
           </div>
 
@@ -2702,6 +3040,21 @@ Product Design, Design Systems, Interaction Design, Prototyping, Figma, User Res
             switchView('people');
             ui.mobileDetailOpen = true;
             renderPeople();
+          }
+        })
+      );
+
+      $('[data-nudge-action]').forEach((btn) =>
+        btn.addEventListener('click', () => {
+          const job = state.jobs.find((j) => j.id === btn.dataset.nudgeJob);
+          if (!job) return;
+          if (btn.dataset.nudgeAction === 'outreach') {
+            openOutreachModal({ name: 'Hiring Team', company: job.company, role: job.role });
+          } else if (btn.dataset.nudgeAction === 'person') {
+            openPersonModal({ name: '', title: '', company: job.company, roleType: 'Referral', email: '', linkedin: '', warmth: 'Warm', lastContact: new Date().toISOString().slice(0, 10), followUpDate: '', notes: '' });
+          } else if (btn.dataset.nudgeAction === 'resume') {
+            ui.studioJobId = job.id;
+            switchView('resume');
           }
         })
       );
@@ -2850,8 +3203,62 @@ Product Design, Design Systems, Interaction Design, Prototyping, Figma, User Res
         );
       }
 
-      $('#jobs-split').classList.toggle('detail-open', ui.mobileDetailOpen);
-      renderJobDetail();
+      const isBoard = ui.jobsViewMode === 'board';
+      $('#jobs-split').style.display = isBoard ? 'none' : '';
+      $('#jobs-board').style.display = isBoard ? 'grid' : 'none';
+      $('#jobs-mode-list')?.classList.toggle('active', !isBoard);
+      $('#jobs-mode-board')?.classList.toggle('active', isBoard);
+
+      if (isBoard) {
+        const boardStages = JOB_STATUSES.filter((s) => s.id !== 'Archived');
+        $('#jobs-board').innerHTML = boardStages
+          .map((stage, idx) => {
+            const colJobs = filtered.filter((j) => j.status === stage.id);
+            const nextStage = boardStages[idx + 1]?.id;
+            return `
+              <div class="kanban-col glass">
+                <div class="kanban-col-head">
+                  <span style="display:inline-flex; align-items:center; gap:6px;"><span class="pill-dot" style="background:${stage.color}"></span>${stage.id}</span>
+                  <span class="nav-count">${colJobs.length}</span>
+                </div>
+                ${colJobs.length ? colJobs.map((j) => `
+                  <div class="kanban-card" data-kcard-id="${j.id}">
+                    <div style="font-size:13.5px; font-weight:650; line-height:1.3;">${esc(j.role)}</div>
+                    <div style="font-size:12px; color:var(--text-secondary);">${esc(j.company)}${j.comp ? ' · ' + esc(j.comp) : ''}</div>
+                    <div style="display:flex; align-items:center; justify-content:space-between; gap:6px; margin-top:2px;">
+                      <span class="chip">${esc(j.workMode || 'Hybrid')}</span>
+                      ${nextStage ? `<button class="btn btn-ghost btn-sm" style="height:26px; padding:0 8px; font-size:11.5px;" data-kadvance-id="${j.id}" data-knext="${nextStage}">${nextStage} →</button>` : ''}
+                    </div>
+                  </div>`).join('') : `<div style="font-size:12px; color:var(--text-tertiary); padding:10px 4px;">No roles here</div>`}
+              </div>`;
+          })
+          .join('');
+
+        $('[data-kcard-id]').forEach((el) =>
+          el.addEventListener('click', (e) => {
+            if (e.target.closest('[data-kadvance-id]')) return;
+            ui.selectedJobId = el.dataset.kcardId;
+            ui.jobsViewMode = 'list';
+            ui.mobileDetailOpen = true;
+            renderJobs();
+          })
+        );
+        $('[data-kadvance-id]').forEach((btn) =>
+          btn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const job = state.jobs.find((j) => j.id === btn.dataset.kadvanceId);
+            if (job) {
+              job.status = btn.dataset.knext;
+              saveState();
+              renderJobs();
+              toast(`Moved ${job.company} to ${job.status}`);
+            }
+          })
+        );
+      } else {
+        $('#jobs-split').classList.toggle('detail-open', ui.mobileDetailOpen);
+        renderJobDetail();
+      }
     }
 
     function renderJobDetail() {
@@ -2939,6 +3346,25 @@ Product Design, Design Systems, Interaction Design, Prototyping, Figma, User Res
           </div>
         </div>
 
+        <!-- Priority Rating & Interview Prep Checklist -->
+        <div class="section-block">
+          <div class="section-head">
+            <span class="section-title">Interview Prep Checklist (${(job.prepDone || []).length}/${PREP_STEPS.length})</span>
+            <div style="display:flex; align-items:center; gap:10px;">
+              <div class="star-row" aria-label="Role excitement rating">
+                ${[1, 2, 3, 4, 5].map((n) => `<button type="button" class="star-btn ${(job.rating || 4) >= n ? 'on' : ''}" data-job-star="${n}" aria-label="Rate ${n} out of 5"><svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg></button>`).join('')}
+              </div>
+              <button class="btn btn-sm" id="job-draft-outreach">Draft Outreach</button>
+            </div>
+          </div>
+          <div class="prep-chips">
+            ${PREP_STEPS.map((step) => {
+              const done = (job.prepDone || []).includes(step);
+              return `<button type="button" class="prep-chip ${done ? 'done' : ''}" data-prep-step="${esc(step)}">${done ? '✓' : '+'} ${esc(step)}</button>`;
+            }).join('')}
+          </div>
+        </div>
+
         <!-- Resume Tailoring Callout -->
         <div class="resume-callout">
           <div>
@@ -3016,6 +3442,33 @@ Product Design, Design Systems, Interaction Design, Prototyping, Figma, User Res
           toast('Contact unlinked');
         })
       );
+
+      $('[data-job-star]').forEach((btn) =>
+        btn.addEventListener('click', () => {
+          job.rating = Number(btn.dataset.jobStar);
+          saveState();
+          renderJobDetail();
+        })
+      );
+      $('[data-prep-step]').forEach((btn) =>
+        btn.addEventListener('click', () => {
+          const step = btn.dataset.prepStep;
+          job.prepDone = Array.isArray(job.prepDone) ? job.prepDone : [];
+          if (job.prepDone.includes(step)) job.prepDone = job.prepDone.filter((s) => s !== step);
+          else job.prepDone.push(step);
+          saveState();
+          renderJobDetail();
+        })
+      );
+      $('#job-draft-outreach')?.addEventListener('click', () => {
+        const firstContact = linkedPeople[0];
+        openOutreachModal({
+          name: firstContact?.name || 'Hiring Team',
+          company: job.company,
+          role: job.role,
+          email: firstContact?.email || ''
+        });
+      });
 
       $('#open-studio-for-job').addEventListener('click', () => {
         ui.studioJobId = job.id;
@@ -3209,6 +3662,7 @@ Product Design, Design Systems, Interaction Design, Prototyping, Figma, User Res
         <div style="display:flex; gap:10px; flex-wrap:wrap;">
           ${person.email ? `<a class="btn btn-sm" href="mailto:${esc(person.email)}" style="text-decoration:none;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg> ${esc(person.email)}</a>` : ''}
           ${person.linkedin ? `<a class="btn btn-sm" href="${esc(person.linkedin)}" target="_blank" rel="noopener" style="text-decoration:none;">LinkedIn ↗</a>` : ''}
+          <button class="btn btn-primary btn-sm" id="person-draft-msg-btn">Draft Message</button>
         </div>
 
         <!-- Linked Jobs -->
@@ -3261,6 +3715,14 @@ Product Design, Design Systems, Interaction Design, Prototyping, Figma, User Res
         toast('Contact deleted');
       });
 
+      $('#person-draft-msg-btn')?.addEventListener('click', () => {
+        openOutreachModal({
+          name: person.name,
+          company: person.company || linkedJobs[0]?.company || 'your team',
+          role: linkedJobs[0]?.role || 'open roles',
+          email: person.email || ''
+        });
+      });
       $('#link-job-to-person-btn').addEventListener('click', () => openLinkJobModal(person));
 
       $$('[data-jump-job]').forEach((el) =>
@@ -4613,6 +5075,9 @@ function doPost(e) {
       autoPullFromCloud(true);
       scheduleAutoSync();
     });
+
+    $('#jobs-mode-list')?.addEventListener('click', () => { ui.jobsViewMode = 'list'; renderJobs(); });
+    $('#jobs-mode-board')?.addEventListener('click', () => { ui.jobsViewMode = 'board'; renderJobs(); });
 
     // Boot
     applyTheme();
