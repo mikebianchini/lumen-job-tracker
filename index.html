@@ -1976,6 +1976,76 @@
       flex-wrap: wrap;
       gap: 6px;
     }
+
+    /* Job Discussion Board & Comments */
+    .comment-composer {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      padding: 14px;
+      border-radius: var(--radius-lg);
+      background: var(--glass-bg-subtle);
+      border: 1px solid var(--divider);
+    }
+
+    .comment-composer-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .comment-feed {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .comment-card {
+      padding: 13px 15px;
+      border-radius: var(--radius-md);
+      background: var(--glass-bg-subtle);
+      border: 1px solid var(--divider);
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+      transition: border-color 0.18s ease;
+    }
+
+    .comment-card.pinned {
+      border-color: var(--accent);
+      background: var(--glass-bg-elevated);
+    }
+
+    .comment-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .comment-meta {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 11.5px;
+      color: var(--text-tertiary);
+    }
+
+    .comment-body {
+      font-size: 13.5px;
+      line-height: 1.55;
+      color: var(--text-primary);
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+
+    .comment-actions {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
   </style>
 </head>
 <body>
@@ -3325,6 +3395,33 @@ Product Design, Design Systems, Interaction Design, Prototyping, Figma, User Res
 
       const [bg, fg] = tintFor(job.company);
       const linkedPeople = (job.personIds || []).map((id) => state.people.find((p) => p.id === id)).filter(Boolean);
+      if (!Array.isArray(job.comments)) {
+        job.comments = [];
+        if (job.notes && job.notes.trim()) {
+          job.comments.push({
+            id: uid('cmt'),
+            tag: 'Note',
+            text: job.notes.trim(),
+            createdAt: (job.appliedDate ? new Date(job.appliedDate + 'T12:00:00') : new Date()).toISOString(),
+            pinned: false
+          });
+          job.notes = '';
+          saveState(true);
+        }
+      }
+      const COMMENT_TAGS = ['Note', 'Interview', 'Feedback', 'Question', 'Follow-Up'];
+      const tagBadgeClass = {
+        Note: 'badge-saved',
+        Interview: 'badge-interviewing',
+        Feedback: 'badge-offer',
+        Question: 'badge-screening',
+        'Follow-Up': 'badge-applied'
+      };
+      const sortedComments = [...job.comments].sort((a, b) => {
+        if (Boolean(b.pinned) !== Boolean(a.pinned)) return b.pinned ? 1 : -1;
+        return new Date(b.createdAt) - new Date(a.createdAt);
+      });
+      const activeCommentTag = ui.commentTag || 'Note';
       const ats = computeATS(job.tailoredResume || state.baseResume, job.jd);
       const hasTailored = Boolean(job.tailoredResume && job.tailoredResume.trim());
 
@@ -3438,12 +3535,47 @@ Product Design, Design Systems, Interaction Design, Prototyping, Figma, User Res
           <textarea class="notes-area" id="detail-job-jd" placeholder="Paste the job description here…">${esc(job.jd)}</textarea>
         </div>
 
-        <!-- Notes -->
+        <!-- Activity & Discussion Notes -->
         <div class="section-block">
           <div class="section-head">
-            <span class="section-title">Interview Notes &amp; Timeline</span>
+            <span class="section-title">Activity &amp; Discussion Notes (${job.comments.length})</span>
+            <span style="font-size:12px; color:var(--text-tertiary);">⌘Enter to post</span>
           </div>
-          <textarea class="notes-area" id="detail-job-notes" placeholder="Log recruiter screens, portfolio feedback, or follow-up questions…">${esc(job.notes)}</textarea>
+          <div class="comment-composer">
+            <textarea class="notes-area" id="new-comment-input" style="min-height:74px; background:var(--input-bg);" placeholder="Add an interview takeaway, recruiter update, or question to ask…"></textarea>
+            <div class="comment-composer-bar">
+              <div style="display:flex; gap:5px; flex-wrap:wrap;">
+                ${COMMENT_TAGS.map((t) => `<button type="button" class="pill ${t === activeCommentTag ? 'active' : ''}" style="padding:4px 10px; font-size:11.5px;" data-comment-tag="${t}">${t}</button>`).join('')}
+              </div>
+              <button type="button" class="btn btn-primary btn-sm" id="post-comment-btn">Post Note</button>
+            </div>
+          </div>
+          <div class="comment-feed">
+            ${
+              sortedComments.length
+                ? sortedComments
+                    .map((c) => {
+                      const dt = c.createdAt ? new Date(c.createdAt).toLocaleString(undefined, { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' }) : '';
+                      return `
+                        <article class="comment-card ${c.pinned ? 'pinned' : ''}">
+                          <div class="comment-head">
+                            <div class="comment-meta">
+                              <span class="badge ${tagBadgeClass[c.tag] || 'badge-saved'}">${esc(c.tag || 'Note')}</span>
+                              ${c.pinned ? '<span class="badge badge-applied">Pinned</span>' : ''}
+                              <span>${esc(dt)}</span>
+                            </div>
+                            <div class="comment-actions">
+                              <button type="button" class="btn btn-ghost btn-sm" style="height:26px; padding:0 8px; font-size:11.5px;" data-pin-comment="${c.id}" aria-label="${c.pinned ? 'Unpin note' : 'Pin note'}">${c.pinned ? 'Unpin' : 'Pin'}</button>
+                              <button type="button" class="btn btn-ghost btn-sm" style="height:26px; padding:0 8px; font-size:11.5px; color:var(--red);" data-del-comment="${c.id}" aria-label="Delete note">Delete</button>
+                            </div>
+                          </div>
+                          <div class="comment-body">${esc(c.text)}</div>
+                        </article>`;
+                    })
+                    .join('')
+                : '<div style="font-size:13px; color:var(--text-tertiary); padding:10px 4px;">No notes yet. Post your first recruiter update, interview takeaway, or question above.</div>'
+            }
+          </div>
         </div>
       `;
 
@@ -3529,10 +3661,56 @@ Product Design, Design Systems, Interaction Design, Prototyping, Figma, User Res
         saveState();
       });
 
-      $('#detail-job-notes').addEventListener('input', (e) => {
-        job.notes = e.target.value;
+      $('[data-comment-tag]').forEach((btn) =>
+        btn.addEventListener('click', () => {
+          ui.commentTag = btn.dataset.commentTag;
+          $('[data-comment-tag]').forEach((b) => b.classList.toggle('active', b.dataset.commentTag === ui.commentTag));
+        })
+      );
+
+      const postComment = () => {
+        const input = $('#new-comment-input');
+        const text = input.value.trim();
+        if (!text) return toast('Write a note before posting');
+        job.comments.unshift({
+          id: uid('cmt'),
+          tag: ui.commentTag || 'Note',
+          text,
+          createdAt: new Date().toISOString(),
+          pinned: false
+        });
         saveState();
+        renderJobDetail();
+        toast('Note posted');
+      };
+
+      $('#post-comment-btn')?.addEventListener('click', postComment);
+      $('#new-comment-input')?.addEventListener('keydown', (e) => {
+        if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') {
+          e.preventDefault();
+          postComment();
+        }
       });
+
+      $('[data-pin-comment]').forEach((btn) =>
+        btn.addEventListener('click', () => {
+          const c = job.comments.find((x) => x.id === btn.dataset.pinComment);
+          if (c) {
+            c.pinned = !c.pinned;
+            saveState();
+            renderJobDetail();
+          }
+        })
+      );
+
+      $('[data-del-comment]').forEach((btn) =>
+        btn.addEventListener('click', () => {
+          job.comments = job.comments.filter((x) => x.id !== btn.dataset.delComment);
+          saveState();
+          renderJobDetail();
+          toast('Note deleted');
+        })
+      );
     }
 
     /* ==========================================================================
