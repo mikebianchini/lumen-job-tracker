@@ -1,4 +1,4 @@
-const CACHE_NAME = 'lumen-v2';
+const CACHE_NAME = 'lumen-v3';
 const ASSETS = [
   './',
   './index.html',
