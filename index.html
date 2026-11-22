@@ -2381,7 +2381,7 @@
           <button class="icon-btn" id="theme-toggle-mobile" title="Toggle Theme" aria-label="Toggle Theme" style="display: none;">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
           </button>
-          <button class="btn btn-primary" id="primary-add-btn">
+          <button class="btn btn-primary" id="primary-add-btn" style="display: none;">
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
             <span id="primary-add-label">New Job</span>
           </button>
@@ -3005,14 +3005,19 @@ Product Design, Design Systems, Interaction Design, Prototyping, Figma, User Res
       $('#search-wrap').style.display = searchVisible ? '' : 'none';
 
       const addBtn = $('#primary-add-btn');
-      if (viewName === 'home' || viewName === 'jobs') {
-        addBtn.style.display = '';
-        $('#primary-add-label').textContent = 'New Job';
-      } else if (viewName === 'people') {
-        addBtn.style.display = '';
-        $('#primary-add-label').textContent = 'New Person';
-      } else {
-        addBtn.style.display = 'none';
+      addBtn.style.display = 'none';
+      const hubAdd = $('#hub-quick-add');
+      if (hubAdd) {
+        const span = hubAdd.querySelector('span');
+        if (viewName === 'people') {
+          hubAdd.style.display = '';
+          if (span) span.textContent = 'New Person';
+        } else if (viewName === 'home' || viewName === 'jobs') {
+          hubAdd.style.display = '';
+          if (span) span.textContent = 'New Job';
+        } else {
+          hubAdd.style.display = 'none';
+        }
       }
 
       renderCurrentView();
