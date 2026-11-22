@@ -3423,7 +3423,7 @@ Product Design, Design Systems, Interaction Design, Prototyping, Figma, User Res
 
             <div class="home-panel glass">
               <div class="section-head">
-                <span class="section-title">Recent Applications</span>
+                <span class="section-title">Recent Applications (${state.jobs.length})</span><button class="btn btn-ghost btn-sm" onclick="ui.jobFilter='All'; switchView('jobs');">View All →</button>
               </div>
               <div class="agenda-list">
                 ${
@@ -5113,6 +5113,8 @@ Product Design, Design Systems, Interaction Design, Prototyping, Figma, User Res
           const newJob = { id: uid('job'), ...payload, notes: '', personIds: [], tailoredResume: '' };
           state.jobs.unshift(newJob);
           ui.selectedJobId = newJob.id;
+          if (ui.jobFilter !== 'All' && ui.jobFilter !== newJob.status) ui.jobFilter = 'All';
+          if (ui.search) { ui.search = ''; const s = $('#global-search'); if (s) s.value = ''; }
           toast('Job added');
         }
         saveState();
