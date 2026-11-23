@@ -2475,11 +2475,96 @@
       background: #004182;
       color: #ffffff;
     }
+
+    /* Full-Screen Lumen Sign-In Page */
+    .auth-gate {
+      position: fixed;
+      inset: 0;
+      z-index: 90;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+
+    .auth-gate.open {
+      display: flex;
+    }
+
+    .auth-card {
+      width: 100%;
+      max-width: 420px;
+      border-radius: 28px;
+      padding: 36px 32px 30px;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+      text-align: center;
+    }
+
+    .auth-card-icon {
+      width: 68px;
+      height: 68px;
+      border-radius: 18px;
+      margin: 0 auto;
+      box-shadow: 0 12px 30px rgba(255, 56, 92, 0.28);
+      border: 1px solid var(--lg-border);
+    }
+
+    .auth-card-title {
+      font: 800 28px/1.1 var(--font-sans);
+      letter-spacing: -0.03em;
+      color: var(--text-primary);
+    }
+
+    .auth-card-sub {
+      font-size: 14px;
+      line-height: 1.5;
+      color: var(--text-secondary);
+      margin-top: 6px;
+    }
+
+    .auth-form {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      text-align: left;
+    }
+
+    body.signed-out .app-shell,
+    body.signed-out .mobile-tabbar {
+      display: none !important;
+    }
   </style>
 </head>
 <body>
   <!-- Clean App Canvas -->
   <div class="ambient-backdrop" aria-hidden="true"></div>
+
+  <!-- Dedicated Lumen Sign-In Page (shown when signed out) -->
+  <section class="auth-gate" id="auth-gate" aria-label="Sign in to Lumen">
+    <div class="auth-card glass-elevated">
+      <img src="./assets/icon-192.png?v=5" class="auth-card-icon" alt="Lumen" />
+      <div>
+        <h1 class="auth-card-title">Welcome to Lumen</h1>
+        <p class="auth-card-sub">Your calm home for tracking jobs, conversations, and tailored resumes across desktop &amp; mobile.</p>
+      </div>
+      <form class="auth-form" id="gate-auth-form">
+        <div class="field">
+          <label for="gate-email">Email Address</label>
+          <input id="gate-email" class="input" type="email" autocomplete="email" placeholder="you@example.com" required style="height:44px;" />
+        </div>
+        <div id="gate-msg" style="font-size:13px; min-height:18px; line-height:1.45;"></div>
+        <button type="submit" class="btn btn-primary" id="gate-submit-btn" style="height:46px; width:100%; font-size:15px;">Send Magic Sign-In Link</button>
+      </form>
+      <div style="padding-top:6px; border-top:1px solid var(--divider); display:flex; align-items:center; justify-content:space-between; gap:8px;">
+        <button type="button" class="btn btn-ghost btn-sm" id="gate-offline-btn" style="font-size:12.5px;">Continue offline</button>
+        <button type="button" class="icon-btn" id="gate-theme-btn" title="Toggle Light/Dark Mode" aria-label="Toggle theme">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+        </button>
+      </div>
+    </div>
+  </section>
 
   <!-- Main Application Shell -->
   <div class="app-shell">
@@ -3119,7 +3204,8 @@ Product Design, Design Systems, Interaction Design, Prototyping, Figma, User Res
       selectedJobId: state.jobs[0]?.id || null,
       selectedPersonId: state.people[0]?.id || null,
       studioJobId: state.jobs[0]?.id || '',
-      mobileDetailOpen: false
+      mobileDetailOpen: false,
+      guestMode: false
     };
 
     window.openOutreachModal = function ({ name = 'there', company = 'your team', role = 'this role', email = '' } = {}) {
@@ -5187,6 +5273,12 @@ Product Design, Design Systems, Interaction Design, Prototyping, Figma, User Res
       const signOutBtn = $('#supa-signout-btn');
       const liBtn = $('#supa-linkedin-btn');
 
+      const gate = $('#auth-gate');
+      const isSignedIn = Boolean(user);
+      const showGate = !isSignedIn && !ui.guestMode && Boolean(state.sync.supaUrl && state.sync.supaKey);
+      document.body.classList.toggle('signed-out', showGate);
+      if (gate) gate.classList.toggle('open', showGate);
+
       if (user) {
         const meta = user.user_metadata || {};
         const fullName = meta.full_name || meta.name || state.profile?.name || user.email || 'Account';
@@ -5297,9 +5389,11 @@ Product Design, Design Systems, Interaction Design, Prototyping, Figma, User Res
         }
         saveState(true);
         history.replaceState(null, '', window.location.pathname + window.location.search);
+        ui.guestMode = false;
         updateAuthUI();
         await autoPullFromCloud(false);
-        toast(`Signed in as ${state.profile.name || user?.email || 'LinkedIn user'}`);
+        renderCurrentView();
+        toast(`Signed in as ${state.profile.name || user?.email || 'Lumen user'}`);
       } catch (e) {
         toast('LinkedIn sign-in failed — check Supabase Auth settings');
       }
@@ -5307,19 +5401,23 @@ Product Design, Design Systems, Interaction Design, Prototyping, Figma, User Res
 
     async function signOutSupabase() {
       const sess = state.sync.supaSession;
-      if (sess?.access_token && state.sync.supaUrl && state.sync.supaKey) {
-        try {
-          await fetch(`${state.sync.supaUrl.trim().replace(/\/$/, '')}/auth/v1/logout`, {
-            method: 'POST',
-            headers: { apikey: state.sync.supaKey.trim(), Authorization: `Bearer ${sess.access_token}` }
-          });
-        } catch {}
-      }
+      clearTimeout(_autoSyncTimer);
       state.sync.supaSession = null;
+      ui.guestMode = false;
       saveState(true);
+      if (window.location.hash && window.location.hash.includes('access_token=')) {
+        history.replaceState(null, '', window.location.pathname + window.location.search);
+      }
       updateAuthUI();
-      renderCurrentView();
+      const gateMsg = $('#gate-msg');
+      if (gateMsg) { gateMsg.style.color = 'var(--text-secondary)'; gateMsg.textContent = 'You have been signed out.'; }
       toast('Signed out');
+      if (sess?.access_token && state.sync.supaUrl && state.sync.supaKey) {
+        fetch(`${state.sync.supaUrl.trim().replace(/\/$/, '')}/auth/v1/logout`, {
+          method: 'POST',
+          headers: { apikey: state.sync.supaKey.trim(), Authorization: `Bearer ${sess.access_token}` }
+        }).catch(() => {});
+      }
     }
 
     function openAuthModal() {
@@ -6277,6 +6375,39 @@ function doPost(e) {
     $('#supa-linkedin-btn')?.addEventListener('click', startLinkedInSignIn);
     $('#supa-signout-btn')?.addEventListener('click', signOutSupabase);
     $('#hub-auth-btn')?.addEventListener('click', openAuthModal);
+    $('#gate-theme-btn')?.addEventListener('click', toggleTheme);
+    $('#gate-offline-btn')?.addEventListener('click', () => {
+      ui.guestMode = true;
+      updateAuthUI();
+      renderCurrentView();
+    });
+    $('#gate-auth-form')?.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const emailEl = $('#gate-email');
+      const msgEl = $('#gate-msg');
+      const btn = $('#gate-submit-btn');
+      const email = emailEl.value.trim();
+      emailEl.classList.toggle('input-error', !email || !email.includes('@'));
+      if (!email || !email.includes('@')) { emailEl.focus(); return; }
+      btn.disabled = true;
+      btn.textContent = 'Sending link…';
+      msgEl.style.color = 'var(--text-secondary)';
+      msgEl.textContent = '';
+      try {
+        const ok = await sendMagicLinkEmail(email);
+        if (ok) {
+          msgEl.style.color = 'var(--green)';
+          msgEl.textContent = 'Magic link sent! Open your inbox and click the link to sign in.';
+          toast('Magic link sent — check your inbox');
+        }
+      } catch (err) {
+        msgEl.style.color = 'var(--red)';
+        msgEl.textContent = err.message || 'Could not send link. Please try again.';
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Send Magic Sign-In Link';
+      }
+    });
     $('#supa-sql-btn').addEventListener('click', () => {
       openModal(`
         <div class="modal-header">
