@@ -7162,8 +7162,8 @@ Product Design, Design Systems, Interaction Design, Prototyping, Figma, User Res
           const cleaned = decodeURIComponent(match[1])
             .replace(/-[0-9a-f]{6,}$/i, '')
             .replace(/-\d{3,}$/, '');
-          const parts = cleaned.split(/[-_]+/).filter((s) => s && !/^\d+$/.test(s));
-          if (parts.length) {
+          const parts = cleaned.split(/[-_.]+/).filter((s) => s && !/^\d+$/.test(s));
+          if (parts.length >= 2) {
             out.name = parts.slice(0, 3).map((p) => p.charAt(0).toUpperCase() + p.slice(1).toLowerCase()).join(' ');
           }
         }
@@ -7184,16 +7184,18 @@ Product Design, Design Systems, Interaction Design, Prototyping, Figma, User Res
 
         if (res.ok) {
           const md = await res.text();
+          const finalUrl = (md.match(/^Final URL:\s*(.+)$/m)?.[1] || '').trim();
           const titleLine = (md.match(/^Title:\s*(.+)$/m)?.[1] || '').trim();
-          // Ignore LinkedIn login/authwall titles
-          if (titleLine && !/^(sign in|join linkedin|linkedin login|security verification|999)/i.test(titleLine)) {
+          const isAuthWall =
+            /\/authwall|\/login|\/signup|\/checkpoint/i.test(finalUrl) ||
+            /^(sign up|sign in|log in|join linkedin|linkedin login|linkedin:|security verification|999|403|404|just a moment)/i.test(titleLine) ||
+            /agree & join linkedin|join linkedin/i.test(md.slice(0, 600));
+
+          if (titleLine && !isAuthWall) {
             const cleanTitle = titleLine.replace(/\s*\|\s*LinkedIn\s*$/i, '').trim();
-            // Common LinkedIn formats:
-            // "Claire Bennett - Design Recruiting Lead - Apple"
-            // "Daniel Park - Design Manager at Apple"
-            // "Maya Lin - Principal Designer | Linear"
             const parts = cleanTitle.split(/\s+[-–—]\s+/);
-            let name = parts[0]?.trim() || fallback.name;
+            const candidateName = parts[0]?.trim() || '';
+            let name = /^(sign up|sign in|log in|linkedin)$/i.test(candidateName) ? fallback.name : (candidateName || fallback.name);
             let title = '';
             let company = '';
 
