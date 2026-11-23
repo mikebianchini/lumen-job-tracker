@@ -1,4 +1,4 @@
-const CACHE_NAME = 'lumen-v8';
+const CACHE_NAME = 'lumen-v9';
 
 self.addEventListener('install', () => {
   self.skipWaiting();
@@ -13,12 +13,20 @@ self.addEventListener('activate', (e) => {
 });
 
 self.addEventListener('fetch', (e) => {
-  if (e.request.method !== 'GET' || new URL(e.request.url).origin !== self.location.origin) return;
+  if (e.request.method !== 'GET') return;
+  const url = new URL(e.request.url);
+  if (url.origin !== self.location.origin) return;
+
+  const isHtml = e.request.mode === 'navigate' || url.pathname === '/' || url.pathname.endsWith('.html');
+  const fetchReq = isHtml ? new Request(e.request, { cache: 'no-store' }) : e.request;
+
   e.respondWith(
-    fetch(e.request)
+    fetch(fetchReq)
       .then((res) => {
-        const clone = res.clone();
-        caches.open(CACHE_NAME).then((cache) => cache.put(e.request, clone));
+        if (res && res.ok) {
+          const clone = res.clone();
+          caches.open(CACHE_NAME).then((cache) => cache.put(e.request, clone));
+        }
         return res;
       })
       .catch(() => caches.match(e.request))

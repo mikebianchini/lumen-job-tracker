@@ -7726,6 +7726,7 @@ create policy "Users manage own Lumen data"
           if (icon) icon.style.transform = '';
           if (label) label.textContent = 'Syncing…';
           try {
+            if (window._lumenSwReg) window._lumenSwReg.update().catch(() => {});
             if (hasCloudConfig()) await autoPullFromCloud(false);
             else renderCurrentView();
           } finally {
@@ -7754,7 +7755,20 @@ create policy "Users manage own Lumen data"
       if (hasCloudConfig() && !window.location.hash.includes('access_token=')) autoPullFromCloud(true);
     });
     if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
-      navigator.serviceWorker.register('./sw.js').catch(() => {});
+      const hadController = Boolean(navigator.serviceWorker.controller);
+      let reloadingForUpdate = false;
+      navigator.serviceWorker.addEventListener('controllerchange', () => {
+        if (!hadController || reloadingForUpdate) return;
+        reloadingForUpdate = true;
+        window.location.reload();
+      });
+      navigator.serviceWorker.register('./sw.js', { updateViaCache: 'none' }).then((reg) => {
+        window._lumenSwReg = reg;
+        reg.update().catch(() => {});
+        document.addEventListener('visibilitychange', () => {
+          if (document.visibilityState === 'visible') reg.update().catch(() => {});
+        });
+      }).catch(() => {});
     }
   </script>
 </body>
