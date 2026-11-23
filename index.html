@@ -2609,6 +2609,13 @@
           <label for="gate-password">Password</label>
           <input id="gate-password" class="input" type="password" autocomplete="current-password" placeholder="Enter your password" style="height:44px;" />
         </div>
+        <div class="field" id="gate-otp-wrap" style="display: none;">
+          <label for="gate-otp">6-Digit Code <span style="font-weight:450; color:var(--text-tertiary)">(for iPhone Home Screen app)</span></label>
+          <div style="display:flex; gap:8px;">
+            <input id="gate-otp" class="input" type="text" inputmode="numeric" autocomplete="one-time-code" placeholder="123456" maxlength="8" style="height:44px; flex:1; letter-spacing:0.15em; font-weight:650;" />
+            <button type="button" class="btn btn-primary" id="gate-verify-otp-btn" style="height:44px;">Verify</button>
+          </div>
+        </div>
         <div id="gate-msg" style="font-size:13px; min-height:18px; line-height:1.45;"></div>
         <button type="submit" class="btn btn-primary" id="gate-submit-btn" style="height:46px; width:100%; font-size:15px;">Sign In</button>
         <button type="button" class="btn btn-ghost btn-sm" id="gate-signup-btn" style="width:100%; font-size:13px;">New here? Create Account</button>
@@ -5410,6 +5417,34 @@ Product Design, Design Systems, Interaction Design, Prototyping, Figma, User Res
       return true;
     }
 
+    async function verifyEmailOtp(email, token) {
+      const url = (state.sync.supaUrl || '').trim().replace(/\/$/, '');
+      const key = (state.sync.supaKey || '').trim();
+      const res = await fetch(`${url}/auth/v1/verify`, {
+        method: 'POST',
+        headers: { apikey: key, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, token: token.trim(), type: 'email' })
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(data.error_description || data.msg || 'Invalid or expired code');
+      state.sync.supaSession = {
+        access_token: data.access_token,
+        refresh_token: data.refresh_token,
+        expires_at: data.expires_at || Math.floor(Date.now() / 1000) + (data.expires_in || 3600),
+        user: data.user
+      };
+      if (data.user?.user_metadata) {
+        const meta = data.user.user_metadata;
+        if (!state.profile.name && (meta.full_name || meta.name)) state.profile.name = meta.full_name || meta.name;
+      }
+      saveState(true);
+      updateAuthUI();
+      await autoPullFromCloud(false);
+      renderCurrentView();
+      maybePromptProfileSetup();
+      return data;
+    }
+
     async function signInWithPassword(email, password) {
       const url = (state.sync.supaUrl || '').trim().replace(/\/$/, '');
       const key = (state.sync.supaKey || '').trim();
@@ -6616,6 +6651,7 @@ function doPost(e) {
       $('#gate-tab-password')?.classList.toggle('active', isPass);
       $('#gate-tab-magic')?.classList.toggle('active', !isPass);
       if ($('#gate-pass-wrap')) $('#gate-pass-wrap').style.display = isPass ? '' : 'none';
+      if ($('#gate-otp-wrap') && isPass) $('#gate-otp-wrap').style.display = 'none';
       if ($('#gate-name-wrap')) $('#gate-name-wrap').style.display = isPass && gateIsSignUp ? '' : 'none';
       if ($('#gate-signup-btn')) {
         $('#gate-signup-btn').style.display = isPass ? '' : 'none';
@@ -6634,6 +6670,29 @@ function doPost(e) {
 
     $('#gate-tab-password')?.addEventListener('click', () => { gateAuthMode = 'password'; syncGateUI(); });
     $('#gate-tab-magic')?.addEventListener('click', () => { gateAuthMode = 'magic'; syncGateUI(); });
+    $('#gate-verify-otp-btn')?.addEventListener('click', async () => {
+      const email = ($('#gate-email')?.value || '').trim();
+      const token = ($('#gate-otp')?.value || '').trim();
+      const msgEl = $('#gate-msg');
+      const btn = $('#gate-verify-otp-btn');
+      if (!email || !token) {
+        msgEl.style.color = 'var(--red)';
+        msgEl.textContent = 'Enter both your email and the 6-digit code from your email.';
+        return;
+      }
+      btn.disabled = true;
+      btn.textContent = 'Verifying…';
+      try {
+        await verifyEmailOtp(email, token);
+        toast('Signed in');
+      } catch (err) {
+        msgEl.style.color = 'var(--red)';
+        msgEl.textContent = err.message || 'Invalid or expired code.';
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Verify';
+      }
+    });
     $('#gate-signup-btn')?.addEventListener('click', () => {
       gateIsSignUp = !gateIsSignUp;
       syncGateUI();
@@ -6708,8 +6767,10 @@ function doPost(e) {
           const ok = await sendMagicLinkEmail(email);
           if (ok) {
             msgEl.style.color = 'var(--green)';
-            msgEl.textContent = 'Magic link sent! Open your inbox and click the link to sign in.';
-            toast('Magic link sent — check your inbox');
+            msgEl.textContent = 'Check your inbox! Tap the link in Safari, or enter the 6-digit code below to stay inside your Home Screen app.';
+            if ($('#gate-otp-wrap')) $('#gate-otp-wrap').style.display = '';
+            $('#gate-otp')?.focus();
+            toast('Sign-in email sent');
           }
         } catch (err) {
           msgEl.style.color = 'var(--red)';
