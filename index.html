@@ -7121,10 +7121,10 @@ Product Design, Design Systems, Interaction Design, Prototyping, Figma, User Res
         }
       }
 
-      // Tier 2: Free Public Markdown Reader (r.jina.ai) for Apple, Stripe, Figma, Ashby, etc.
+      // Tier 2: Free Public Markdown Reader (r.jina.ai) for Apple, Stripe, Figma, Allstate, Ashby, etc.
       try {
         const ctrl = new AbortController();
-        const timer = setTimeout(() => ctrl.abort(), 7000);
+        const timer = setTimeout(() => ctrl.abort(), 12000);
         const res = await fetch(`https://r.jina.ai/${rawUrl}`, {
           headers: { Accept: 'text/plain' },
           signal: ctrl.signal
@@ -7153,21 +7153,40 @@ Product Design, Design Systems, Interaction Design, Prototyping, Figma, User Res
             }
 
             const bodyStart = md.indexOf('Markdown Content:');
-            const cleanBody = (bodyStart !== -1 ? md.slice(bodyStart + 17) : md)
+            let rawBody = bodyStart !== -1 ? md.slice(bodyStart + 17) : md;
+
+            // Skip giant corporate site navigation menus by jumping to the actual job title/H1 or JD heading
+            let jdStart = -1;
+            const h1Match = rawBody.match(/^#\s+.+$/m);
+            if (h1Match && h1Match.index > 0 && h1Match.index < rawBody.length - 120) {
+              jdStart = h1Match.index;
+            }
+            if (jdStart === -1 && role && role.length >= 6) {
+              const rIdx = rawBody.indexOf(role);
+              if (rIdx > 0 && rIdx < rawBody.length - 120) jdStart = rIdx;
+            }
+            if (jdStart === -1) {
+              const secMatch = rawBody.match(/(?:^|\n)(?:#{1,3}\s*|\*\*)?(?:Job Description|Position Overview|About the Role|Key Responsibilities|Key aspects of the role|What You(?:'|’)ll Do|Role Overview)/i);
+              if (secMatch && secMatch.index > 0) jdStart = secMatch.index;
+            }
+            if (jdStart > 0) rawBody = rawBody.slice(jdStart);
+
+            const cleanBody = rawBody
               .replace(/!\[.*?\]\(.*?\)/g, '')
               .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1')
               .replace(/[#*_`>]+/g, '')
+              .replace(/^[ \t]*Apply now[ \t]*$/gim, '')
               .replace(/\n{3,}/g, '\n\n')
               .trim();
 
             return {
               company: company || fallback.company,
               role: role || fallback.role,
-              level: detectLevel((role || '') + ' ' + cleanBody.slice(0, 1200)),
-              comp: detectComp(cleanBody),
-              workMode: detectWorkMode(cleanBody.slice(0, 2000)),
-              location: detectLocation(cleanBody.slice(0, 1500)),
-              jd: cleanBody.slice(0, 2600)
+              level: detectLevel((role || '') + ' ' + cleanBody.slice(0, 1500)),
+              comp: detectComp(cleanBody.slice(0, 6000)),
+              workMode: detectWorkMode(cleanBody.slice(0, 2500)),
+              location: detectLocation(cleanBody.slice(0, 1800)),
+              jd: cleanBody.slice(0, 4000)
             };
           }
         }
