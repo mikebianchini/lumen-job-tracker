@@ -2606,7 +2606,10 @@
           <input id="gate-email" class="input" type="email" autocomplete="email" placeholder="you@example.com" required style="height:44px;" />
         </div>
         <div class="field" id="gate-pass-wrap">
-          <label for="gate-password">Password</label>
+          <div style="display:flex; align-items:center; justify-content:space-between; gap:8px;">
+            <label for="gate-password">Password</label>
+            <button type="button" id="gate-forgot-btn" style="background:none; border:0; padding:0; font-family:inherit; font-size:12px; font-weight:600; color:var(--accent-text); cursor:pointer;">Forgot password?</button>
+          </div>
           <input id="gate-password" class="input" type="password" autocomplete="current-password" placeholder="Enter your password" style="height:44px;" />
         </div>
         <div class="field" id="gate-otp-wrap" style="display: none;">
@@ -5504,6 +5507,81 @@ Product Design, Design Systems, Interaction Design, Prototyping, Figma, User Res
       return { signedIn: false };
     }
 
+    async function sendPasswordReset(email) {
+      const url = (state.sync.supaUrl || '').trim().replace(/\/$/, '');
+      const key = (state.sync.supaKey || '').trim();
+      const redirectTo = window.location.protocol.startsWith('http')
+        ? window.location.origin + window.location.pathname
+        : 'https://mikebianchini.github.io/lumen-job-tracker/';
+      const res = await fetch(`${url}/auth/v1/recover?redirect_to=${encodeURIComponent(redirectTo)}`, {
+        method: 'POST',
+        headers: { apikey: key, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email })
+      });
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.error_description || err.msg || 'Could not send reset email');
+      }
+      return true;
+    }
+
+    function openSetNewPasswordModal() {
+      openModal(`
+        <div class="modal-header">
+          <h3 class="modal-title">Set New Password</h3>
+          <button class="icon-btn" onclick="closeModal()" aria-label="Close dialog"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></button>
+        </div>
+        <p style="font-size:13px; color:var(--text-secondary); line-height:1.5;">
+          Choose a new password (6+ characters) for your Lumen account.
+        </p>
+        <div class="field">
+          <label for="np-pass1">New Password</label>
+          <input id="np-pass1" class="input" type="password" autocomplete="new-password" placeholder="At least 6 characters" />
+        </div>
+        <div class="field">
+          <label for="np-pass2">Confirm New Password</label>
+          <input id="np-pass2" class="input" type="password" autocomplete="new-password" placeholder="Re-enter password" />
+        </div>
+        <div id="np-msg" style="font-size:12.5px; color:var(--red); min-height:16px;"></div>
+        <div class="modal-footer">
+          <button class="btn btn-ghost" onclick="closeModal()">Cancel</button>
+          <button class="btn btn-primary" id="np-save-btn">Update Password</button>
+        </div>
+      `);
+      $('#np-save-btn')?.addEventListener('click', async () => {
+        const p1 = $('#np-pass1').value;
+        const p2 = $('#np-pass2').value;
+        const msg = $('#np-msg');
+        if (p1.length < 6) { msg.textContent = 'Password must be at least 6 characters.'; return; }
+        if (p1 !== p2) { msg.textContent = 'Passwords do not match.'; return; }
+        const btn = $('#np-save-btn');
+        btn.disabled = true;
+        btn.textContent = 'Updating…';
+        try {
+          const sess = await ensureValidSupaSession();
+          if (!sess?.access_token) throw new Error('Please sign in first.');
+          const res = await fetch(`${state.sync.supaUrl.trim().replace(/\/$/, '')}/auth/v1/user`, {
+            method: 'PUT',
+            headers: {
+              apikey: state.sync.supaKey.trim(),
+              Authorization: `Bearer ${sess.access_token}`,
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ password: p1 })
+          });
+          const data = await res.json().catch(() => ({}));
+          if (!res.ok) throw new Error(data.error_description || data.msg || 'Could not update password');
+          closeModal();
+          toast('Password updated successfully');
+        } catch (err) {
+          msg.textContent = err.message || 'Could not update password.';
+        } finally {
+          btn.disabled = false;
+          btn.textContent = 'Update Password';
+        }
+      });
+    }
+
     function startLinkedInSignIn() {
       openAuthModal();
     }
@@ -5513,6 +5591,7 @@ Product Design, Design Systems, Interaction Design, Prototyping, Figma, User Res
       const params = new URLSearchParams(window.location.hash.slice(1));
       const access_token = params.get('access_token');
       const refresh_token = params.get('refresh_token');
+      const authType = params.get('type') || '';
       const expires_in = Number(params.get('expires_in') || 3600);
       if (!access_token || !state.sync.supaUrl || !state.sync.supaKey) return;
 
@@ -5538,8 +5617,13 @@ Product Design, Design Systems, Interaction Design, Prototyping, Figma, User Res
         updateAuthUI();
         await autoPullFromCloud(false);
         renderCurrentView();
-        maybePromptProfileSetup();
-        toast(`Signed in as ${state.profile.name || user?.email || 'Lumen user'}`);
+        if (authType === 'recovery') {
+          setTimeout(() => openSetNewPasswordModal(), 200);
+          toast('Reset link verified — choose your new password');
+        } else {
+          maybePromptProfileSetup();
+          toast(`Signed in as ${state.profile.name || user?.email || 'Lumen user'}`);
+        }
       } catch (e) {
         toast('LinkedIn sign-in failed — check Supabase Auth settings');
       }
@@ -5698,11 +5782,13 @@ Product Design, Design Systems, Interaction Design, Prototyping, Figma, User Res
           </div>
           <div class="modal-footer">
             <button class="btn" id="modal-edit-profile-btn">Edit Profile</button>
+            <button class="btn" id="modal-change-pass-btn">Password</button>
             <button class="btn" onclick="closeModal(); switchView('sync');">Settings</button>
             <button class="btn btn-danger" id="modal-signout-btn">Sign Out</button>
           </div>
         `);
         $('#modal-edit-profile-btn')?.addEventListener('click', () => { closeModal(); openProfileSetupModal(false); });
+        $('#modal-change-pass-btn')?.addEventListener('click', () => { closeModal(); openSetNewPasswordModal(); });
         $('#modal-signout-btn')?.addEventListener('click', () => { closeModal(); signOutSupabase(); });
         return;
       }
@@ -6653,6 +6739,7 @@ function doPost(e) {
       if ($('#gate-pass-wrap')) $('#gate-pass-wrap').style.display = isPass ? '' : 'none';
       if ($('#gate-otp-wrap') && isPass) $('#gate-otp-wrap').style.display = 'none';
       if ($('#gate-name-wrap')) $('#gate-name-wrap').style.display = isPass && gateIsSignUp ? '' : 'none';
+      if ($('#gate-forgot-btn')) $('#gate-forgot-btn').style.display = isPass && !gateIsSignUp ? '' : 'none';
       if ($('#gate-signup-btn')) {
         $('#gate-signup-btn').style.display = isPass ? '' : 'none';
         $('#gate-signup-btn').textContent = gateIsSignUp ? 'Already have an account? Sign In' : 'New here? Create Account';
@@ -6668,6 +6755,29 @@ function doPost(e) {
       if ($('#gate-msg')) $('#gate-msg').textContent = '';
     };
 
+    $('#gate-forgot-btn')?.addEventListener('click', async () => {
+      const emailEl = $('#gate-email');
+      const msgEl = $('#gate-msg');
+      const email = (emailEl?.value || '').trim();
+      emailEl?.classList.toggle('input-error', !email || !email.includes('@'));
+      if (!email || !email.includes('@')) {
+        emailEl?.focus();
+        msgEl.style.color = 'var(--red)';
+        msgEl.textContent = 'Enter your email address above, then click Forgot password.';
+        return;
+      }
+      msgEl.style.color = 'var(--text-secondary)';
+      msgEl.textContent = 'Sending password reset link…';
+      try {
+        await sendPasswordReset(email);
+        msgEl.style.color = 'var(--green)';
+        msgEl.textContent = 'Reset link sent! Open the link in your inbox to set a new password.';
+        toast('Password reset link sent');
+      } catch (err) {
+        msgEl.style.color = 'var(--red)';
+        msgEl.textContent = err.message || 'Could not send reset email.';
+      }
+    });
     $('#gate-tab-password')?.addEventListener('click', () => { gateAuthMode = 'password'; syncGateUI(); });
     $('#gate-tab-magic')?.addEventListener('click', () => { gateAuthMode = 'magic'; syncGateUI(); });
     $('#gate-verify-otp-btn')?.addEventListener('click', async () => {
