@@ -5804,6 +5804,7 @@ Product Design, Design Systems, Interaction Design, Prototyping, Figma, User Res
         profile: state.profile || {},
         baseResume: state.baseResume,
         baseResumeName: state.baseResumeName,
+        aiApiKey: state.sync?.aiApiKey || '',
         updatedAt: state.updatedAt || new Date().toISOString()
       };
     }
@@ -5820,96 +5821,133 @@ Product Design, Design Systems, Interaction Design, Prototyping, Figma, User Res
       if (data.profile && typeof data.profile === 'object') state.profile = { ...state.profile, ...data.profile };
       if (typeof data.baseResume === 'string') state.baseResume = data.baseResume;
       if (typeof data.baseResumeName === 'string') state.baseResumeName = data.baseResumeName;
+      if (typeof data.aiApiKey === 'string' && data.aiApiKey) state.sync.aiApiKey = data.aiApiKey;
       state.updatedAt = data.updatedAt || new Date().toISOString();
       saveState(true);
       renderCurrentView();
       return true;
     }
 
+    let _pendingCloudPush = false;
     function scheduleAutoSync() {
       if (!state.sync.autoSync || !hasCloudConfig()) return;
+      if (state.sync.supaUrl && state.sync.supaKey && !state.sync.supaSession?.access_token) return;
       if (!navigator.onLine) {
         setSyncBadge('Offline', '--amber');
         return;
       }
+      _pendingCloudPush = true;
       setSyncBadge('Syncing…', '--accent');
       clearTimeout(_autoSyncTimer);
       _autoSyncTimer = setTimeout(() => {
         autoPushToCloud(true);
-      }, 1200);
+      }, 900);
     }
 
-    async function autoPushToCloud(silent = false) {
-      if (!hasCloudConfig()) return;
+    async function autoPushToCloud(silent = false, keepalive = false) {
+      if (!hasCloudConfig()) return false;
+      _pendingCloudPush = false;
       setSyncBadge('Syncing…', '--accent');
       try {
         if (state.sync.supaUrl && state.sync.supaKey) {
           const url = state.sync.supaUrl.trim().replace(/\/$/, '');
           const key = state.sync.supaKey.trim();
           const sess = await ensureValidSupaSession();
-          const rowId = sess?.user?.id || 'default';
+          if (!sess?.access_token || !sess?.user?.id) {
+            setSyncBadge('Sign in', '--amber');
+            return false;
+          }
+          const rowId = sess.user.id;
           const headers = {
             apikey: key,
+            Authorization: `Bearer ${sess.access_token}`,
             'Content-Type': 'application/json',
-            Prefer: 'resolution=merge-duplicates'
+            Prefer: 'resolution=merge-duplicates,return=minimal'
           };
-          if (sess?.access_token) headers.Authorization = `Bearer ${sess.access_token}`;
-          else if (key.startsWith('eyJ')) headers.Authorization = `Bearer ${key}`;
-          const res = await fetch(`${url}/rest/v1/lumen_state`, {
+          const res = await fetch(`${url}/rest/v1/lumen_state?on_conflict=id`, {
             method: 'POST',
             headers,
-            body: JSON.stringify({ id: rowId, payload: getSyncPayload(), updated_at: state.updatedAt })
+            keepalive,
+            body: JSON.stringify({ id: rowId, payload: getSyncPayload(), updated_at: state.updatedAt || new Date().toISOString() })
           });
-          if (!res.ok) throw new Error(res.statusText);
+          if (!res.ok) {
+            const errData = await res.json().catch(() => ({}));
+            throw new Error(errData.message || errData.hint || `HTTP ${res.status}`);
+          }
         } else if (state.sync.gsheetsUrl) {
           await fetch(state.sync.gsheetsUrl.trim(), {
             method: 'POST',
             mode: 'no-cors',
+            keepalive,
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(getSyncPayload())
           });
         }
         setSyncBadge('Synced ✓', '--green');
         if (!silent) toast('Synced to cloud');
+        return true;
       } catch (e) {
+        console.warn('Cloud push failed:', e);
         setSyncBadge('Retry', '--amber');
-        if (!silent) toast(`Sync failed: ${e.message}`);
+        if (!silent || /permission denied|42501/i.test(e.message || '')) {
+          toast(`Sync failed: ${e.message}`);
+        }
+        return false;
       }
     }
 
     async function autoPullFromCloud(silent = true) {
-      if (!hasCloudConfig() || !navigator.onLine) return;
+      if (!hasCloudConfig() || !navigator.onLine) return false;
+      if (_pendingCloudPush) return false;
       setSyncBadge('Syncing…', '--accent');
       try {
         let data = null;
+        let cloudRowMissing = false;
         if (state.sync.supaUrl && state.sync.supaKey) {
           const url = state.sync.supaUrl.trim().replace(/\/$/, '');
           const key = state.sync.supaKey.trim();
           const sess = await ensureValidSupaSession();
-          const rowId = sess?.user?.id || 'default';
-          const headers = { apikey: key };
-          if (sess?.access_token) headers.Authorization = `Bearer ${sess.access_token}`;
-          else if (key.startsWith('eyJ')) headers.Authorization = `Bearer ${key}`;
+          if (!sess?.access_token || !sess?.user?.id) {
+            setSyncBadge('Sign in');
+            return false;
+          }
+          const rowId = sess.user.id;
           const res = await fetch(`${url}/rest/v1/lumen_state?id=eq.${encodeURIComponent(rowId)}&select=payload,updated_at`, {
-            headers
-          });
-          if (res.ok) {
-            const rows = await res.json();
-            if (rows?.[0]?.payload) {
-              data = { ...rows[0].payload, updatedAt: rows[0].updated_at || rows[0].payload.updatedAt };
+            headers: {
+              apikey: key,
+              Authorization: `Bearer ${sess.access_token}`
             }
+          });
+          if (!res.ok) {
+            const errData = await res.json().catch(() => ({}));
+            throw new Error(errData.message || errData.hint || `HTTP ${res.status}`);
+          }
+          const rows = await res.json();
+          if (rows?.[0]?.payload) {
+            data = { ...rows[0].payload, updatedAt: rows[0].updated_at || rows[0].payload.updatedAt };
+          } else {
+            cloudRowMissing = true;
           }
         } else if (state.sync.gsheetsUrl) {
           const res = await fetch(state.sync.gsheetsUrl.trim());
           data = await res.json();
         }
+        if (cloudRowMissing) {
+          await autoPushToCloud(true);
+          return true;
+        }
         const updated = applyCloudPayload(data, silent);
         setSyncBadge('Synced ✓', '--green');
         if (updated && !silent) toast('Pulled latest from cloud');
         else if (updated && silent) toast('Auto-synced latest changes');
+        return updated;
       } catch (e) {
-        setSyncBadge(hasCloudConfig() ? 'Cloud' : 'Local');
-        if (!silent) toast('Pull failed — verify your sync URL/key');
+        console.warn('Cloud pull failed:', e);
+        setSyncBadge('Retry', '--amber');
+        if (!silent || /permission denied|42501/i.test(e.message || '')) {
+          toast(`Sync failed: ${e.message}`);
+        }
+        return false;
       }
     }
 
@@ -7487,16 +7525,19 @@ function doPost(e) {
         <p style="font-size:13px; color:var(--text-secondary); line-height:1.5;">
           <strong>1. Run this SQL</strong> in Supabase SQL Editor (enables private per-user Row-Level Security):
         </p>
-        <div class="code-box">create table if not exists lumen_state (
+        <div class="code-box">create table if not exists public.lumen_state (
   id text primary key,
   payload jsonb not null,
   updated_at timestamptz default now()
 );
 
-alter table lumen_state enable row level security;
+grant select, insert, update, delete on table public.lumen_state to authenticated;
 
+alter table public.lumen_state enable row level security;
+
+drop policy if exists "Users manage own Lumen data" on public.lumen_state;
 create policy "Users manage own Lumen data"
-  on lumen_state for all
+  on public.lumen_state for all to authenticated
   using (auth.uid()::text = id)
   with check (auth.uid()::text = id);</div>
         <p style="font-size:12.5px; color:var(--text-secondary); line-height:1.5;">
@@ -7585,14 +7626,26 @@ create policy "Users manage own Lumen data"
       })
     );
 
-    // Auto-pull when returning to Lumen on phone/desktop or coming back online
+    // Auto-pull when returning to Lumen on phone/desktop, coming back online, or periodically while open
     document.addEventListener('visibilitychange', () => {
       if (document.visibilityState === 'visible') autoPullFromCloud(true);
+      else if (_pendingCloudPush) autoPushToCloud(true, true);
+    });
+    window.addEventListener('focus', () => {
+      if (document.visibilityState === 'visible') autoPullFromCloud(true);
+    });
+    window.addEventListener('pagehide', () => {
+      if (_pendingCloudPush) autoPushToCloud(true, true);
     });
     window.addEventListener('online', () => {
       autoPullFromCloud(true);
       scheduleAutoSync();
     });
+    setInterval(() => {
+      if (document.visibilityState === 'visible' && navigator.onLine && state.sync.autoSync && state.sync.supaSession?.access_token) {
+        autoPullFromCloud(true);
+      }
+    }, 25000);
 
     $('#jobs-mode-list')?.addEventListener('click', () => { ui.jobsViewMode = 'list'; renderJobs(); });
     $('#jobs-mode-board')?.addEventListener('click', () => { ui.jobsViewMode = 'board'; renderJobs(); });
