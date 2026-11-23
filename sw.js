@@ -1,4 +1,4 @@
-const CACHE_NAME = 'lumen-v6';
+const CACHE_NAME = 'lumen-v7';
 
 self.addEventListener('install', () => {
   self.skipWaiting();

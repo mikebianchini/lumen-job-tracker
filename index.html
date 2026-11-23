@@ -2888,26 +2888,172 @@
         border-radius: 24px;
       }
 
-      /* Floating iOS 26 Liquid Glass Bottom Tab Bar */
+      /* Larger, Effortless Apple iOS Mobile Typography */
+      body {
+        font-size: 16px;
+        line-height: 1.5;
+      }
+
+      .page-title {
+        font-size: 32px;
+      }
+
+      .home-greeting {
+        font-size: 25px;
+        line-height: 1.18;
+      }
+
+      .home-hero p {
+        font-size: 15px !important;
+      }
+
+      .kpi-label {
+        font-size: 13.5px;
+      }
+
+      .kpi-value {
+        font-size: 30px;
+      }
+
+      .kpi-sub {
+        font-size: 13px;
+      }
+
+      .section-title {
+        font-size: 15.5px;
+      }
+
+      .item-title {
+        font-size: 16px;
+      }
+
+      .item-subtitle {
+        font-size: 14px;
+      }
+
+      .item-meta-row,
+      .chip,
+      .badge {
+        font-size: 12.5px;
+      }
+
+      .detail-title {
+        font-size: 23px;
+      }
+
+      .detail-company {
+        font-size: 15px;
+      }
+
+      .meta-label {
+        font-size: 11.5px;
+      }
+
+      .meta-value {
+        font-size: 15.5px;
+      }
+
+      .comment-body {
+        font-size: 15px;
+      }
+
+      .pill {
+        font-size: 14px;
+        padding: 8px 15px;
+      }
+
+      .btn {
+        font-size: 15px;
+      }
+
+      .btn-sm {
+        font-size: 13.5px;
+        min-height: 38px;
+        height: 38px;
+        padding: 0 14px;
+      }
+
+      .workspace {
+        padding-bottom: calc(114px + env(safe-area-inset-bottom, 0px));
+      }
+
+      /* Signature Apple iOS 26 Liquid Glass Floating Bottom Tab Bar */
       .mobile-tabbar {
-        left: 12px;
-        right: 12px;
-        max-width: 460px;
+        left: 16px;
+        right: 16px;
+        max-width: 440px;
         margin: 0 auto;
-        bottom: max(12px, env(safe-area-inset-bottom, 0px));
-        padding: 5px;
+        bottom: max(14px, env(safe-area-inset-bottom, 0px));
+        padding: 6px;
+        border-radius: 999px;
+        background: linear-gradient(180deg, rgba(255, 255, 255, 0.72) 0%, rgba(255, 255, 255, 0.54) 100%);
+        backdrop-filter: blur(42px) saturate(230%);
+        -webkit-backdrop-filter: blur(42px) saturate(230%);
+        border: 1px solid rgba(255, 255, 255, 0.82);
+        box-shadow:
+          inset 0 1.5px 0 rgba(255, 255, 255, 0.96),
+          inset 0 -1px 0 rgba(15, 23, 42, 0.06),
+          0 16px 40px -8px rgba(15, 23, 42, 0.2),
+          0 4px 12px rgba(15, 23, 42, 0.08);
+      }
+
+      [data-theme="dark"] .mobile-tabbar {
+        background: linear-gradient(180deg, rgba(44, 44, 52, 0.76) 0%, rgba(26, 26, 32, 0.68) 100%);
+        border: 1px solid rgba(255, 255, 255, 0.18);
+        box-shadow:
+          inset 0 1.5px 0 rgba(255, 255, 255, 0.24),
+          inset 0 -1px 0 rgba(0, 0, 0, 0.45),
+          0 20px 48px -8px rgba(0, 0, 0, 0.65);
       }
 
       .mobile-tab {
-        min-height: 48px;
-        font-size: 10.5px;
-        gap: 2px;
+        min-height: 54px;
+        padding: 6px 4px;
+        border-radius: 999px;
+        font-size: 12px;
+        font-weight: 650;
+        gap: 3px;
+        color: var(--text-secondary);
+        transition: transform 0.18s var(--ease-spring), background 0.22s var(--ease-spring), color 0.18s ease, box-shadow 0.22s ease;
+      }
+
+      .mobile-tab svg {
+        width: 22px;
+        height: 22px;
+        stroke-width: 2.1;
+        transition: transform 0.2s var(--ease-spring);
+      }
+
+      .mobile-tab:active {
+        transform: scale(0.94);
+      }
+
+      .mobile-tab.active {
+        background: linear-gradient(180deg, rgba(255, 255, 255, 0.92) 0%, rgba(255, 241, 243, 0.85) 100%);
+        color: var(--accent);
+        box-shadow:
+          inset 0 1px 0 rgba(255, 255, 255, 1),
+          0 4px 14px rgba(255, 56, 92, 0.16),
+          0 1px 3px rgba(15, 23, 42, 0.08);
+      }
+
+      [data-theme="dark"] .mobile-tab.active {
+        background: linear-gradient(180deg, rgba(255, 90, 117, 0.28) 0%, rgba(255, 90, 117, 0.16) 100%);
+        color: #ff758f;
+        box-shadow:
+          inset 0 1px 0 rgba(255, 255, 255, 0.2),
+          0 4px 14px rgba(0, 0, 0, 0.35);
+      }
+
+      .mobile-tab.active svg {
+        transform: translateY(-1px);
       }
 
       .toast {
-        bottom: calc(82px + env(safe-area-inset-bottom, 0px));
+        bottom: calc(92px + env(safe-area-inset-bottom, 0px));
         max-width: calc(100vw - 32px);
         text-align: center;
+        font-size: 14px;
       }
     }
   </style>
