@@ -2537,12 +2537,12 @@
     }
   </style>
 </head>
-<body>
+<body class="signed-out">
   <!-- Clean App Canvas -->
   <div class="ambient-backdrop" aria-hidden="true"></div>
 
   <!-- Dedicated Lumen Sign-In Page (shown when signed out) -->
-  <section class="auth-gate" id="auth-gate" aria-label="Sign in to Lumen">
+  <section class="auth-gate open" id="auth-gate" aria-label="Sign in to Lumen">
     <div class="auth-card glass-elevated">
       <img src="./assets/icon-192.png?v=5" class="auth-card-icon" alt="Lumen" />
       <div>
@@ -2557,12 +2557,7 @@
         <div id="gate-msg" style="font-size:13px; min-height:18px; line-height:1.45;"></div>
         <button type="submit" class="btn btn-primary" id="gate-submit-btn" style="height:46px; width:100%; font-size:15px;">Send Magic Sign-In Link</button>
       </form>
-      <div style="padding-top:6px; border-top:1px solid var(--divider); display:flex; align-items:center; justify-content:space-between; gap:8px;">
-        <button type="button" class="btn btn-ghost btn-sm" id="gate-offline-btn" style="font-size:12.5px;">Continue offline</button>
-        <button type="button" class="icon-btn" id="gate-theme-btn" title="Toggle Light/Dark Mode" aria-label="Toggle theme">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
-        </button>
-      </div>
+
     </div>
   </section>
 
@@ -5275,7 +5270,7 @@ Product Design, Design Systems, Interaction Design, Prototyping, Figma, User Res
 
       const gate = $('#auth-gate');
       const isSignedIn = Boolean(user);
-      const showGate = !isSignedIn && !ui.guestMode && Boolean(state.sync.supaUrl && state.sync.supaKey);
+      const showGate = !isSignedIn;
       document.body.classList.toggle('signed-out', showGate);
       if (gate) gate.classList.toggle('open', showGate);
 
