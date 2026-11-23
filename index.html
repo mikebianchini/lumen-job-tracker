@@ -7256,11 +7256,7 @@ Product Design, Design Systems, Interaction Design, Prototyping, Figma, User Res
             <select id="m-p-role" class="select">${PEOPLE_ROLES.map((r) => `<option value="${r}" ${r === p.roleType ? 'selected' : ''}>${r}</option>`).join('')}</select>
           </div>
         </div>
-        <div class="form-row">
-          <div class="field"><label>Email</label><input id="m-p-email" class="input" type="email" value="${esc(p.email)}" placeholder="name@company.com" /></div>
-          <div class="field"><label>Follow-Up Date</label><input id="m-p-follow" class="input" type="date" value="${esc(p.followUpDate)}" /></div>
-        </div>
-        <div class="field"><label>Notes</label><textarea id="m-p-notes" class="notes-area" style="min-height:76px;" placeholder="How you met, what you discussed…">${esc(p.notes)}</textarea></div>
+        <div class="field"><label>Email</label><input id="m-p-email" class="input" type="email" value="${esc(p.email)}" placeholder="name@company.com" /></div>
         <div class="modal-footer">
           <button class="btn" onclick="closeModal()">Cancel</button>
           <button class="btn btn-primary" id="save-person-modal-btn">${existing ? 'Save Changes' : 'Add Contact'}</button>
@@ -7324,8 +7320,8 @@ Product Design, Design Systems, Interaction Design, Prototyping, Figma, User Res
           email: $('#m-p-email').value.trim(),
           linkedin: $('#m-p-linkedin').value.trim(),
           lastContact: existing?.lastContact || '',
-          followUpDate: $('#m-p-follow').value,
-          notes: $('#m-p-notes').value.trim()
+          followUpDate: existing?.followUpDate || '',
+          notes: existing?.notes || ''
         };
 
         if (existing) {
