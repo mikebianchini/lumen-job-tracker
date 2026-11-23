@@ -2554,6 +2554,10 @@
         <button type="button" class="view-seg-btn" id="gate-tab-magic" role="tab" aria-selected="false">Magic Link</button>
       </div>
       <form class="auth-form" id="gate-auth-form">
+        <div class="field" id="gate-name-wrap" style="display: none;">
+          <label for="gate-name">Full Name</label>
+          <input id="gate-name" class="input" type="text" autocomplete="name" placeholder="Mike Bianchini" style="height:44px;" />
+        </div>
         <div class="field">
           <label for="gate-email">Email Address</label>
           <input id="gate-email" class="input" type="email" autocomplete="email" placeholder="you@example.com" required style="height:44px;" />
@@ -5391,16 +5395,20 @@ Product Design, Design Systems, Interaction Design, Prototyping, Figma, User Res
       return data;
     }
 
-    async function signUpWithPassword(email, password) {
+    async function signUpWithPassword(email, password, fullName = '') {
       const url = (state.sync.supaUrl || '').trim().replace(/\/$/, '');
       const key = (state.sync.supaKey || '').trim();
+      const body = fullName ? { email, password, data: { full_name: fullName } } : { email, password };
       const res = await fetch(`${url}/auth/v1/signup`, {
         method: 'POST',
         headers: { apikey: key, 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password })
+        body: JSON.stringify(body)
       });
       const data = await res.json().catch(() => ({}));
       if (!res.ok) throw new Error(data.error_description || data.msg || 'Could not create account');
+      if (fullName) {
+        state.profile = { ...(state.profile || {}), name: fullName };
+      }
       if (data.access_token) {
         state.sync.supaSession = {
           access_token: data.access_token,
@@ -5408,13 +5416,13 @@ Product Design, Design Systems, Interaction Design, Prototyping, Figma, User Res
           expires_at: data.expires_at || Math.floor(Date.now() / 1000) + (data.expires_in || 3600),
           user: data.user
         };
-        saveState(true);
+        saveState();
         updateAuthUI();
         await autoPullFromCloud(false);
         renderCurrentView();
-        maybePromptProfileSetup();
         return { signedIn: true };
       }
+      saveState(true);
       return { signedIn: false };
     }
 
@@ -6565,6 +6573,7 @@ function doPost(e) {
       $('#gate-tab-password')?.classList.toggle('active', isPass);
       $('#gate-tab-magic')?.classList.toggle('active', !isPass);
       if ($('#gate-pass-wrap')) $('#gate-pass-wrap').style.display = isPass ? '' : 'none';
+      if ($('#gate-name-wrap')) $('#gate-name-wrap').style.display = isPass && gateIsSignUp ? '' : 'none';
       if ($('#gate-signup-btn')) {
         $('#gate-signup-btn').style.display = isPass ? '' : 'none';
         $('#gate-signup-btn').textContent = gateIsSignUp ? 'Already have an account? Sign In' : 'New here? Create Account';
@@ -6585,7 +6594,7 @@ function doPost(e) {
     $('#gate-signup-btn')?.addEventListener('click', () => {
       gateIsSignUp = !gateIsSignUp;
       syncGateUI();
-      $('#gate-email')?.focus();
+      (gateIsSignUp ? $('#gate-name') : $('#gate-email'))?.focus();
     });
 
     $('#gate-auth-form')?.addEventListener('submit', async (e) => {
@@ -6618,7 +6627,18 @@ function doPost(e) {
         msgEl.textContent = '';
         try {
           if (gateIsSignUp) {
-            const res = await signUpWithPassword(email, pass);
+            const nameEl = $('#gate-name');
+            const fullName = (nameEl?.value || '').trim();
+            if (nameEl) nameEl.classList.toggle('input-error', !fullName);
+            if (!fullName) {
+              btn.disabled = false;
+              btn.textContent = 'Create Account';
+              nameEl?.focus();
+              msgEl.style.color = 'var(--red)';
+              msgEl.textContent = 'Please enter your name.';
+              return;
+            }
+            const res = await signUpWithPassword(email, pass, fullName);
             if (res.signedIn) {
               toast('Account created & signed in');
             } else {
