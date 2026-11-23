@@ -2572,6 +2572,334 @@
       from { transform: rotate(0deg); }
       to { transform: rotate(360deg); }
     }
+
+    /* ==========================================================================
+       Apple iOS HIG Mobile Redesign (375px–980px — Native App Feel)
+       ========================================================================== */
+    @media (max-width: 980px) {
+      html, body {
+        overflow-x: clip;
+      }
+
+      /* Safe-area aware sticky iOS navigation bar */
+      .hub-topbar {
+        padding-top: env(safe-area-inset-top, 0px);
+      }
+
+      .hub-topbar-in {
+        height: 56px;
+        padding: 0 14px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+      }
+
+      .hub-brand-text {
+        font-size: 20px;
+      }
+
+      .hub-right {
+        gap: 6px;
+      }
+
+      /* Keep topbar uncluttered on narrow phones: avatar-only chip + gear + crisp '+' pill */
+      #hub-auth-label {
+        display: none;
+      }
+
+      .account-chip {
+        padding: 3px;
+        width: 38px;
+        height: 38px;
+        justify-content: center;
+      }
+
+      #hub-theme-btn,
+      #theme-toggle-mobile {
+        display: none !important;
+      }
+
+      #hub-settings-btn {
+        width: 38px;
+        height: 38px;
+        min-width: 38px;
+        min-height: 38px;
+      }
+
+      #hub-quick-add {
+        height: 38px;
+        min-height: 38px;
+        padding: 0 13px;
+        font-size: 13px;
+      }
+
+      /* Generous mobile workspace with safe bottom clearance above floating glass tabbar */
+      .workspace {
+        padding: 12px 14px calc(104px + env(safe-area-inset-bottom, 0px));
+        gap: 12px;
+        overflow-x: clip;
+      }
+
+      /* Clean stacked iOS large title + full-width search bar */
+      .topbar {
+        padding: 2px 0 4px !important;
+        flex-direction: column;
+        align-items: stretch;
+        gap: 10px;
+      }
+
+      .topbar-left {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 10px;
+        width: 100%;
+      }
+
+      .topbar-actions {
+        display: none;
+      }
+
+      .page-title {
+        font-size: 28px;
+        line-height: 1.1;
+      }
+
+      .search-wrap {
+        width: 100%;
+      }
+
+      .search-input {
+        height: 42px;
+        font-size: 16px;
+        padding: 0 14px 0 38px;
+      }
+
+      /* Balanced button sizing: 44px primary/form controls, 34px compact inline chips */
+      .btn {
+        min-height: 42px;
+      }
+
+      .btn-sm {
+        min-height: 34px;
+        height: 34px;
+        padding: 0 12px;
+        font-size: 12.5px;
+      }
+
+      /* Home Dashboard mobile polish */
+      .home-hero {
+        padding: 18px 16px;
+      }
+
+      .home-greeting {
+        font-size: 22px;
+        line-height: 1.2;
+      }
+
+      .home-kpi-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 10px;
+      }
+
+      .kpi-card {
+        padding: 14px 14px;
+        border-radius: 18px;
+      }
+
+      .kpi-value {
+        font-size: 26px;
+      }
+
+      .home-panel {
+        padding: 16px;
+        border-radius: 20px;
+      }
+
+      /* Timeline & Nudge rows wrap cleanly on 375px */
+      .timeline-item {
+        flex-direction: column;
+        gap: 4px;
+        padding: 10px 10px;
+      }
+
+      .timeline-time {
+        margin-top: 0;
+        font-size: 11px;
+      }
+
+      .nudge-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+      }
+
+      .nudge-item .btn {
+        align-self: flex-start;
+      }
+
+      /* Jobs filter bar + List/Board toggle */
+      .filter-row-wrap {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 8px;
+      }
+
+      .view-seg {
+        align-self: flex-start;
+      }
+
+      .filter-bar {
+        -webkit-overflow-scrolling: touch;
+        padding-bottom: 2px;
+      }
+
+      /* Native swipe-snap Kanban columns on mobile */
+      .kanban-board {
+        grid-template-columns: repeat(5, minmax(82vw, 310px));
+        scroll-snap-type: x mandatory;
+        -webkit-overflow-scrolling: touch;
+        padding-bottom: 16px;
+      }
+
+      .kanban-col {
+        scroll-snap-align: start;
+        max-height: 68vh;
+      }
+
+      /* Master-detail panels on mobile */
+      .split-pane {
+        min-height: 0;
+      }
+
+      .list-panel {
+        padding: 8px;
+        border-radius: 20px;
+      }
+
+      .detail-panel {
+        padding: 16px;
+        border-radius: 20px;
+        gap: 16px;
+      }
+
+      .detail-header {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 12px;
+        padding-bottom: 14px;
+      }
+
+      .detail-title {
+        font-size: 20px;
+      }
+
+      .detail-actions {
+        width: 100%;
+        flex-wrap: wrap;
+      }
+
+      .detail-actions .select {
+        flex: 1;
+        min-width: 130px;
+        height: 36px;
+      }
+
+      .meta-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 8px;
+      }
+
+      .meta-tile {
+        padding: 10px 12px;
+      }
+
+      .resume-callout {
+        padding: 14px;
+      }
+
+      /* Resume Studio mobile layout */
+      .studio-col {
+        padding: 16px;
+        border-radius: 20px;
+      }
+
+      .resume-editor {
+        min-height: 260px;
+        font-size: 15px;
+      }
+
+      /* Settings & Sync mobile layout */
+      .sync-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .sync-card {
+        padding: 18px 16px;
+        border-radius: 20px;
+      }
+
+      /* Native iOS Bottom Sheet Modals */
+      .modal-backdrop {
+        align-items: flex-end;
+        padding: 0;
+      }
+
+      .modal {
+        max-width: 100%;
+        width: 100%;
+        max-height: 90dvh;
+        border-radius: 26px 26px 0 0;
+        padding: 14px 18px calc(22px + env(safe-area-inset-bottom, 0px));
+        animation: sheetUp 0.28s var(--ease-spring);
+      }
+
+      .modal::before {
+        content: "";
+        display: block;
+        width: 38px;
+        height: 4px;
+        border-radius: 999px;
+        background: var(--divider);
+        margin: 0 auto 6px;
+        flex-shrink: 0;
+      }
+
+      @keyframes sheetUp {
+        from { transform: translateY(48px); opacity: 0.7; }
+        to { transform: translateY(0); opacity: 1; }
+      }
+
+      /* Sign-In card mobile sizing */
+      .auth-gate {
+        padding: 16px;
+      }
+
+      .auth-card {
+        padding: 28px 22px 24px;
+        border-radius: 24px;
+      }
+
+      /* Floating iOS 26 Liquid Glass Bottom Tab Bar */
+      .mobile-tabbar {
+        left: 12px;
+        right: 12px;
+        bottom: max(10px, env(safe-area-inset-bottom, 0px));
+        padding: 5px;
+      }
+
+      .mobile-tab {
+        min-height: 48px;
+        font-size: 10.5px;
+        gap: 2px;
+      }
+
+      .toast {
+        bottom: calc(82px + env(safe-area-inset-bottom, 0px));
+        max-width: calc(100vw - 32px);
+        text-align: center;
+      }
+    }
   </style>
 </head>
 <body class="signed-out">
@@ -2923,7 +3251,9 @@
               <div style="font-size: 12.5px; color: var(--text-secondary); margin-top: 2px;">Add Lumen to your iPhone Home Screen (Safari → Share → Add to Home Screen) to keep your search right at your fingertips.</div>
             </div>
           </div>
-          <div class="bg-picker" title="Choose App Background" style="flex-shrink:0;">
+          <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap; flex-shrink:0;">
+            <button type="button" class="btn btn-sm" id="settings-theme-btn">Light / Dark</button>
+            <div class="bg-picker" title="Choose App Background">
             <span style="font-size: 11px; font-weight: 600; color: var(--text-tertiary);">Canvas</span>
             <div style="display: flex; gap: 6px;">
               <button class="bg-swatch" data-bg-pick="linen" title="Warm Linen" style="background: #faf8f5;"></button>
@@ -2932,6 +3262,7 @@
               <button class="bg-swatch" data-bg-pick="sage" title="Morning Sage" style="background: #e4ede6;"></button>
               <button class="bg-swatch" data-bg-pick="blush" title="Soft Blush" style="background: #f9e6e2;"></button>
             </div>
+          </div>
           </div>
         </div>
         <div class="sync-grid">
@@ -6530,6 +6861,7 @@ Product Design, Design Systems, Interaction Design, Prototyping, Figma, User Res
 
     $('#theme-toggle-desktop').addEventListener('click', toggleTheme);
     $('#hub-theme-btn')?.addEventListener('click', toggleTheme);
+    $('#settings-theme-btn')?.addEventListener('click', toggleTheme);
     $('#hub-settings-btn')?.addEventListener('click', () => switchView('sync'));
     $('#hub-quick-add')?.addEventListener('click', () => {
       if (ui.view === 'people') openPersonModal();
