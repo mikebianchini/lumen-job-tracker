@@ -6687,6 +6687,69 @@ Product Design, Design Systems, Interaction Design, Prototyping, Figma, User Res
         } catch {}
       }
 
+      // Tier 1C: LinkedIn Public Guest Job API (handles /jobs/search-results/?currentJobId=..., /jobs/collections/..., and /jobs/view/...)
+      if (/linkedin\.com/i.test(u.hostname)) {
+        const liJobId =
+          u.searchParams.get('currentJobId') ||
+          u.pathname.match(/\/jobs\/view\/(?:[^/]*-)?(\d+)/i)?.[1] ||
+          u.pathname.match(/\/jobPosting\/(\d+)/i)?.[1];
+        if (liJobId) {
+          try {
+            const guestUrl = `https://www.linkedin.com/jobs-guest/jobs/api/jobPosting/${liJobId}`;
+            const ctrl = new AbortController();
+            const timer = setTimeout(() => ctrl.abort(), 9000);
+            const [htmlRes, mdRes] = await Promise.allSettled([
+              fetch(`https://r.jina.ai/${guestUrl}`, { headers: { 'X-Return-Format': 'html' }, signal: ctrl.signal }),
+              fetch(`https://r.jina.ai/${guestUrl}`, { headers: { Accept: 'text/plain' }, signal: ctrl.signal })
+            ]);
+            clearTimeout(timer);
+
+            let role = '';
+            let company = '';
+            let loc = '';
+            let salaryText = '';
+            let jd = '';
+
+            if (htmlRes.status === 'fulfilled' && htmlRes.value.ok) {
+              const html = await htmlRes.value.text();
+              const doc = new DOMParser().parseFromString(html, 'text/html');
+              const cleanTxt = (el) => (el?.textContent || '').replace(/\s+/g, ' ').trim();
+              role = cleanTxt(doc.querySelector('.topcard__title, .top-card-layout__title, h2, h1'));
+              company = cleanTxt(doc.querySelector('.topcard__org-name-link, .top-card-layout__card a[href*="/company/"]'));
+              loc = cleanTxt(doc.querySelector('.topcard__flavor--bullet'));
+              salaryText = cleanTxt(doc.querySelector('.salary, .compensation__salary'));
+              const markup = doc.querySelector('.show-more-less-html__markup, .description__text');
+              if (markup) jd = cleanTxt(markup);
+            }
+
+            if (mdRes.status === 'fulfilled' && mdRes.value.ok) {
+              const md = await mdRes.value.text();
+              const bodyStart = md.indexOf('Markdown Content:');
+              const cleanMd = (bodyStart !== -1 ? md.slice(bodyStart + 17) : md)
+                .replace(/!\[.*?\]\(.*?\)/g, '')
+                .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1')
+                .replace(/[#*_`>]+/g, '')
+                .replace(/\n{3,}/g, '\n\n')
+                .trim();
+              if (cleanMd.length > jd.length) jd = cleanMd;
+            }
+
+            if (role || company || jd) {
+              const combined = `${role} ${salaryText} ${loc} ${jd}`;
+              return {
+                company: company || fallback.company,
+                role: role || fallback.role,
+                level: detectLevel(role + ' ' + jd.slice(0, 1200)),
+                comp: salaryText || detectComp(combined),
+                workMode: detectWorkMode(loc + ' ' + jd.slice(0, 2000)),
+                location: loc || detectLocation(jd.slice(0, 1500)),
+                jd: jd.slice(0, 2600)
+              };
+            }
+          } catch {}
+        }
+      }
+
       // Tier 2: Free Public Markdown Reader (r.jina.ai) for Apple, Stripe, Figma, Ashby, etc.
       try {
         const ctrl = new AbortController();
