@@ -3772,6 +3772,7 @@ Product Design, Design Systems, Interaction Design, Prototyping, Figma, User Res
         },
         weeklyGoal: 5,
         timeline: [],
+        events: [],
         profile: {
           name: '',
           headline: '',
@@ -4100,15 +4101,43 @@ Product Design, Design Systems, Interaction Design, Prototyping, Figma, User Res
       const circ = 125.6;
       const offset = circ - (circ * momentumPct) / 100;
 
-      // Build upcoming agenda (job next steps + people follow-ups)
+      // Build upcoming agenda (scheduled events + job next steps + people follow-ups)
+      const formatEventTime = (t) => {
+        if (!t) return '';
+        const [hh, mm] = t.split(':').map(Number);
+        if (isNaN(hh)) return t;
+        const ampm = hh >= 12 ? 'PM' : 'AM';
+        const h12 = hh % 12 || 12;
+        return `${h12}:${String(mm || 0).padStart(2, '0')} ${ampm}`;
+      };
       const todayStr = new Date().toISOString().slice(0, 10);
       const agenda = [];
+      (state.events || []).forEach((ev) => {
+        if (!ev.completed && ev.date) {
+          const linkedJob = ev.jobId ? state.jobs.find((j) => j.id === ev.jobId) : null;
+          const linkedPerson = ev.personId ? state.people.find((p) => p.id === ev.personId) : null;
+          const subParts = [ev.type || 'Event'];
+          if (ev.time) subParts.push(formatEventTime(ev.time));
+          if (linkedJob) subParts.push(linkedJob.company);
+          if (linkedPerson) subParts.push(linkedPerson.name);
+          agenda.push({
+            type: 'event',
+            id: ev.id,
+            date: ev.date,
+            time: ev.time || '',
+            title: ev.title,
+            sub: subParts.join(' · '),
+            badge: ev.type || 'Event'
+          });
+        }
+      });
       state.jobs.forEach((j) => {
         if (j.nextStepDate && j.status !== 'Archived') {
           agenda.push({
             type: 'job',
             id: j.id,
             date: j.nextStepDate,
+            time: '',
             title: `${j.company} — ${j.role}`,
             sub: `${j.status} · Next step`,
             badge: j.status
@@ -4121,13 +4150,14 @@ Product Design, Design Systems, Interaction Design, Prototyping, Figma, User Res
             type: 'person',
             id: p.id,
             date: p.followUpDate,
+            time: '',
             title: `Follow up with ${p.name}`,
             sub: `${p.roleType}${p.company ? ' · ' + p.company : ''}`,
             badge: 'Follow-Up'
           });
         }
       });
-      agenda.sort((a, b) => a.date.localeCompare(b.date));
+      agenda.sort((a, b) => (a.date + ' ' + (a.time || '99:99')).localeCompare(b.date + ' ' + (b.time || '99:99')));
 
       const stageCounts = {};
       JOB_STATUSES.forEach((s) => (stageCounts[s.id] = state.jobs.filter((j) => j.status === s.id).length));
@@ -4140,10 +4170,11 @@ Product Design, Design Systems, Interaction Design, Prototyping, Figma, User Res
             <div class="hero-kicker">${esc(todayLabel)}</div>
             <h2 class="home-greeting">${greeting}</h2>
             <p style="font-size:13.5px; color:var(--text-secondary); max-width:520px; line-height:1.45;">
-              You have <strong style="color:var(--text-primary)">${activeJobs.length}</strong> active role${activeJobs.length === 1 ? '' : 's'}, <strong style="color:var(--text-primary)">${interviewing}</strong> interview loop${interviewing === 1 ? '' : 's'}, and <strong style="color:var(--text-primary)">${agenda.length}</strong> upcoming action${agenda.length === 1 ? '' : 's'}.
+              You have <strong style="color:var(--text-primary)">${activeJobs.length}</strong> active role${activeJobs.length === 1 ? '' : 's'}, <strong style="color:var(--text-primary)">${interviewing}</strong> interview loop${interviewing === 1 ? '' : 's'}, and <strong style="color:var(--text-primary)">${agenda.length}</strong> upcoming event${agenda.length === 1 ? '' : 's'}.
             </p>
             <div style="display:flex; gap:8px; flex-wrap:wrap; margin-top:2px;">
               <button class="btn btn-primary btn-sm" id="home-add-job">+ Add Job</button>
+              <button class="btn btn-sm" id="home-add-event">+ Add Event</button>
               <button class="btn btn-sm" id="home-add-person">+ Add Person</button>
             </div>
           </div>
@@ -4322,21 +4353,24 @@ Product Design, Design Systems, Interaction Design, Prototyping, Figma, User Res
           <div style="display:flex; flex-direction:column; gap:14px;">
             <div class="home-panel glass">
               <div class="section-head">
-                <span class="section-title">Upcoming Focus &amp; Follow-Ups</span>
-                <span class="chip">${agenda.length} scheduled</span>
+                <span class="section-title">Upcoming Focus &amp; Events</span>
+                <div style="display:flex; align-items:center; gap:8px;">
+                  <span class="chip">${agenda.length} scheduled</span>
+                  <button type="button" class="btn btn-sm" id="home-upcoming-add-event">+ Add Event</button>
+                </div>
               </div>
               <div class="agenda-list">
                 ${
                   agenda.length
                     ? agenda
-                        .slice(0, 5)
+                        .slice(0, 8)
                         .map((item) => {
                           const isOverdue = item.date < todayStr;
                           const isToday = item.date === todayStr;
                           const dateBadge = isOverdue
                             ? `<span class="badge badge-archived">Overdue · ${formatDate(item.date)}</span>`
                             : isToday
-                            ? `<span class="badge badge-interviewing">Today</span>`
+                            ? `<span class="badge badge-interviewing">Today${item.time ? ' · ' + formatEventTime(item.time) : ''}</span>`
                             : `<span class="badge badge-applied">${formatDate(item.date)}</span>`;
                           return `
                             <div class="agenda-row" data-agenda-type="${item.type}" data-agenda-id="${item.id}">
@@ -4348,7 +4382,7 @@ Product Design, Design Systems, Interaction Design, Prototyping, Figma, User Res
                             </div>`;
                         })
                         .join('')
-                    : `<div style="padding:18px 10px; text-align:center; color:var(--text-secondary); font-size:13px;">No upcoming dates yet. Add a Next Step date on a job or a Follow-Up date on a contact.</div>`
+                    : `<div style="padding:18px 10px; text-align:center; color:var(--text-secondary); font-size:13px;">No upcoming events yet. Tap <strong>+ Add Event</strong> to schedule an interview, meeting, or follow-up.</div>`
                 }
               </div>
             </div>
@@ -4479,51 +4513,156 @@ Product Design, Design Systems, Interaction Design, Prototyping, Figma, User Res
         })
       );
 
-      $('#home-log-event-btn')?.addEventListener('click', () => {
+      const EVENT_TYPES = ['Interview', 'Meeting', 'Recruiter Call', 'Coffee Chat', 'Follow-Up', 'Deadline', 'Other'];
+      function openEventModal(existing = null) {
+        const ev = existing || {
+          type: 'Interview',
+          title: '',
+          date: new Date().toISOString().slice(0, 10),
+          time: '',
+          jobId: '',
+          personId: '',
+          notes: '',
+          completed: false
+        };
         openModal(`
           <div class="modal-header">
-            <h3 class="modal-title">Log Timeline Event</h3>
+            <h3 class="modal-title">${existing ? 'Edit Event' : 'Add Meeting, Interview or Event'}</h3>
             <button class="icon-btn" onclick="closeModal()" aria-label="Close dialog"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></button>
           </div>
+          <div class="field">
+            <label for="m-ev-title">Event Title *</label>
+            <input id="m-ev-title" class="input" value="${esc(ev.title)}" placeholder="Final Round Interview with VP of Product" />
+          </div>
           <div class="form-row">
-            <div class="field"><label for="m-ev-kind">Event Type</label>
-              <select id="m-ev-kind" class="select">
-                <option value="interview">Interview</option>
-                <option value="person">Meeting / Coffee Chat</option>
-                <option value="applied">Applied</option>
-                <option value="status">Stage Update</option>
-                <option value="note">Milestone / Note</option>
+            <div class="field">
+              <label for="m-ev-type">Event Type</label>
+              <select id="m-ev-type" class="select">
+                ${EVENT_TYPES.map((t) => `<option value="${t}" ${t === ev.type ? 'selected' : ''}>${t}</option>`).join('')}
               </select>
             </div>
-            <div class="field"><label for="m-ev-date">Date</label><input id="m-ev-date" class="input" type="date" value="${new Date().toISOString().slice(0, 10)}" /></div>
+            <div class="field">
+              <label for="m-ev-date">Date *</label>
+              <input id="m-ev-date" class="input" type="date" value="${esc(ev.date)}" />
+            </div>
           </div>
-          <div class="field"><label for="m-ev-title">What happened? *</label><input id="m-ev-title" class="input" placeholder="Portfolio review with Apple Design Manager" /></div>
-          <div class="field"><label for="m-ev-detail">Details (optional)</label><textarea id="m-ev-detail" class="notes-area" style="min-height:76px;" placeholder="Key takeaways, next steps, or who you met…"></textarea></div>
-          <div class="modal-footer">
-            <button class="btn" onclick="closeModal()">Cancel</button>
-            <button class="btn btn-primary" id="save-ev-modal-btn">Add to Timeline</button>
+          <div class="form-row">
+            <div class="field">
+              <label for="m-ev-time">Time (optional)</label>
+              <input id="m-ev-time" class="input" type="time" value="${esc(ev.time || '')}" />
+            </div>
+            <div class="field">
+              <label for="m-ev-job">Link to Job (optional)</label>
+              <select id="m-ev-job" class="select">
+                <option value="">None</option>
+                ${state.jobs.map((j) => `<option value="${j.id}" ${j.id === ev.jobId ? 'selected' : ''}>${esc(j.company)} — ${esc(j.role)}</option>`).join('')}
+              </select>
+            </div>
+          </div>
+          <div class="field">
+            <label for="m-ev-person">Link to Person (optional)</label>
+            <select id="m-ev-person" class="select">
+              <option value="">None</option>
+              ${state.people.map((p) => `<option value="${p.id}" ${p.id === ev.personId ? 'selected' : ''}>${esc(p.name)}${p.company ? ' · ' + esc(p.company) : ''}</option>`).join('')}
+            </select>
+          </div>
+          <div class="field">
+            <label for="m-ev-detail">Notes / Meeting Link (optional)</label>
+            <textarea id="m-ev-detail" class="notes-area" style="min-height:76px;" placeholder="Zoom / Google Meet link, interviewers, prep notes…">${esc(ev.notes || '')}</textarea>
+          </div>
+          <div class="modal-footer" style="justify-content:space-between;">
+            <div style="display:flex; gap:8px;">
+              ${existing ? `<button type="button" class="btn btn-danger btn-sm" id="del-ev-modal-btn">Delete</button>` : ''}
+              ${existing ? `<button type="button" class="btn btn-sm" id="done-ev-modal-btn">${ev.completed ? 'Reopen' : 'Mark Done'}</button>` : ''}
+            </div>
+            <div style="display:flex; gap:8px;">
+              <button type="button" class="btn" onclick="closeModal()">Cancel</button>
+              <button type="button" class="btn btn-primary" id="save-ev-modal-btn">${existing ? 'Save Changes' : 'Add Event'}</button>
+            </div>
           </div>
         `);
-        $('#save-ev-modal-btn').addEventListener('click', () => {
-          const title = $('#m-ev-title').value.trim();
-          const tEl = $('#m-ev-title');
-          tEl.classList.toggle('input-error', !title);
-          if (!title) { tEl.focus(); return toast('Please describe what happened'); }
-          const dVal = $('#m-ev-date').value;
-          const isToday = dVal === new Date().toISOString().slice(0, 10);
-          logActivity({
-            kind: $('#m-ev-kind').value,
-            title,
-            detail: $('#m-ev-detail').value.trim(),
-            timestamp: isToday ? new Date().toISOString() : new Date(dVal + 'T12:00:00').toISOString()
-          });
+
+        $('#del-ev-modal-btn')?.addEventListener('click', () => {
+          state.events = (state.events || []).filter((x) => x.id !== existing.id);
           saveState();
           closeModal();
           renderHome();
-          toast('Event added to timeline');
+          toast('Event deleted');
         });
-      });
 
+        $('#done-ev-modal-btn')?.addEventListener('click', () => {
+          existing.completed = !existing.completed;
+          if (existing.completed) {
+            logActivity({
+              kind: existing.type === 'Interview' ? 'interview' : 'note',
+              title: `Completed: ${existing.title}`,
+              detail: existing.notes || existing.type,
+              targetType: existing.jobId ? 'job' : existing.personId ? 'person' : '',
+              targetId: existing.jobId || existing.personId || ''
+            });
+          }
+          saveState();
+          closeModal();
+          renderHome();
+          toast(existing.completed ? 'Marked event done' : 'Reopened event');
+        });
+
+        $('#save-ev-modal-btn').addEventListener('click', () => {
+          const title = $('#m-ev-title').value.trim();
+          const date = $('#m-ev-date').value;
+          const tEl = $('#m-ev-title');
+          const dEl = $('#m-ev-date');
+          tEl.classList.toggle('input-error', !title);
+          dEl.classList.toggle('input-error', !date);
+          if (!title) { tEl.focus(); return toast('Please enter an event title'); }
+          if (!date) { dEl.focus(); return toast('Please pick a date'); }
+
+          const payload = {
+            type: $('#m-ev-type').value,
+            title,
+            date,
+            time: $('#m-ev-time').value,
+            jobId: $('#m-ev-job').value,
+            personId: $('#m-ev-person').value,
+            notes: $('#m-ev-detail').value.trim(),
+            completed: existing ? Boolean(existing.completed) : false
+          };
+
+          if (!Array.isArray(state.events)) state.events = [];
+          if (existing) {
+            Object.assign(existing, payload);
+            toast('Event updated');
+          } else {
+            const created = { id: uid('ev'), ...payload };
+            state.events.unshift(created);
+            const linkedJob = payload.jobId ? state.jobs.find((j) => j.id === payload.jobId) : null;
+            const linkedPerson = payload.personId ? state.people.find((p) => p.id === payload.personId) : null;
+            const detailBits = [
+              payload.type,
+              formatDate(payload.date) + (payload.time ? ' at ' + formatEventTime(payload.time) : ''),
+              linkedJob ? linkedJob.company : '',
+              linkedPerson ? linkedPerson.name : '',
+              payload.notes
+            ].filter(Boolean);
+            logActivity({
+              kind: /interview|recruiter/i.test(payload.type) ? 'interview' : /coffee|meeting|follow/i.test(payload.type) ? 'person' : 'note',
+              title: payload.title,
+              detail: detailBits.join(' · '),
+              targetType: payload.jobId ? 'job' : payload.personId ? 'person' : '',
+              targetId: payload.jobId || payload.personId || '',
+              timestamp: new Date().toISOString()
+            });
+            toast('Event scheduled');
+          }
+          saveState();
+          closeModal();
+          renderHome();
+        });
+      }
+
+      $('#home-log-event-btn')?.addEventListener('click', () => openEventModal());
+      $('#home-add-event')?.addEventListener('click', () => openEventModal());
+      $('#home-upcoming-add-event')?.addEventListener('click', () => openEventModal());
       $('#home-add-job').addEventListener('click', () => openJobModal());
       $('#home-add-person').addEventListener('click', () => openPersonModal());
       $('#home-view-all-jobs')?.addEventListener('click', () => {
@@ -4541,7 +4680,10 @@ Product Design, Design Systems, Interaction Design, Prototyping, Figma, User Res
 
       $$('[data-agenda-id]').forEach((el) =>
         el.addEventListener('click', () => {
-          if (el.dataset.agendaType === 'job') {
+          if (el.dataset.agendaType === 'event') {
+            const ev = (state.events || []).find((x) => x.id === el.dataset.agendaId);
+            if (ev) openEventModal(ev);
+          } else if (el.dataset.agendaType === 'job') {
             ui.selectedJobId = el.dataset.agendaId;
             switchView('jobs');
             ui.mobileDetailOpen = true;
@@ -5870,6 +6012,7 @@ Product Design, Design Systems, Interaction Design, Prototyping, Figma, User Res
         jobs: state.jobs,
         people: state.people,
         timeline: state.timeline || [],
+        events: state.events || [],
         profile: state.profile || {},
         baseResume: state.baseResume,
         baseResumeName: state.baseResumeName,
@@ -5887,6 +6030,7 @@ Product Design, Design Systems, Interaction Design, Prototyping, Figma, User Res
       if (Array.isArray(data.jobs)) state.jobs = data.jobs;
       if (Array.isArray(data.people)) state.people = data.people;
       if (Array.isArray(data.timeline)) state.timeline = data.timeline;
+      if (Array.isArray(data.events)) state.events = data.events;
       if (data.profile && typeof data.profile === 'object') state.profile = { ...state.profile, ...data.profile };
       if (typeof data.baseResume === 'string') state.baseResume = data.baseResume;
       if (typeof data.baseResumeName === 'string') state.baseResumeName = data.baseResumeName;
