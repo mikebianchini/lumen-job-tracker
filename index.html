@@ -3361,7 +3361,7 @@
             </div>
 
             <div class="section-block" style="margin-top: auto; padding-top: 10px; border-top: 1px solid var(--divider);">
-              <div class="field">
+              <div class="field" id="ai-key-wrap" style="display: none;">
                 <label for="ai-api-key">Optional AI Key (OpenAI or Gemini — stored locally)</label>
                 <input id="ai-api-key" class="input" type="password" placeholder="sk-... or AIza... (optional)" />
               </div>
@@ -5543,9 +5543,14 @@ Product Design, Design Systems, Interaction Design, Prototyping, Figma, User Res
       saveState();
 
       if (!apiKey) {
+        const wrap = $('#ai-key-wrap');
+        if (wrap) wrap.style.display = '';
+        $('#ai-api-key').focus();
         toast('Add an OpenAI (sk-...) or Gemini (AIza...) key, or use Auto-Tailor');
         return;
       }
+      const wrap = $('#ai-key-wrap');
+      if (wrap) wrap.style.display = 'none';
 
       const resume = $('#resume-editor').value.trim();
       const jd = $('#studio-jd-preview').value.trim();
