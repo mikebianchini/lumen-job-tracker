@@ -5452,6 +5452,22 @@ Product Design, Design Systems, Interaction Design, Prototyping, Figma, User Res
 
       const [bg, fg] = tintFor(person.name);
       const linkedJobs = state.jobs.filter((j) => (j.personIds || []).includes(person.id));
+      if (!Array.isArray(person.comments)) person.comments = [];
+      if (person.comments.length === 0 && person.notes && person.notes.trim()) {
+        person.comments.push({
+          id: uid('pn'),
+          tag: 'Note',
+          text: person.notes.trim(),
+          createdAt: person.lastContact ? person.lastContact + 'T12:00:00.000Z' : new Date().toISOString(),
+          pinned: false
+        });
+        person.notes = '';
+        saveState(true);
+      }
+      const PERSON_NOTE_TAGS = ['Call', 'Coffee Chat', 'Referral', 'Follow-Up', 'Note'];
+      const pTagBadgeClass = { Call: 'badge-interviewing', 'Coffee Chat': 'badge-applied', Referral: 'badge-offer', 'Follow-Up': 'badge-screening', Note: 'badge-saved' };
+      const activePNoteTag = ui.personNoteTag || 'Note';
+      const sortedPNotes = [...person.comments].sort((a, b) => (b.pinned ? 1 : 0) - (a.pinned ? 1 : 0) || new Date(b.createdAt || 0) - new Date(a.createdAt || 0));
 
       detailEl.innerHTML = `
         <button class="btn btn-ghost btn-sm mobile-back-btn" id="person-mobile-back" style="align-self:flex-start; margin-bottom:-8px;">← Back to People</button>
@@ -5522,12 +5538,64 @@ Product Design, Design Systems, Interaction Design, Prototyping, Figma, User Res
           </div>
         </div>
 
-        <!-- Conversation Notes -->
+        <!-- Conversation Notes (Multiple Notes with Add, Edit, Pin & Delete) -->
         <div class="section-block">
           <div class="section-head">
-            <span class="section-title">Conversation Notes</span>
+            <span class="section-title">Conversation Notes (${person.comments.length})</span>
+            <span style="font-size:12px; color:var(--text-tertiary);">⌘Enter to save</span>
           </div>
-          <textarea class="notes-area" id="detail-person-notes" style="min-height:150px;" placeholder="Key takeaways, team insights, referral details…">${esc(person.notes)}</textarea>
+          <div class="comment-composer">
+            <textarea class="notes-area" id="new-person-note-input" style="min-height:74px; background:var(--input-bg);" placeholder="Add a call takeaway, referral insight, or follow-up note…"></textarea>
+            <div class="comment-composer-bar">
+              <div style="display:flex; gap:5px; flex-wrap:wrap;">
+                ${PERSON_NOTE_TAGS.map((t) => `<button type="button" class="pill ${t === activePNoteTag ? 'active' : ''}" style="padding:4px 10px; font-size:11.5px;" data-pnote-tag="${t}">${t}</button>`).join('')}
+              </div>
+              <button type="button" class="btn btn-primary btn-sm" id="save-person-note-btn">Save Note</button>
+            </div>
+          </div>
+          <div class="comment-feed">
+            ${
+              sortedPNotes.length
+                ? sortedPNotes
+                    .map((c) => {
+                      const dt = c.createdAt ? new Date(c.createdAt).toLocaleString(undefined, { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' }) : '';
+                      const isEditing = ui.editingPersonNoteId === c.id;
+                      if (isEditing) {
+                        return `
+                          <article class="comment-card ${c.pinned ? 'pinned' : ''}" style="border-color: var(--accent);">
+                            <div class="comment-head">
+                              <div style="display:flex; gap:5px; flex-wrap:wrap;">
+                                ${PERSON_NOTE_TAGS.map((t) => `<button type="button" class="pill ${t === (ui.editingPersonNoteTag || c.tag || 'Note') ? 'active' : ''}" style="padding:3px 9px; font-size:11.5px;" data-edit-pnote-tag="${t}">${t}</button>`).join('')}
+                              </div>
+                            </div>
+                            <textarea class="notes-area" id="edit-pnote-textarea" style="min-height:80px; background:var(--input-bg);">${esc(c.text)}</textarea>
+                            <div style="display:flex; justify-content:flex-end; gap:8px; margin-top:4px;">
+                              <button type="button" class="btn btn-sm" id="cancel-edit-pnote-btn">Cancel</button>
+                              <button type="button" class="btn btn-primary btn-sm" id="save-edit-pnote-btn" data-save-pnote="${c.id}">Save</button>
+                            </div>
+                          </article>`;
+                      }
+                      return `
+                        <article class="comment-card ${c.pinned ? 'pinned' : ''}">
+                          <div class="comment-head">
+                            <div class="comment-meta">
+                              <span class="badge ${pTagBadgeClass[c.tag] || 'badge-saved'}">${esc(c.tag || 'Note')}</span>
+                              ${c.pinned ? '<span class="badge badge-applied">Pinned</span>' : ''}
+                              <span>${esc(dt)}${c.updatedAt ? ' · Edited' : ''}</span>
+                            </div>
+                            <div class="comment-actions">
+                              <button type="button" class="btn btn-ghost btn-sm" style="height:26px; padding:0 8px; font-size:11.5px;" data-edit-pnote="${c.id}" aria-label="Edit note">Edit</button>
+                              <button type="button" class="btn btn-ghost btn-sm" style="height:26px; padding:0 8px; font-size:11.5px;" data-pin-pnote="${c.id}" aria-label="${c.pinned ? 'Unpin note' : 'Pin note'}">${c.pinned ? 'Unpin' : 'Pin'}</button>
+                              <button type="button" class="btn btn-ghost btn-sm" style="height:26px; padding:0 8px; font-size:11.5px; color:var(--red);" data-del-pnote="${c.id}" aria-label="Delete note">Delete</button>
+                            </div>
+                          </div>
+                          <div class="comment-body">${esc(c.text)}</div>
+                        </article>`;
+                    })
+                    .join('')
+                : '<div style="font-size:13px; color:var(--text-tertiary); padding:10px 4px;">No notes yet. Add your first conversation takeaway, referral update, or follow-up above.</div>'
+            }
+          </div>
         </div>
       `;
 
@@ -5579,10 +5647,111 @@ Product Design, Design Systems, Interaction Design, Prototyping, Figma, User Res
         })
       );
 
-      $('#detail-person-notes').addEventListener('input', (e) => {
-        person.notes = e.target.value;
+      $$('[data-pnote-tag]').forEach((btn) =>
+        btn.addEventListener('click', () => {
+          ui.personNoteTag = btn.dataset.pnoteTag;
+          $$('[data-pnote-tag]').forEach((b) => b.classList.toggle('active', b.dataset.pnoteTag === ui.personNoteTag));
+        })
+      );
+
+      const savePersonNote = () => {
+        const input = $('#new-person-note-input');
+        const text = input.value.trim();
+        if (!text) return toast('Write a note first');
+        const tag = ui.personNoteTag || 'Note';
+        person.comments.unshift({
+          id: uid('pn'),
+          tag,
+          text,
+          createdAt: new Date().toISOString(),
+          pinned: false
+        });
+        person.lastContact = new Date().toISOString().slice(0, 10);
+        logActivity({
+          kind: 'person',
+          title: `${tag} note on ${person.name}${person.company ? ' (' + person.company + ')' : ''}`,
+          detail: text.slice(0, 140),
+          targetType: 'person',
+          targetId: person.id
+        });
         saveState();
+        renderPeople();
+        toast('Note saved');
+      };
+
+      $('#save-person-note-btn')?.addEventListener('click', savePersonNote);
+      $('#new-person-note-input')?.addEventListener('keydown', (e) => {
+        if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') {
+          e.preventDefault();
+          savePersonNote();
+        }
       });
+
+      $$('[data-edit-pnote]').forEach((btn) =>
+        btn.addEventListener('click', () => {
+          const note = person.comments.find((x) => x.id === btn.dataset.editPnote);
+          if (!note) return;
+          ui.editingPersonNoteId = note.id;
+          ui.editingPersonNoteTag = note.tag || 'Note';
+          renderPersonDetail();
+          setTimeout(() => {
+            const ta = $('#edit-pnote-textarea');
+            if (ta) { ta.focus(); ta.setSelectionRange(ta.value.length, ta.value.length); }
+          }, 20);
+        })
+      );
+
+      $$('[data-edit-pnote-tag]').forEach((btn) =>
+        btn.addEventListener('click', () => {
+          ui.editingPersonNoteTag = btn.dataset.editPnoteTag;
+          $$('[data-edit-pnote-tag]').forEach((b) => b.classList.toggle('active', b.dataset.editPnoteTag === ui.editingPersonNoteTag));
+        })
+      );
+
+      $('#cancel-edit-pnote-btn')?.addEventListener('click', () => {
+        ui.editingPersonNoteId = null;
+        ui.editingPersonNoteTag = null;
+        renderPersonDetail();
+      });
+
+      $('#save-edit-pnote-btn')?.addEventListener('click', () => {
+        const id = $('#save-edit-pnote-btn').dataset.savePnote;
+        const note = person.comments.find((x) => x.id === id);
+        const text = $('#edit-pnote-textarea')?.value.trim();
+        if (!text) return toast('Note cannot be empty');
+        if (note) {
+          note.text = text;
+          note.tag = ui.editingPersonNoteTag || note.tag || 'Note';
+          note.updatedAt = new Date().toISOString();
+          saveState();
+        }
+        ui.editingPersonNoteId = null;
+        ui.editingPersonNoteTag = null;
+        renderPersonDetail();
+        toast('Note updated');
+      });
+
+      $$('[data-pin-pnote]').forEach((btn) =>
+        btn.addEventListener('click', () => {
+          const note = person.comments.find((x) => x.id === btn.dataset.pinPnote);
+          if (note) {
+            note.pinned = !note.pinned;
+            saveState();
+            renderPersonDetail();
+            toast(note.pinned ? 'Note pinned' : 'Note unpinned');
+          }
+        })
+      );
+
+      $$('[data-del-pnote]').forEach((btn) =>
+        btn.addEventListener('click', () => {
+          person.comments = person.comments.filter((x) => x.id !== btn.dataset.delPnote);
+          if (ui.editingPersonNoteId === btn.dataset.delPnote) ui.editingPersonNoteId = null;
+          saveState();
+          renderPeople();
+          toast('Note deleted');
+        })
+      );
     }
 
     /* ==========================================================================
