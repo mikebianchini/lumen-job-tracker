@@ -6649,10 +6649,7 @@ Product Design, Design Systems, Interaction Design, Prototyping, Figma, User Res
             </select>
           </div>
         </div>
-        <div class="form-row">
-          <div class="field"><label>Location</label><input id="m-j-loc" class="input" value="${esc(j.location)}" placeholder="San Francisco, CA" /></div>
-          <div class="field"><label>Applied Date</label><input id="m-j-applied" class="input" type="date" value="${esc(j.appliedDate)}" /></div>
-        </div>
+        <div class="field"><label>Location</label><input id="m-j-loc" class="input" value="${esc(j.location)}" placeholder="San Francisco, CA" /></div>
         <div class="field"><label>Job Description (for Resume ATS Match)</label><textarea id="m-j-jd" class="notes-area" style="min-height:86px;" placeholder="Paste key requirements or let Auto-Fill fetch them…">${esc(j.jd)}</textarea></div>
         <div class="modal-footer">
           <button class="btn" onclick="closeModal()">Cancel</button>
@@ -6720,7 +6717,7 @@ Product Design, Design Systems, Interaction Design, Prototyping, Figma, User Res
           workMode: $('#m-j-mode').value,
           location: $('#m-j-loc').value.trim(),
           url: $('#m-j-url').value.trim(),
-          appliedDate: $('#m-j-applied').value,
+          appliedDate: existing?.appliedDate || new Date().toISOString().slice(0, 10),
           nextStepDate: existing?.nextStepDate || '',
           jd: $('#m-j-jd').value.trim()
         };
