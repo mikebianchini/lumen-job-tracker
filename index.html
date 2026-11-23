@@ -6440,24 +6440,28 @@ Product Design, Design Systems, Interaction Design, Prototyping, Figma, User Res
         if (state.sync.supaUrl && state.sync.supaKey) {
           const url = state.sync.supaUrl.trim().replace(/\/$/, '');
           const key = state.sync.supaKey.trim();
-          const sess = await ensureValidSupaSession();
+          let sess = await ensureValidSupaSession();
           if (!sess?.access_token || !sess?.user?.id) {
             setSyncBadge('Sign in', '--amber');
             return false;
           }
-          const rowId = sess.user.id;
-          const headers = {
-            apikey: key,
-            Authorization: `Bearer ${sess.access_token}`,
-            'Content-Type': 'application/json',
-            Prefer: 'resolution=merge-duplicates,return=minimal'
-          };
-          const res = await fetch(`${url}/rest/v1/lumen_state?on_conflict=id`, {
+          const doPush = (s) => fetch(`${url}/rest/v1/lumen_state?on_conflict=id`, {
             method: 'POST',
-            headers,
+            headers: {
+              apikey: key,
+              Authorization: `Bearer ${s.access_token}`,
+              'Content-Type': 'application/json',
+              Prefer: 'resolution=merge-duplicates,return=minimal'
+            },
             keepalive,
-            body: JSON.stringify({ id: rowId, payload: getSyncPayload(), updated_at: state.updatedAt || new Date().toISOString() })
+            body: JSON.stringify({ id: s.user.id, payload: getSyncPayload(), updated_at: state.updatedAt || new Date().toISOString() })
           });
+          let res = await doPush(sess);
+          if (res.status === 401) {
+            sess = await ensureValidSupaSession(true);
+            if (!sess?.access_token) return false;
+            res = await doPush(sess);
+          }
           if (!res.ok) {
             const errData = await res.json().catch(() => ({}));
             throw new Error(errData.message || errData.hint || `HTTP ${res.status}`);
@@ -6505,18 +6509,23 @@ Product Design, Design Systems, Interaction Design, Prototyping, Figma, User Res
         if (state.sync.supaUrl && state.sync.supaKey) {
           const url = state.sync.supaUrl.trim().replace(/\/$/, '');
           const key = state.sync.supaKey.trim();
-          const sess = await ensureValidSupaSession();
+          let sess = await ensureValidSupaSession();
           if (!sess?.access_token || !sess?.user?.id) {
             setSyncBadge('Sign in');
             return false;
           }
-          const rowId = sess.user.id;
-          const res = await fetch(`${url}/rest/v1/lumen_state?id=eq.${encodeURIComponent(rowId)}&select=payload,updated_at`, {
+          const doPull = (s) => fetch(`${url}/rest/v1/lumen_state?id=eq.${encodeURIComponent(s.user.id)}&select=payload,updated_at`, {
             headers: {
               apikey: key,
-              Authorization: `Bearer ${sess.access_token}`
+              Authorization: `Bearer ${s.access_token}`
             }
           });
+          let res = await doPull(sess);
+          if (res.status === 401) {
+            sess = await ensureValidSupaSession(true);
+            if (!sess?.access_token) return false;
+            res = await doPull(sess);
+          }
           if (!res.ok) {
             const errData = await res.json().catch(() => ({}));
             throw new Error(errData.message || errData.hint || `HTTP ${res.status}`);
@@ -6620,32 +6629,50 @@ Product Design, Design Systems, Interaction Design, Prototyping, Figma, User Res
       }
     }
 
-    async function ensureValidSupaSession() {
+    let _supaRefreshPromise = null;
+    async function ensureValidSupaSession(forceRefresh = false) {
       const sess = state.sync.supaSession;
       if (!sess || !state.sync.supaUrl || !state.sync.supaKey) return null;
       const nowSec = Math.floor(Date.now() / 1000);
-      if (sess.expires_at && sess.expires_at > nowSec + 60) return sess;
-      if (!sess.refresh_token) return sess;
-      try {
-        const url = state.sync.supaUrl.trim().replace(/\/$/, '');
-        const res = await fetch(`${url}/auth/v1/token?grant_type=refresh_token`, {
-          method: 'POST',
-          headers: { apikey: state.sync.supaKey.trim(), 'Content-Type': 'application/json' },
-          body: JSON.stringify({ refresh_token: sess.refresh_token })
-        });
-        if (res.ok) {
-          const fresh = await res.json();
-          state.sync.supaSession = {
-            access_token: fresh.access_token,
-            refresh_token: fresh.refresh_token || sess.refresh_token,
-            expires_at: fresh.expires_at || nowSec + (fresh.expires_in || 3600),
-            user: fresh.user || sess.user
-          };
-          saveState(true);
-          return state.sync.supaSession;
-        }
-      } catch {}
-      return sess;
+      const expSec = sess.expires_at > 1e12 ? Math.floor(sess.expires_at / 1000) : (sess.expires_at || 0);
+      if (!forceRefresh && expSec && expSec > nowSec + 90) return sess;
+      if (!sess.refresh_token) return forceRefresh ? null : sess;
+
+      if (_supaRefreshPromise) return _supaRefreshPromise;
+      _supaRefreshPromise = (async () => {
+        try {
+          const url = state.sync.supaUrl.trim().replace(/\/$/, '');
+          const res = await fetch(`${url}/auth/v1/token?grant_type=refresh_token`, {
+            method: 'POST',
+            headers: { apikey: state.sync.supaKey.trim(), 'Content-Type': 'application/json' },
+            body: JSON.stringify({ refresh_token: sess.refresh_token })
+          });
+          if (res.ok) {
+            const fresh = await res.json();
+            state.sync.supaSession = {
+              access_token: fresh.access_token,
+              refresh_token: fresh.refresh_token || sess.refresh_token,
+              expires_at: fresh.expires_at || Math.floor(Date.now() / 1000) + (fresh.expires_in || 3600),
+              user: fresh.user || sess.user
+            };
+            saveState(true);
+            return state.sync.supaSession;
+          }
+          if (res.status === 400 || res.status === 401) {
+            // Refresh token expired/revoked — clear dead token (keep all local data intact!)
+            state.sync.supaSession = null;
+            saveState(true);
+            updateAuthUI();
+            setSyncDetail('Session expired — sign in again to sync your data.', true);
+            toast('Session expired — please sign in again to resume sync');
+            return null;
+          }
+        } catch {}
+        return sess;
+      })().finally(() => {
+        _supaRefreshPromise = null;
+      });
+      return _supaRefreshPromise;
     }
 
     async function sendMagicLinkEmail(email) {
