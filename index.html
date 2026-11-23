@@ -5407,7 +5407,7 @@ Product Design, Design Systems, Interaction Design, Prototyping, Figma, User Res
       saveState(true);
       const redirectTo = window.location.protocol.startsWith('http')
         ? window.location.origin + window.location.pathname
-        : 'https://lumen.pages.dev/';
+        : 'https://lumen.mikebianchini.workers.dev/';
       const res = await fetch(`${url}/auth/v1/otp?redirect_to=${encodeURIComponent(redirectTo)}`, {
         method: 'POST',
         headers: { apikey: key, 'Content-Type': 'application/json' },
@@ -5512,7 +5512,7 @@ Product Design, Design Systems, Interaction Design, Prototyping, Figma, User Res
       const key = (state.sync.supaKey || '').trim();
       const redirectTo = window.location.protocol.startsWith('http')
         ? window.location.origin + window.location.pathname
-        : 'https://lumen.pages.dev/';
+        : 'https://lumen.mikebianchini.workers.dev/';
       const res = await fetch(`${url}/auth/v1/recover?redirect_to=${encodeURIComponent(redirectTo)}`, {
         method: 'POST',
         headers: { apikey: key, 'Content-Type': 'application/json' },
@@ -6913,7 +6913,7 @@ create policy "Users manage own Lumen data"
   using (auth.uid()::text = id)
   with check (auth.uid()::text = id);</div>
         <p style="font-size:12.5px; color:var(--text-secondary); line-height:1.5;">
-          <strong>2. Add Redirect URL:</strong> Under Supabase → Authentication → URL Configuration → Redirect URLs, add <code>https://lumen.pages.dev/</code>. Email Magic Links work out of the box with zero extra setup!
+          <strong>2. Add Redirect URL:</strong> Under Supabase → Authentication → URL Configuration → Redirect URLs, add <code>https://lumen.mikebianchini.workers.dev/</code>. Email Magic Links work out of the box with zero extra setup!
         </p>
         <div class="modal-footer"><button class="btn btn-primary" onclick="closeModal()">Done</button></div>
       `);
