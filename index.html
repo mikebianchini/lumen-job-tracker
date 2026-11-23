@@ -2549,13 +2549,22 @@
         <h1 class="auth-card-title">Welcome to Lumen</h1>
         <p class="auth-card-sub">Your calm home for tracking jobs, conversations, and tailored resumes across desktop &amp; mobile.</p>
       </div>
+      <div class="view-seg" role="tablist" aria-label="Sign in method" style="align-self:center;">
+        <button type="button" class="view-seg-btn active" id="gate-tab-password" role="tab" aria-selected="true">Password</button>
+        <button type="button" class="view-seg-btn" id="gate-tab-magic" role="tab" aria-selected="false">Magic Link</button>
+      </div>
       <form class="auth-form" id="gate-auth-form">
         <div class="field">
           <label for="gate-email">Email Address</label>
           <input id="gate-email" class="input" type="email" autocomplete="email" placeholder="you@example.com" required style="height:44px;" />
         </div>
+        <div class="field" id="gate-pass-wrap">
+          <label for="gate-password">Password</label>
+          <input id="gate-password" class="input" type="password" autocomplete="current-password" placeholder="Enter your password" style="height:44px;" />
+        </div>
         <div id="gate-msg" style="font-size:13px; min-height:18px; line-height:1.45;"></div>
-        <button type="submit" class="btn btn-primary" id="gate-submit-btn" style="height:46px; width:100%; font-size:15px;">Send Magic Sign-In Link</button>
+        <button type="submit" class="btn btn-primary" id="gate-submit-btn" style="height:46px; width:100%; font-size:15px;">Sign In</button>
+        <button type="button" class="btn btn-ghost btn-sm" id="gate-signup-btn" style="width:100%; font-size:13px;">New here? Create Account</button>
       </form>
 
     </div>
@@ -5354,6 +5363,59 @@ Product Design, Design Systems, Interaction Design, Prototyping, Figma, User Res
       return true;
     }
 
+    async function signInWithPassword(email, password) {
+      const url = (state.sync.supaUrl || '').trim().replace(/\/$/, '');
+      const key = (state.sync.supaKey || '').trim();
+      const res = await fetch(`${url}/auth/v1/token?grant_type=password`, {
+        method: 'POST',
+        headers: { apikey: key, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password })
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(data.error_description || data.msg || 'Invalid email or password');
+      state.sync.supaSession = {
+        access_token: data.access_token,
+        refresh_token: data.refresh_token,
+        expires_at: data.expires_at || Math.floor(Date.now() / 1000) + (data.expires_in || 3600),
+        user: data.user
+      };
+      if (data.user?.user_metadata) {
+        const meta = data.user.user_metadata;
+        if (!state.profile.name && (meta.full_name || meta.name)) state.profile.name = meta.full_name || meta.name;
+      }
+      saveState(true);
+      updateAuthUI();
+      await autoPullFromCloud(false);
+      renderCurrentView();
+      return data;
+    }
+
+    async function signUpWithPassword(email, password) {
+      const url = (state.sync.supaUrl || '').trim().replace(/\/$/, '');
+      const key = (state.sync.supaKey || '').trim();
+      const res = await fetch(`${url}/auth/v1/signup`, {
+        method: 'POST',
+        headers: { apikey: key, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password })
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(data.error_description || data.msg || 'Could not create account');
+      if (data.access_token) {
+        state.sync.supaSession = {
+          access_token: data.access_token,
+          refresh_token: data.refresh_token,
+          expires_at: data.expires_at || Math.floor(Date.now() / 1000) + (data.expires_in || 3600),
+          user: data.user
+        };
+        saveState(true);
+        updateAuthUI();
+        await autoPullFromCloud(false);
+        renderCurrentView();
+        return { signedIn: true };
+      }
+      return { signedIn: false };
+    }
+
     function startLinkedInSignIn() {
       openAuthModal();
     }
@@ -6376,31 +6438,97 @@ function doPost(e) {
       updateAuthUI();
       renderCurrentView();
     });
+    let gateAuthMode = 'password';
+    const setGateMode = (mode) => {
+      gateAuthMode = mode;
+      const isPass = mode === 'password';
+      $('#gate-tab-password')?.classList.toggle('active', isPass);
+      $('#gate-tab-magic')?.classList.toggle('active', !isPass);
+      if ($('#gate-pass-wrap')) $('#gate-pass-wrap').style.display = isPass ? '' : 'none';
+      if ($('#gate-signup-btn')) $('#gate-signup-btn').style.display = isPass ? '' : 'none';
+      if ($('#gate-submit-btn')) $('#gate-submit-btn').textContent = isPass ? 'Sign In' : 'Send Magic Sign-In Link';
+      if ($('#gate-msg')) $('#gate-msg').textContent = '';
+    };
+    $('#gate-tab-password')?.addEventListener('click', () => setGateMode('password'));
+    $('#gate-tab-magic')?.addEventListener('click', () => setGateMode('magic'));
+
+    $('#gate-signup-btn')?.addEventListener('click', async () => {
+      const emailEl = $('#gate-email');
+      const passEl = $('#gate-password');
+      const msgEl = $('#gate-msg');
+      const email = emailEl.value.trim();
+      const pass = passEl.value;
+      emailEl.classList.toggle('input-error', !email || !email.includes('@'));
+      passEl.classList.toggle('input-error', pass.length < 6);
+      if (!email || !email.includes('@')) { emailEl.focus(); return; }
+      if (pass.length < 6) {
+        passEl.focus();
+        msgEl.style.color = 'var(--red)';
+        msgEl.textContent = 'Password must be at least 6 characters.';
+        return;
+      }
+      msgEl.style.color = 'var(--text-secondary)';
+      msgEl.textContent = 'Creating account…';
+      try {
+        const res = await signUpWithPassword(email, pass);
+        if (res.signedIn) {
+          toast('Account created & signed in');
+        } else {
+          msgEl.style.color = 'var(--green)';
+          msgEl.textContent = 'Account created! Check your email to confirm (or turn off Confirm Email in Supabase → Auth → Email for instant login).';
+        }
+      } catch (err) {
+        msgEl.style.color = 'var(--red)';
+        msgEl.textContent = err.message || 'Could not create account.';
+      }
+    });
+
     $('#gate-auth-form')?.addEventListener('submit', async (e) => {
       e.preventDefault();
       const emailEl = $('#gate-email');
+      const passEl = $('#gate-password');
       const msgEl = $('#gate-msg');
       const btn = $('#gate-submit-btn');
       const email = emailEl.value.trim();
       emailEl.classList.toggle('input-error', !email || !email.includes('@'));
       if (!email || !email.includes('@')) { emailEl.focus(); return; }
-      btn.disabled = true;
-      btn.textContent = 'Sending link…';
-      msgEl.style.color = 'var(--text-secondary)';
-      msgEl.textContent = '';
-      try {
-        const ok = await sendMagicLinkEmail(email);
-        if (ok) {
-          msgEl.style.color = 'var(--green)';
-          msgEl.textContent = 'Magic link sent! Open your inbox and click the link to sign in.';
-          toast('Magic link sent — check your inbox');
+
+      if (gateAuthMode === 'password') {
+        const pass = passEl.value;
+        passEl.classList.toggle('input-error', !pass);
+        if (!pass) { passEl.focus(); return; }
+        btn.disabled = true;
+        btn.textContent = 'Signing in…';
+        msgEl.textContent = '';
+        try {
+          await signInWithPassword(email, pass);
+          toast('Signed in');
+        } catch (err) {
+          msgEl.style.color = 'var(--red)';
+          msgEl.textContent = err.message || 'Invalid email or password.';
+        } finally {
+          btn.disabled = false;
+          btn.textContent = 'Sign In';
         }
-      } catch (err) {
-        msgEl.style.color = 'var(--red)';
-        msgEl.textContent = err.message || 'Could not send link. Please try again.';
-      } finally {
-        btn.disabled = false;
-        btn.textContent = 'Send Magic Sign-In Link';
+      } else {
+        btn.disabled = true;
+        btn.textContent = 'Sending link…';
+        msgEl.style.color = 'var(--text-secondary)';
+        msgEl.textContent = '';
+        try {
+          const ok = await sendMagicLinkEmail(email);
+          if (ok) {
+            msgEl.style.color = 'var(--green)';
+            msgEl.textContent = 'Magic link sent! Open your inbox and click the link to sign in.';
+            toast('Magic link sent — check your inbox');
+          }
+        } catch (err) {
+          msgEl.style.color = 'var(--red)';
+          msgEl.textContent = err.message || 'Could not send link. Please try again.';
+        } finally {
+          btn.disabled = false;
+          btn.textContent = 'Send Magic Sign-In Link';
+        }
       }
     });
     $('#supa-sql-btn').addEventListener('click', () => {
