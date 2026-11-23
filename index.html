@@ -5564,11 +5564,12 @@ Product Design, Design Systems, Interaction Design, Prototyping, Figma, User Res
           </div>
         </div>
 
-        <div style="display:flex; gap:10px; flex-wrap:wrap;">
-          ${person.email ? `<a class="btn btn-sm" href="mailto:${esc(person.email)}" style="text-decoration:none;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg> ${esc(person.email)}</a>` : ''}
-          ${person.linkedin ? `<a class="btn btn-sm" href="${esc(person.linkedin)}" target="_blank" rel="noopener" style="text-decoration:none;">LinkedIn ↗</a>` : ''}
-          <button class="btn btn-primary btn-sm" id="person-draft-msg-btn">Draft Message</button>
-        </div>
+        ${person.email || person.linkedin ? `
+          <div style="display:flex; gap:10px; flex-wrap:wrap;">
+            ${person.email ? `<a class="btn btn-sm" href="mailto:${esc(person.email)}" style="text-decoration:none;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg> ${esc(person.email)}</a>` : ''}
+            ${person.linkedin ? `<a class="btn btn-sm" href="${esc(person.linkedin)}" target="_blank" rel="noopener" style="text-decoration:none;">LinkedIn ↗</a>` : ''}
+          </div>
+        ` : ''}
 
         <!-- Linked Jobs -->
         <div class="section-block">
