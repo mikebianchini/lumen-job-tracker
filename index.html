@@ -5155,29 +5155,10 @@ Product Design, Design Systems, Interaction Design, Prototyping, Figma, User Res
           </div>
         </div>
 
-        <!-- Priority Rating & Interview Prep Checklist -->
-        <div class="section-block">
-          <div class="section-head">
-            <span class="section-title">${ico("checkSquare", 16, "var(--green)")} Interview Prep Checklist (${(job.prepDone || []).length}/${PREP_STEPS.length})</span>
-            <div style="display:flex; align-items:center; gap:10px;">
-              <div class="star-row" aria-label="Role excitement rating">
-                ${[1, 2, 3, 4, 5].map((n) => `<button type="button" class="star-btn ${(job.rating || 4) >= n ? 'on' : ''}" data-job-star="${n}" aria-label="Rate ${n} out of 5"><svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg></button>`).join('')}
-              </div>
-              <button class="btn btn-sm" id="job-draft-outreach">Draft Outreach</button>
-            </div>
-          </div>
-          <div class="prep-chips">
-            ${PREP_STEPS.map((step) => {
-              const done = (job.prepDone || []).includes(step);
-              return `<button type="button" class="prep-chip ${done ? 'done' : ''}" data-prep-step="${esc(step)}">${done ? '✓' : '+'} ${esc(step)}</button>`;
-            }).join('')}
-          </div>
-        </div>
-
-        <!-- Resume Match Comparison -->
+        <!-- Resume Match Comparison (Collapsible) -->
         <div class="resume-callout" style="flex-direction:column; align-items:stretch; gap:14px;">
           <div style="display:flex; justify-content:space-between; align-items:center; gap:10px; flex-wrap:wrap;">
-            <div>
+            <div style="cursor:${ats.total ? 'pointer' : 'default'};" id="resume-match-head-toggle">
               <div style="font-size:16px; font-weight:680; display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
                 ${ico("target", 16, "var(--green)")} Resume Match
                 ${ats.total ? `<span class="badge ${ats.score >= 75 ? 'badge-offer' : ats.score >= 55 ? 'badge-applied' : 'badge-interviewing'}">${ats.score}% · ${esc(ats.tier)}</span>` : ''}
@@ -5188,26 +5169,31 @@ Product Design, Design Systems, Interaction Design, Prototyping, Figma, User Res
                   : 'Upload your resume to score fit and auto-fill your profile.'}
               </div>
             </div>
-            <button type="button" class="btn btn-sm" id="open-studio-for-job">${state.baseResumeName && state.baseResumeName !== 'Sample_Resume.txt' ? 'Update Resume' : 'Upload Resume'}</button>
+            <div style="display:flex; align-items:center; gap:8px;">
+              <button type="button" class="btn btn-sm" id="open-studio-for-job">${state.baseResumeName && state.baseResumeName !== 'Sample_Resume.txt' ? 'Update Resume' : 'Upload Resume'}</button>
+              ${ats.total ? `<button type="button" class="btn btn-ghost btn-sm" id="toggle-resume-match-btn" aria-expanded="${ui.resumeMatchCollapsed ? 'false' : 'true'}">${ui.resumeMatchCollapsed ? 'Show Details ▾' : 'Hide ▴'}</button>` : ''}
+            </div>
           </div>
           ${ats.total ? `
             <div style="height:7px; border-radius:999px; background:var(--divider); overflow:hidden;">
               <div style="height:100%; width:${ats.score}%; border-radius:999px; background:${ats.score >= 75 ? 'var(--green)' : ats.score >= 55 ? 'var(--accent)' : 'var(--amber)'}; transition:width 0.35s ease;"></div>
             </div>
-            <div style="display:flex; flex-direction:column; gap:10px;">
-              ${ats.matched.length ? `
-                <div>
-                  <div style="font-size:12.5px; font-weight:650; color:var(--green); margin-bottom:6px;">Matched Skills (${ats.matched.length})</div>
-                  <div class="kw-group">${ats.matched.slice(0, 12).map((w) => `<span class="kw-chip matched">✓ ${esc(w)}</span>`).join('')}</div>
-                </div>
-              ` : ''}
-              ${ats.missing.length ? `
-                <div>
-                  <div style="font-size:12.5px; font-weight:650; color:var(--amber); margin-bottom:6px;">Gaps to Highlight (${ats.missing.length})</div>
-                  <div class="kw-group">${ats.missing.slice(0, 12).map((w) => `<span class="kw-chip missing">${esc(w)}</span>`).join('')}</div>
-                </div>
-              ` : ''}
-            </div>
+            ${!ui.resumeMatchCollapsed ? `
+              <div style="display:flex; flex-direction:column; gap:10px;">
+                ${ats.matched.length ? `
+                  <div>
+                    <div style="font-size:12.5px; font-weight:650; color:var(--green); margin-bottom:6px;">Matched Skills (${ats.matched.length})</div>
+                    <div class="kw-group">${ats.matched.slice(0, 12).map((w) => `<span class="kw-chip matched">✓ ${esc(w)}</span>`).join('')}</div>
+                  </div>
+                ` : ''}
+                ${ats.missing.length ? `
+                  <div>
+                    <div style="font-size:12.5px; font-weight:650; color:var(--amber); margin-bottom:6px;">Gaps to Highlight (${ats.missing.length})</div>
+                    <div class="kw-group">${ats.missing.slice(0, 12).map((w) => `<span class="kw-chip missing">${esc(w)}</span>`).join('')}</div>
+                  </div>
+                ` : ''}
+              </div>
+            ` : ''}
           ` : ''}
         </div>
 
@@ -5358,6 +5344,14 @@ Product Design, Design Systems, Interaction Design, Prototyping, Figma, User Res
       $('#open-studio-for-job')?.addEventListener('click', () => {
         $('#resume-file-input')?.click();
       });
+
+      const toggleResumeMatch = () => {
+        if (!ats.total) return;
+        ui.resumeMatchCollapsed = !ui.resumeMatchCollapsed;
+        renderJobDetail();
+      };
+      $('#toggle-resume-match-btn')?.addEventListener('click', toggleResumeMatch);
+      $('#resume-match-head-toggle')?.addEventListener('click', toggleResumeMatch);
 
       $('#detail-job-jd').addEventListener('input', (e) => {
         job.jd = e.target.value;
