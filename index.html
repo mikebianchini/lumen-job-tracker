@@ -3070,8 +3070,8 @@ Product Design, Design Systems, Interaction Design, Prototyping, Figma, User Res
         sync: {
           autoSync: true,
           gsheetsUrl: '',
-          supaUrl: '',
-          supaKey: '',
+          supaUrl: 'https://qyrzolvejabspgyuikba.supabase.co',
+          supaKey: 'sb_publishable_7IVH5r3zpjW9_rDebvSK6A_QwDK0L2J',
           aiApiKey: '',
           supaSession: null
         },
@@ -3208,7 +3208,12 @@ Product Design, Design Systems, Interaction Design, Prototyping, Figma, User Res
         return {
           ...getDefaultState(),
           ...parsed,
-          sync: { ...getDefaultState().sync, ...(parsed.sync || {}) },
+          sync: {
+            ...getDefaultState().sync,
+            ...(parsed.sync || {}),
+            supaUrl: (parsed.sync && parsed.sync.supaUrl) || 'https://qyrzolvejabspgyuikba.supabase.co',
+            supaKey: (parsed.sync && parsed.sync.supaKey) || 'sb_publishable_7IVH5r3zpjW9_rDebvSK6A_QwDK0L2J'
+          },
           profile: { ...getDefaultState().profile, ...(parsed.profile || {}) }
         };
       } catch {
@@ -5106,15 +5111,16 @@ Product Design, Design Systems, Interaction Design, Prototyping, Figma, User Res
           const key = state.sync.supaKey.trim();
           const sess = await ensureValidSupaSession();
           const rowId = sess?.user?.id || 'default';
-          const authToken = sess?.access_token || key;
+          const headers = {
+            apikey: key,
+            'Content-Type': 'application/json',
+            Prefer: 'resolution=merge-duplicates'
+          };
+          if (sess?.access_token) headers.Authorization = `Bearer ${sess.access_token}`;
+          else if (key.startsWith('eyJ')) headers.Authorization = `Bearer ${key}`;
           const res = await fetch(`${url}/rest/v1/lumen_state`, {
             method: 'POST',
-            headers: {
-              apikey: key,
-              Authorization: `Bearer ${authToken}`,
-              'Content-Type': 'application/json',
-              Prefer: 'resolution=merge-duplicates'
-            },
+            headers,
             body: JSON.stringify({ id: rowId, payload: getSyncPayload(), updated_at: state.updatedAt })
           });
           if (!res.ok) throw new Error(res.statusText);
@@ -5144,9 +5150,11 @@ Product Design, Design Systems, Interaction Design, Prototyping, Figma, User Res
           const key = state.sync.supaKey.trim();
           const sess = await ensureValidSupaSession();
           const rowId = sess?.user?.id || 'default';
-          const authToken = sess?.access_token || key;
+          const headers = { apikey: key };
+          if (sess?.access_token) headers.Authorization = `Bearer ${sess.access_token}`;
+          else if (key.startsWith('eyJ')) headers.Authorization = `Bearer ${key}`;
           const res = await fetch(`${url}/rest/v1/lumen_state?id=eq.${encodeURIComponent(rowId)}&select=payload,updated_at`, {
-            headers: { apikey: key, Authorization: `Bearer ${authToken}` }
+            headers
           });
           if (res.ok) {
             const rows = await res.json();
