@@ -3291,13 +3291,6 @@
             </span>
             <span class="nav-count" id="top-count-people"></span>
           </button>
-          <button class="nav-btn" data-view="resume">
-            <span class="nav-btn-left">
-              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
-              Resume
-            </span>
-          </button>
-
         </nav>
 
         <div class="hub-right">
@@ -4177,10 +4170,16 @@ Product Design, Design Systems, Interaction Design, Prototyping, Figma, User Res
             <span class="kpi-value">${state.people.length}</span>
             <span class="kpi-sub">${state.people.filter((p) => p.roleType === 'Referral').length} referrals · ${state.people.filter((p) => p.roleType === 'Recruiter').length} recruiters</span>
           </div>
-          <div class="kpi-card glass" data-kpi-nav="resume">
-            <span class="kpi-label">Tailored Resumes <span style="color:var(--green)">↗</span></span>
-            <span class="kpi-value">${tailored}</span>
-            <span class="kpi-sub">${state.baseResumeName ? esc(state.baseResumeName) : 'Upload base resume'}</span>
+          <div class="kpi-card glass" data-kpi-nav="jobs">
+            ${(() => {
+              const scored = activeJobs.map((j) => computeATS(state.baseResume, j.jd)).filter((a) => a.total > 0);
+              const avg = scored.length ? Math.round(scored.reduce((s, a) => s + a.score, 0) / scored.length) : 0;
+              return `
+                <span class="kpi-label">Avg Resume Match <span style="color:var(--green)">↗</span></span>
+                <span class="kpi-value">${scored.length ? `${avg}%` : '—'}</span>
+                <span class="kpi-sub">${state.baseResumeName && state.baseResumeName !== 'Sample_Resume.txt' ? esc(state.baseResumeName) : 'Upload resume to score fit'}</span>
+              `;
+            })()}
           </div>
         </div>
 
