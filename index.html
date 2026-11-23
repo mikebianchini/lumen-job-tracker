@@ -3588,10 +3588,13 @@
                 <input id="supa-key" class="input" type="password" placeholder="eyJhbGciOi..." />
               </div>
             </div>
-            <div id="supa-auth-status" style="font-size:12.5px; color:var(--text-secondary);"></div>
+            <div id="supa-auth-status" style="font-size:13px; color:var(--text-secondary);"></div>
+            <div id="supa-sync-detail" style="font-size:13px; color:var(--text-tertiary);"></div>
             <div style="display: flex; gap: 8px; flex-wrap: wrap;">
               <button type="button" class="btn btn-primary btn-sm" id="supa-linkedin-btn">Sign in with Email Link</button>
-              <button type="button" class="btn btn-sm" id="supa-sync-btn">Sync Now</button>
+              <button type="button" class="btn btn-primary btn-sm" id="supa-sync-btn">Sync Now</button>
+              <button type="button" class="btn btn-sm" id="supa-push-btn">Push This Browser → Cloud</button>
+              <button type="button" class="btn btn-sm" id="supa-pull-btn">Pull Cloud → This Browser</button>
               <button type="button" class="btn btn-ghost btn-sm" id="supa-sql-btn" style="display:none;">View SQL Setup</button>
               <button type="button" class="btn btn-danger btn-sm" id="supa-signout-btn" style="display:none;">Sign Out</button>
             </div>
@@ -4058,7 +4061,7 @@ Product Design, Design Systems, Interaction Design, Prototyping, Figma, User Res
     function toggleTheme() {
       state.theme = state.theme === 'dark' ? 'light' : 'dark';
       applyTheme();
-      saveState();
+      saveState(true);
     }
 
     function switchView(viewName) {
@@ -6468,17 +6471,28 @@ Product Design, Design Systems, Interaction Design, Prototyping, Figma, User Res
             body: JSON.stringify(getSyncPayload())
           });
         }
+        const nowStr = new Date().toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' });
+        setSyncDetail(`Last pushed at ${nowStr} · ${state.jobs.length} jobs, ${state.people.length} people, ${(state.events || []).length} events`, false);
         setSyncBadge('Synced ✓', '--green');
         if (!silent) toast('Synced to cloud');
         return true;
       } catch (e) {
         console.warn('Cloud push failed:', e);
+        setSyncDetail(`Sync error: ${e.message}`, true);
         setSyncBadge('Retry', '--amber');
         if (!silent || /permission denied|42501/i.test(e.message || '')) {
           toast(`Sync failed: ${e.message}`);
         }
         return false;
       }
+    }
+
+    function setSyncDetail(msg, isError = false) {
+      ui.lastSyncDetail = { msg, isError };
+      const el = $('#supa-sync-detail');
+      if (!el) return;
+      el.textContent = msg || '';
+      el.style.color = isError ? 'var(--red)' : 'var(--text-tertiary)';
     }
 
     async function autoPullFromCloud(silent = true) {
@@ -6517,17 +6531,32 @@ Product Design, Design Systems, Interaction Design, Prototyping, Figma, User Res
           const res = await fetch(state.sync.gsheetsUrl.trim());
           data = await res.json();
         }
+        const localTime = state.updatedAt ? new Date(state.updatedAt).getTime() : 0;
         if (cloudRowMissing) {
+          if (localTime > 0) {
+            await autoPushToCloud(true);
+            return true;
+          }
+          setSyncDetail('Cloud is empty — make an edit or tap "Push This Browser → Cloud" on your main browser.', false);
+          setSyncBadge('Synced ✓', '--green');
+          return false;
+        }
+        const cloudTime = data?.updatedAt ? new Date(data.updatedAt).getTime() : 0;
+        if (silent && cloudTime && localTime && localTime > cloudTime) {
+          // Local browser has newer unsynced edits → push them up automatically!
           await autoPushToCloud(true);
           return true;
         }
         const updated = applyCloudPayload(data, silent);
+        const nowStr = new Date().toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' });
+        setSyncDetail(`Last synced at ${nowStr} · ${state.jobs.length} jobs, ${state.people.length} people, ${(state.events || []).length} events`, false);
         setSyncBadge('Synced ✓', '--green');
         if (updated && !silent) toast('Pulled latest from cloud');
         else if (updated && silent) toast('Auto-synced latest changes');
         return updated;
       } catch (e) {
         console.warn('Cloud pull failed:', e);
+        setSyncDetail(`Sync error: ${e.message}`, true);
         setSyncBadge('Retry', '--amber');
         if (!silent || /permission denied|42501/i.test(e.message || '')) {
           toast(`Sync failed: ${e.message}`);
@@ -7106,12 +7135,12 @@ Product Design, Design Systems, Interaction Design, Prototyping, Figma, User Res
     }
 
     async function syncSupabase() {
-      const url = $('#supa-url').value.trim().replace(/\/$/, '');
-      const key = $('#supa-key').value.trim();
+      const url = ($('#supa-url')?.value || state.sync.supaUrl || '').trim().replace(/\/$/, '');
+      const key = ($('#supa-key')?.value || state.sync.supaKey || '').trim();
       state.sync.supaUrl = url;
       state.sync.supaKey = key;
       saveState(true);
-      if (!url || !key) return toast('Enter both Supabase Project URL and Anon Key');
+      if (!url || !key) return toast('Sync configuration missing');
       await autoPullFromCloud(true);
       await autoPushToCloud(false);
     }
@@ -8028,6 +8057,14 @@ function doPost(e) {
     });
 
     $('#supa-sync-btn').addEventListener('click', syncSupabase);
+    $('#supa-push-btn')?.addEventListener('click', async () => {
+      state.updatedAt = new Date().toISOString();
+      saveState(true);
+      await autoPushToCloud(false);
+    });
+    $('#supa-pull-btn')?.addEventListener('click', async () => {
+      await autoPullFromCloud(false);
+    });
     $('#supa-linkedin-btn')?.addEventListener('click', startLinkedInSignIn);
     $('#supa-signout-btn')?.addEventListener('click', signOutSupabase);
     $('#hub-auth-btn')?.addEventListener('click', openAuthModal);
