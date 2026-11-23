@@ -7258,9 +7258,8 @@ Product Design, Design Systems, Interaction Design, Prototyping, Figma, User Res
         </div>
         <div class="form-row">
           <div class="field"><label>Email</label><input id="m-p-email" class="input" type="email" value="${esc(p.email)}" placeholder="name@company.com" /></div>
-          <div class="field"><label>Last Contacted</label><input id="m-p-last" class="input" type="date" value="${esc(p.lastContact)}" /></div>
+          <div class="field"><label>Follow-Up Date</label><input id="m-p-follow" class="input" type="date" value="${esc(p.followUpDate)}" /></div>
         </div>
-        <div class="field"><label>Follow-Up Date</label><input id="m-p-follow" class="input" type="date" value="${esc(p.followUpDate)}" /></div>
         <div class="field"><label>Notes</label><textarea id="m-p-notes" class="notes-area" style="min-height:76px;" placeholder="How you met, what you discussed…">${esc(p.notes)}</textarea></div>
         <div class="modal-footer">
           <button class="btn" onclick="closeModal()">Cancel</button>
@@ -7324,7 +7323,7 @@ Product Design, Design Systems, Interaction Design, Prototyping, Figma, User Res
           roleType: $('#m-p-role').value,
           email: $('#m-p-email').value.trim(),
           linkedin: $('#m-p-linkedin').value.trim(),
-          lastContact: $('#m-p-last').value,
+          lastContact: existing?.lastContact || '',
           followUpDate: $('#m-p-follow').value,
           notes: $('#m-p-notes').value.trim()
         };
