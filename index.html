@@ -4114,6 +4114,143 @@ Product Design, Design Systems, Interaction Design, Prototyping, Figma, User Res
           </div>
         </div>
 
+        <!-- Activity Timeline History -->
+        <div class="home-panel glass">
+          ${(() => {
+            const filter = ui.timelineFilter || 'All';
+            const events = [];
+            const seen = new Set();
+
+            (state.timeline || []).forEach((ev) => {
+              events.push(ev);
+              seen.add(ev.title + '|' + (ev.timestamp || '').slice(0, 10));
+            });
+
+            state.jobs.forEach((j) => {
+              if (j.appliedDate) {
+                const title = `Applied to ${j.company} — ${j.role}`;
+                const key = title + '|' + j.appliedDate;
+                if (!seen.has(key)) {
+                  events.push({
+                    id: 'hist-job-' + j.id,
+                    kind: 'applied',
+                    title,
+                    detail: [j.status, j.comp, j.workMode].filter(Boolean).join(' · '),
+                    targetType: 'job',
+                    targetId: j.id,
+                    timestamp: j.appliedDate + 'T12:00:00.000Z'
+                  });
+                }
+              }
+              (j.comments || []).forEach((c) => {
+                const title = `${c.tag || 'Note'} logged on ${j.company}`;
+                const key = title + '|' + (c.createdAt || '').slice(0, 10);
+                if (!seen.has(key)) {
+                  events.push({
+                    id: 'hist-cmt-' + c.id,
+                    kind: c.tag === 'Interview' ? 'interview' : 'note',
+                    title,
+                    detail: (c.text || '').slice(0, 90),
+                    targetType: 'job',
+                    targetId: j.id,
+                    timestamp: c.createdAt || new Date().toISOString()
+                  });
+                }
+              });
+            });
+
+            state.people.forEach((p) => {
+              if (p.lastContact) {
+                const title = `Spoke with ${p.name}${p.company ? ' at ' + p.company : ''}`;
+                const key = title + '|' + p.lastContact;
+                if (!seen.has(key)) {
+                  events.push({
+                    id: 'hist-per-' + p.id,
+                    kind: 'person',
+                    title,
+                    detail: [p.roleType, p.title].filter(Boolean).join(' · '),
+                    targetType: 'person',
+                    targetId: p.id,
+                    timestamp: p.lastContact + 'T14:00:00.000Z'
+                  });
+                }
+              }
+            });
+
+            events.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+
+            const filteredEvents = events.filter((e) => {
+              if (filter === 'All') return true;
+              if (filter === 'Jobs') return ['job', 'applied', 'status', 'offer', 'resume'].includes(e.kind);
+              if (filter === 'Interviews & Notes') return ['interview', 'note'].includes(e.kind);
+              if (filter === 'People') return e.kind === 'person';
+              return true;
+            });
+
+            const dotColors = {
+              job: 'var(--accent)',
+              applied: 'var(--accent)',
+              status: 'var(--teal)',
+              interview: 'var(--amber)',
+              offer: 'var(--green)',
+              person: 'var(--teal)',
+              note: 'var(--slate)',
+              resume: 'var(--green)'
+            };
+
+            const kindLabels = {
+              job: 'Job Added',
+              applied: 'Applied',
+              status: 'Stage Update',
+              interview: 'Interview',
+              offer: 'Offer',
+              person: 'Meeting / Contact',
+              note: 'Note',
+              resume: 'Resume'
+            };
+
+            const fmtTime = (ts) => {
+              if (!ts) return '';
+              const d = new Date(ts);
+              const sameDay = d.toDateString() === new Date().toDateString();
+              return sameDay
+                ? 'Today · ' + d.toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' })
+                : d.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: d.getFullYear() !== new Date().getFullYear() ? 'numeric' : undefined });
+            };
+
+            return `
+              <div class="section-head" style="flex-wrap:wrap;">
+                <span class="section-title">Activity Timeline (${filteredEvents.length})</span>
+                <div style="display:flex; gap:6px; flex-wrap:wrap; align-items:center;">
+                  ${['All', 'Jobs', 'Interviews & Notes', 'People'].map((f) => `<button type="button" class="pill ${f === filter ? 'active' : ''}" style="padding:4px 10px; font-size:11.5px;" data-tl-filter="${f}">${f}</button>`).join('')}
+                  <button type="button" class="btn btn-sm" id="home-log-event-btn">+ Log Event</button>
+                </div>
+              </div>
+              <div class="timeline-list">
+                ${
+                  filteredEvents.length
+                    ? filteredEvents
+                        .slice(0, 15)
+                        .map((ev) => `
+                          <div class="timeline-item" data-tl-type="${ev.targetType || ''}" data-tl-id="${ev.targetId || ''}">
+                            <span class="timeline-dot" style="background:${dotColors[ev.kind] || 'var(--accent)'};"></span>
+                            <div style="min-width:0; flex:1;">
+                              <div style="display:flex; align-items:center; gap:7px; flex-wrap:wrap;">
+                                <span style="font-size:13.5px; font-weight:640; color:var(--text-primary);">${esc(ev.title)}</span>
+                                <span class="chip" style="padding:2px 8px; font-size:11px;">${kindLabels[ev.kind] || 'Activity'}</span>
+                              </div>
+                              ${ev.detail ? `<div style="font-size:12.5px; color:var(--text-secondary); margin-top:2px;">${esc(ev.detail)}</div>` : ''}
+                            </div>
+                            <span class="timeline-time">${esc(fmtTime(ev.timestamp))}</span>
+                          </div>`)
+                        .join('')
+                    : '<div style="font-size:13px; color:var(--text-tertiary); padding:10px 4px;">No activity yet — add a job, log a meeting, or post a note to start your timeline.</div>'
+                }
+              </div>
+            `;
+          })()}
+        </div>
+
         <!-- Two-Column Actionable Split -->
         <div class="home-two-col">
           <!-- Left: Upcoming Focus + Weekly Goal + Smart Career Nudges -->
@@ -4250,143 +4387,6 @@ Product Design, Design Systems, Interaction Design, Prototyping, Figma, User Res
               </div>
             </div>
           </div>
-        </div>
-
-        <!-- Activity Timeline History -->
-        <div class="home-panel glass">
-          ${(() => {
-            const filter = ui.timelineFilter || 'All';
-            const events = [];
-            const seen = new Set();
-
-            (state.timeline || []).forEach((ev) => {
-              events.push(ev);
-              seen.add(ev.title + '|' + (ev.timestamp || '').slice(0, 10));
-            });
-
-            state.jobs.forEach((j) => {
-              if (j.appliedDate) {
-                const title = `Applied to ${j.company} — ${j.role}`;
-                const key = title + '|' + j.appliedDate;
-                if (!seen.has(key)) {
-                  events.push({
-                    id: 'hist-job-' + j.id,
-                    kind: 'applied',
-                    title,
-                    detail: [j.status, j.comp, j.workMode].filter(Boolean).join(' · '),
-                    targetType: 'job',
-                    targetId: j.id,
-                    timestamp: j.appliedDate + 'T12:00:00.000Z'
-                  });
-                }
-              }
-              (j.comments || []).forEach((c) => {
-                const title = `${c.tag || 'Note'} logged on ${j.company}`;
-                const key = title + '|' + (c.createdAt || '').slice(0, 10);
-                if (!seen.has(key)) {
-                  events.push({
-                    id: 'hist-cmt-' + c.id,
-                    kind: c.tag === 'Interview' ? 'interview' : 'note',
-                    title,
-                    detail: (c.text || '').slice(0, 90),
-                    targetType: 'job',
-                    targetId: j.id,
-                    timestamp: c.createdAt || new Date().toISOString()
-                  });
-                }
-              });
-            });
-
-            state.people.forEach((p) => {
-              if (p.lastContact) {
-                const title = `Spoke with ${p.name}${p.company ? ' at ' + p.company : ''}`;
-                const key = title + '|' + p.lastContact;
-                if (!seen.has(key)) {
-                  events.push({
-                    id: 'hist-per-' + p.id,
-                    kind: 'person',
-                    title,
-                    detail: [p.roleType, p.title].filter(Boolean).join(' · '),
-                    targetType: 'person',
-                    targetId: p.id,
-                    timestamp: p.lastContact + 'T14:00:00.000Z'
-                  });
-                }
-              }
-            });
-
-            events.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
-
-            const filteredEvents = events.filter((e) => {
-              if (filter === 'All') return true;
-              if (filter === 'Jobs') return ['job', 'applied', 'status', 'offer', 'resume'].includes(e.kind);
-              if (filter === 'Interviews & Notes') return ['interview', 'note'].includes(e.kind);
-              if (filter === 'People') return e.kind === 'person';
-              return true;
-            });
-
-            const dotColors = {
-              job: 'var(--accent)',
-              applied: 'var(--accent)',
-              status: 'var(--teal)',
-              interview: 'var(--amber)',
-              offer: 'var(--green)',
-              person: 'var(--teal)',
-              note: 'var(--slate)',
-              resume: 'var(--green)'
-            };
-
-            const kindLabels = {
-              job: 'Job Added',
-              applied: 'Applied',
-              status: 'Stage Update',
-              interview: 'Interview',
-              offer: 'Offer',
-              person: 'Meeting / Contact',
-              note: 'Note',
-              resume: 'Resume'
-            };
-
-            const fmtTime = (ts) => {
-              if (!ts) return '';
-              const d = new Date(ts);
-              const sameDay = d.toDateString() === new Date().toDateString();
-              return sameDay
-                ? 'Today · ' + d.toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' })
-                : d.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: d.getFullYear() !== new Date().getFullYear() ? 'numeric' : undefined });
-            };
-
-            return `
-              <div class="section-head" style="flex-wrap:wrap;">
-                <span class="section-title">Activity Timeline (${filteredEvents.length})</span>
-                <div style="display:flex; gap:6px; flex-wrap:wrap; align-items:center;">
-                  ${['All', 'Jobs', 'Interviews & Notes', 'People'].map((f) => `<button type="button" class="pill ${f === filter ? 'active' : ''}" style="padding:4px 10px; font-size:11.5px;" data-tl-filter="${f}">${f}</button>`).join('')}
-                  <button type="button" class="btn btn-sm" id="home-log-event-btn">+ Log Event</button>
-                </div>
-              </div>
-              <div class="timeline-list">
-                ${
-                  filteredEvents.length
-                    ? filteredEvents
-                        .slice(0, 15)
-                        .map((ev) => `
-                          <div class="timeline-item" data-tl-type="${ev.targetType || ''}" data-tl-id="${ev.targetId || ''}">
-                            <span class="timeline-dot" style="background:${dotColors[ev.kind] || 'var(--accent)'};"></span>
-                            <div style="min-width:0; flex:1;">
-                              <div style="display:flex; align-items:center; gap:7px; flex-wrap:wrap;">
-                                <span style="font-size:13.5px; font-weight:640; color:var(--text-primary);">${esc(ev.title)}</span>
-                                <span class="chip" style="padding:2px 8px; font-size:11px;">${kindLabels[ev.kind] || 'Activity'}</span>
-                              </div>
-                              ${ev.detail ? `<div style="font-size:12.5px; color:var(--text-secondary); margin-top:2px;">${esc(ev.detail)}</div>` : ''}
-                            </div>
-                            <span class="timeline-time">${esc(fmtTime(ev.timestamp))}</span>
-                          </div>`)
-                        .join('')
-                    : '<div style="font-size:13px; color:var(--text-tertiary); padding:10px 4px;">No activity yet — add a job, log a meeting, or post a note to start your timeline.</div>'
-                }
-              </div>
-            `;
-          })()}
         </div>
       `;
 
