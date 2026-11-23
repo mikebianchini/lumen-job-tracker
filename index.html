@@ -6439,48 +6439,35 @@ function doPost(e) {
       renderCurrentView();
     });
     let gateAuthMode = 'password';
-    const setGateMode = (mode) => {
-      gateAuthMode = mode;
-      const isPass = mode === 'password';
+    let gateIsSignUp = false;
+    const syncGateUI = () => {
+      const isPass = gateAuthMode === 'password';
+      const titleEl = document.querySelector('.auth-card-title');
+      const passEl = $('#gate-password');
       $('#gate-tab-password')?.classList.toggle('active', isPass);
       $('#gate-tab-magic')?.classList.toggle('active', !isPass);
       if ($('#gate-pass-wrap')) $('#gate-pass-wrap').style.display = isPass ? '' : 'none';
-      if ($('#gate-signup-btn')) $('#gate-signup-btn').style.display = isPass ? '' : 'none';
-      if ($('#gate-submit-btn')) $('#gate-submit-btn').textContent = isPass ? 'Sign In' : 'Send Magic Sign-In Link';
+      if ($('#gate-signup-btn')) {
+        $('#gate-signup-btn').style.display = isPass ? '' : 'none';
+        $('#gate-signup-btn').textContent = gateIsSignUp ? 'Already have an account? Sign In' : 'New here? Create Account';
+      }
+      if (titleEl) titleEl.textContent = isPass && gateIsSignUp ? 'Create your account' : 'Welcome to Lumen';
+      if (passEl) {
+        passEl.placeholder = gateIsSignUp ? 'Create a password (6+ characters)' : 'Enter your password';
+        passEl.autocomplete = gateIsSignUp ? 'new-password' : 'current-password';
+      }
+      if ($('#gate-submit-btn')) {
+        $('#gate-submit-btn').textContent = !isPass ? 'Send Magic Sign-In Link' : gateIsSignUp ? 'Create Account' : 'Sign In';
+      }
       if ($('#gate-msg')) $('#gate-msg').textContent = '';
     };
-    $('#gate-tab-password')?.addEventListener('click', () => setGateMode('password'));
-    $('#gate-tab-magic')?.addEventListener('click', () => setGateMode('magic'));
 
-    $('#gate-signup-btn')?.addEventListener('click', async () => {
-      const emailEl = $('#gate-email');
-      const passEl = $('#gate-password');
-      const msgEl = $('#gate-msg');
-      const email = emailEl.value.trim();
-      const pass = passEl.value;
-      emailEl.classList.toggle('input-error', !email || !email.includes('@'));
-      passEl.classList.toggle('input-error', pass.length < 6);
-      if (!email || !email.includes('@')) { emailEl.focus(); return; }
-      if (pass.length < 6) {
-        passEl.focus();
-        msgEl.style.color = 'var(--red)';
-        msgEl.textContent = 'Password must be at least 6 characters.';
-        return;
-      }
-      msgEl.style.color = 'var(--text-secondary)';
-      msgEl.textContent = 'Creating account…';
-      try {
-        const res = await signUpWithPassword(email, pass);
-        if (res.signedIn) {
-          toast('Account created & signed in');
-        } else {
-          msgEl.style.color = 'var(--green)';
-          msgEl.textContent = 'Account created! Check your email to confirm (or turn off Confirm Email in Supabase → Auth → Email for instant login).';
-        }
-      } catch (err) {
-        msgEl.style.color = 'var(--red)';
-        msgEl.textContent = err.message || 'Could not create account.';
-      }
+    $('#gate-tab-password')?.addEventListener('click', () => { gateAuthMode = 'password'; syncGateUI(); });
+    $('#gate-tab-magic')?.addEventListener('click', () => { gateAuthMode = 'magic'; syncGateUI(); });
+    $('#gate-signup-btn')?.addEventListener('click', () => {
+      gateIsSignUp = !gateIsSignUp;
+      syncGateUI();
+      $('#gate-email')?.focus();
     });
 
     $('#gate-auth-form')?.addEventListener('submit', async (e) => {
@@ -6491,24 +6478,45 @@ function doPost(e) {
       const btn = $('#gate-submit-btn');
       const email = emailEl.value.trim();
       emailEl.classList.toggle('input-error', !email || !email.includes('@'));
-      if (!email || !email.includes('@')) { emailEl.focus(); return; }
+      if (!email || !email.includes('@')) {
+        emailEl.focus();
+        msgEl.style.color = 'var(--red)';
+        msgEl.textContent = 'Please enter a valid email address.';
+        return;
+      }
 
       if (gateAuthMode === 'password') {
         const pass = passEl.value;
-        passEl.classList.toggle('input-error', !pass);
-        if (!pass) { passEl.focus(); return; }
+        const minLen = gateIsSignUp ? 6 : 1;
+        passEl.classList.toggle('input-error', pass.length < minLen);
+        if (pass.length < minLen) {
+          passEl.focus();
+          msgEl.style.color = 'var(--red)';
+          msgEl.textContent = gateIsSignUp ? 'Password must be at least 6 characters.' : 'Please enter your password.';
+          return;
+        }
         btn.disabled = true;
-        btn.textContent = 'Signing in…';
+        btn.textContent = gateIsSignUp ? 'Creating account…' : 'Signing in…';
         msgEl.textContent = '';
         try {
-          await signInWithPassword(email, pass);
-          toast('Signed in');
+          if (gateIsSignUp) {
+            const res = await signUpWithPassword(email, pass);
+            if (res.signedIn) {
+              toast('Account created & signed in');
+            } else {
+              msgEl.style.color = 'var(--green)';
+              msgEl.textContent = 'Account created! Check your email to confirm, or switch Confirm Email off in Supabase for instant sign-in.';
+            }
+          } else {
+            await signInWithPassword(email, pass);
+            toast('Signed in');
+          }
         } catch (err) {
           msgEl.style.color = 'var(--red)';
-          msgEl.textContent = err.message || 'Invalid email or password.';
+          msgEl.textContent = err.message || (gateIsSignUp ? 'Could not create account.' : 'Invalid email or password.');
         } finally {
           btn.disabled = false;
-          btn.textContent = 'Sign In';
+          btn.textContent = gateIsSignUp ? 'Create Account' : 'Sign In';
         }
       } else {
         btn.disabled = true;
