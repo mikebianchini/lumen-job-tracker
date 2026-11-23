@@ -2601,9 +2601,9 @@
         </nav>
 
         <div class="hub-right">
-          <button class="account-chip" id="hub-auth-btn" title="Sign in with LinkedIn" aria-label="Account and Sign in">
+          <button class="account-chip" id="hub-auth-btn" title="Sign in &amp; Sync" aria-label="Account and Sign in">
             <span class="account-avatar" id="hub-auth-avatar">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14m-.5 15.5v-5.3a3.26 3.26 0 0 0-3.26-3.26c-.85 0-1.84.52-2.28 1.3v-1.11h-2.79v8.37h2.79v-4.93c0-.77.62-1.4 1.39-1.4a1.4 1.4 0 0 1 1.4 1.4v4.93h2.75M6.88 8.56a1.68 1.68 0 0 0 1.68-1.68c0-.93-.75-1.69-1.68-1.69a1.69 1.69 0 0 0-1.69 1.69c0 .93.76 1.68 1.69 1.68m1.39 9.94v-8.37H5.5v8.37h2.77z"/></svg>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
             </span>
             <span id="hub-auth-label">Sign in</span>
           </button>
@@ -2865,12 +2865,9 @@
             </div>
             <div id="supa-auth-status" style="font-size:12.5px; color:var(--text-secondary);"></div>
             <div style="display: flex; gap: 8px; flex-wrap: wrap;">
-              <button type="button" class="btn btn-linkedin btn-sm" id="supa-linkedin-btn">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14m-.5 15.5v-5.3a3.26 3.26 0 0 0-3.26-3.26c-.85 0-1.84.52-2.28 1.3v-1.11h-2.79v8.37h2.79v-4.93c0-.77.62-1.4 1.39-1.4a1.4 1.4 0 0 1 1.4 1.4v4.93h2.75M6.88 8.56a1.68 1.68 0 0 0 1.68-1.68c0-.93-.75-1.69-1.68-1.69a1.69 1.69 0 0 0-1.69 1.69c0 .93.76 1.68 1.69 1.68m1.39 9.94v-8.37H5.5v8.37h2.77z"/></svg>
-                Continue with LinkedIn
-              </button>
+              <button type="button" class="btn btn-primary btn-sm" id="supa-linkedin-btn">Sign in with Email Link</button>
               <button type="button" class="btn btn-sm" id="supa-sync-btn">Sync Now</button>
-              <button type="button" class="btn btn-ghost btn-sm" id="supa-sql-btn">View SQL &amp; Setup</button>
+              <button type="button" class="btn btn-ghost btn-sm" id="supa-sql-btn">View SQL Setup</button>
               <button type="button" class="btn btn-danger btn-sm" id="supa-signout-btn" style="display:none;">Sign Out</button>
             </div>
           </div>
@@ -5193,15 +5190,15 @@ Product Design, Design Systems, Interaction Design, Prototyping, Figma, User Res
             ? `<img src="${esc(pic)}" alt="" style="width:100%; height:100%; border-radius:50%; object-fit:cover;" />`
             : esc(initials(fullName));
         }
-        if (status) status.innerHTML = `Signed in with LinkedIn as <strong style="color:var(--text-primary)">${esc(fullName)}</strong> (${esc(user.email || '')}) · Auto-Sync active`;
+        if (status) status.innerHTML = `Signed in as <strong style="color:var(--text-primary)">${esc(fullName)}</strong> (${esc(user.email || '')}) · Auto-Sync active`;
         if (signOutBtn) signOutBtn.style.display = '';
         if (liBtn) liBtn.style.display = 'none';
       } else {
         if (label) label.textContent = 'Sign in';
         if (avatar) {
-          avatar.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14m-.5 15.5v-5.3a3.26 3.26 0 0 0-3.26-3.26c-.85 0-1.84.52-2.28 1.3v-1.11h-2.79v8.37h2.79v-4.93c0-.77.62-1.4 1.39-1.4a1.4 1.4 0 0 1 1.4 1.4v4.93h2.75M6.88 8.56a1.68 1.68 0 0 0 1.68-1.68c0-.93-.75-1.69-1.68-1.69a1.69 1.69 0 0 0-1.69 1.69c0 .93.76 1.68 1.69 1.68m1.39 9.94v-8.37H5.5v8.37h2.77z"/></svg>';
+          avatar.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>';
         }
-        if (status) status.textContent = state.sync.supaUrl && state.sync.supaKey ? 'Supabase connected — sign in with LinkedIn for private per-user sync.' : 'Enter your Supabase URL & Anon Key to enable Continue with LinkedIn.';
+        if (status) status.textContent = state.sync.supaUrl && state.sync.supaKey ? 'Supabase connected — sign in with an Email Magic Link for private per-user sync.' : 'Enter your Supabase URL & Anon Key to enable 1-click Email Magic Link sign-in.';
         if (signOutBtn) signOutBtn.style.display = 'none';
         if (liBtn) liBtn.style.display = '';
       }
@@ -5235,19 +5232,33 @@ Product Design, Design Systems, Interaction Design, Prototyping, Figma, User Res
       return sess;
     }
 
-    function startLinkedInSignIn() {
+    async function sendMagicLinkEmail(email) {
       const url = ($('#supa-url')?.value || state.sync.supaUrl || '').trim().replace(/\/$/, '');
       const key = ($('#supa-key')?.value || state.sync.supaKey || '').trim();
       if (!url || !key) {
+        closeModal();
         switchView('sync');
         toast('Paste your Supabase Project URL & Anon Key first');
-        return;
+        return false;
       }
       state.sync.supaUrl = url;
       state.sync.supaKey = key;
       saveState(true);
       const redirectTo = window.location.origin + window.location.pathname;
-      window.location.href = `${url}/auth/v1/authorize?provider=linkedin_oidc&redirect_to=${encodeURIComponent(redirectTo)}`;
+      const res = await fetch(`${url}/auth/v1/otp`, {
+        method: 'POST',
+        headers: { apikey: key, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, create_user: true, options: { emailRedirectTo: redirectTo } })
+      });
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.msg || err.error_description || res.statusText);
+      }
+      return true;
+    }
+
+    function startLinkedInSignIn() {
+      openAuthModal();
     }
 
     async function handleSupabaseOAuthCallback() {
@@ -5333,21 +5344,44 @@ Product Design, Design Systems, Interaction Design, Prototyping, Figma, User Res
           <button class="icon-btn" onclick="closeModal()" aria-label="Close dialog"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></button>
         </div>
         <p style="font-size:13.5px; color:var(--text-secondary); line-height:1.5;">
-          Sign in with LinkedIn via Supabase to sync your jobs, contacts, timeline, and tailored resumes automatically across desktop and mobile.
+          Enter your email to get a 1-click Magic Sign-In Link (works out of the box with Supabase — no password or OAuth apps required).
         </p>
-        <button type="button" class="btn btn-linkedin" id="modal-linkedin-btn" style="height:44px; width:100%;">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14m-.5 15.5v-5.3a3.26 3.26 0 0 0-3.26-3.26c-.85 0-1.84.52-2.28 1.3v-1.11h-2.79v8.37h2.79v-4.93c0-.77.62-1.4 1.39-1.4a1.4 1.4 0 0 1 1.4 1.4v4.93h2.75M6.88 8.56a1.68 1.68 0 0 0 1.68-1.68c0-.93-.75-1.69-1.68-1.69a1.69 1.69 0 0 0-1.69 1.69c0 .93.76 1.68 1.69 1.68m1.39 9.94v-8.37H5.5v8.37h2.77z"/></svg>
-          Continue with LinkedIn
-        </button>
+        <div class="field">
+          <label for="modal-auth-email">Email Address</label>
+          <input id="modal-auth-email" class="input" type="email" placeholder="you@example.com" />
+        </div>
+        <div id="modal-auth-msg" style="font-size:12.5px; color:var(--green); min-height:16px;"></div>
+        <button type="button" class="btn btn-primary" id="modal-magic-btn" style="height:44px; width:100%;">Send Magic Sign-In Link</button>
         <div style="font-size:12px; color:var(--text-tertiary); text-align:center;">
-          ${state.sync.supaUrl && state.sync.supaKey ? 'Powered by your connected Supabase project.' : 'Need to connect Supabase first? Click below to paste your Project URL & Anon Key.'}
+          ${state.sync.supaUrl && state.sync.supaKey ? 'Connected to your Supabase project.' : 'First time? Paste your Supabase URL & Anon Key in Settings.'}
         </div>
         <div class="modal-footer">
-          <button class="btn btn-ghost" onclick="closeModal(); switchView('sync');">Configure Supabase</button>
+          <button class="btn btn-ghost" onclick="closeModal(); switchView('sync');">Open Settings</button>
           <button class="btn" onclick="closeModal()">Cancel</button>
         </div>
       `);
-      $('#modal-linkedin-btn')?.addEventListener('click', () => { closeModal(); startLinkedInSignIn(); });
+      $('#modal-magic-btn')?.addEventListener('click', async () => {
+        const emailEl = $('#modal-auth-email');
+        const email = emailEl.value.trim();
+        emailEl.classList.toggle('input-error', !email || !email.includes('@'));
+        if (!email || !email.includes('@')) { emailEl.focus(); return toast('Enter a valid email address'); }
+        const btn = $('#modal-magic-btn');
+        btn.disabled = true;
+        btn.textContent = 'Sending link…';
+        try {
+          const ok = await sendMagicLinkEmail(email);
+          if (ok) {
+            $('#modal-auth-msg').textContent = 'Check your inbox! Click the sign-in link on any device to sync.';
+            toast('Magic link sent — check your email');
+          }
+        } catch (err) {
+          $('#modal-auth-msg').style.color = 'var(--red)';
+          $('#modal-auth-msg').textContent = err.message || 'Could not send link — check Supabase URL & Key.';
+        } finally {
+          btn.disabled = false;
+          btn.textContent = 'Send Magic Sign-In Link';
+        }
+      });
     }
 
     function renderSyncView() {
@@ -6255,7 +6289,7 @@ create policy "Users manage own Lumen data"
   using (auth.uid()::text = id)
   with check (auth.uid()::text = id);</div>
         <p style="font-size:12.5px; color:var(--text-secondary); line-height:1.5;">
-          <strong>2. Enable LinkedIn (OIDC):</strong> In Supabase → Authentication → Providers → LinkedIn (OIDC), paste your LinkedIn Client ID &amp; Secret, and add <code>https://mikebianchini.github.io/lumen-job-tracker/</code> under Authentication → URL Configuration → Redirect URLs.
+          <strong>2. Add Redirect URL:</strong> Under Supabase → Authentication → URL Configuration → Redirect URLs, add <code>https://mikebianchini.github.io/lumen-job-tracker/</code>. Email Magic Links work out of the box with zero extra setup!
         </p>
         <div class="modal-footer"><button class="btn btn-primary" onclick="closeModal()">Done</button></div>
       `);
