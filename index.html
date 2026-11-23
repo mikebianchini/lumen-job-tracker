@@ -5285,7 +5285,7 @@ Product Design, Design Systems, Interaction Design, Prototyping, Figma, User Res
 
       if (user) {
         const meta = user.user_metadata || {};
-        const fullName = meta.full_name || meta.name || state.profile?.name || user.email || 'Account';
+        const fullName = state.profile?.name || meta.full_name || meta.name || user.email || 'Account';
         const first = fullName.split(/\s+/)[0];
         const pic = meta.avatar_url || meta.picture || '';
         if (label) label.textContent = first;
@@ -5387,6 +5387,7 @@ Product Design, Design Systems, Interaction Design, Prototyping, Figma, User Res
       updateAuthUI();
       await autoPullFromCloud(false);
       renderCurrentView();
+      maybePromptProfileSetup();
       return data;
     }
 
@@ -5411,6 +5412,7 @@ Product Design, Design Systems, Interaction Design, Prototyping, Figma, User Res
         updateAuthUI();
         await autoPullFromCloud(false);
         renderCurrentView();
+        maybePromptProfileSetup();
         return { signedIn: true };
       }
       return { signedIn: false };
@@ -5450,6 +5452,7 @@ Product Design, Design Systems, Interaction Design, Prototyping, Figma, User Res
         updateAuthUI();
         await autoPullFromCloud(false);
         renderCurrentView();
+        maybePromptProfileSetup();
         toast(`Signed in as ${state.profile.name || user?.email || 'Lumen user'}`);
       } catch (e) {
         toast('LinkedIn sign-in failed — check Supabase Auth settings');
@@ -5477,6 +5480,119 @@ Product Design, Design Systems, Interaction Design, Prototyping, Figma, User Res
       }
     }
 
+    async function updateSupabaseUserName(fullName) {
+      const sess = await ensureValidSupaSession();
+      if (!sess?.access_token || !state.sync.supaUrl || !state.sync.supaKey || !fullName) return;
+      try {
+        const res = await fetch(`${state.sync.supaUrl.trim().replace(/\/$/, '')}/auth/v1/user`, {
+          method: 'PUT',
+          headers: {
+            apikey: state.sync.supaKey.trim(),
+            Authorization: `Bearer ${sess.access_token}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ data: { full_name: fullName } })
+        });
+        if (res.ok) {
+          const updatedUser = await res.json();
+          if (state.sync.supaSession) {
+            state.sync.supaSession.user = updatedUser;
+            saveState(true);
+          }
+        }
+      } catch {}
+    }
+
+    function openProfileSetupModal(isOnboarding = false) {
+      const prof = state.profile || {};
+      const email = state.sync.supaSession?.user?.email || '';
+      const suggestedName = prof.name || (email ? titleCase(email.split('@')[0].replace(/[._+]/g, ' ')) : '');
+
+      openModal(`
+        <div class="modal-header">
+          <h3 class="modal-title">${isOnboarding ? 'Complete Your Profile' : 'Edit Your Profile'}</h3>
+          <button class="icon-btn" onclick="closeModal()" aria-label="Close dialog"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></button>
+        </div>
+        <p style="font-size:13px; color:var(--text-secondary); line-height:1.5;">
+          ${isOnboarding ? 'Personalize Lumen for your job search — your name, target role, and preferences sync automatically across all devices.' : 'Update your name, LinkedIn profile, and default job preferences.'}
+        </p>
+        <div class="field">
+          <label for="ob-linkedin">LinkedIn Profile URL <span style="font-weight:450; color:var(--text-tertiary)">(optional — paste to auto-fill)</span></label>
+          <div style="display:flex; gap:8px;">
+            <input id="ob-linkedin" class="input" type="url" value="${esc(prof.linkedinUrl || '')}" placeholder="https://www.linkedin.com/in/your-name" style="flex:1;" />
+            <button type="button" class="btn btn-sm" id="ob-autofill-btn" style="height:38px; padding:0 12px;">Auto-Fill</button>
+          </div>
+          <div id="ob-status" style="font-size:11.5px; color:var(--accent-text); min-height:14px;"></div>
+        </div>
+        <div class="form-row">
+          <div class="field"><label for="ob-name">Your Name *</label><input id="ob-name" class="input" value="${esc(suggestedName)}" placeholder="Mike Bianchini" /></div>
+          <div class="field"><label for="ob-headline">Target Role / Headline</label><input id="ob-headline" class="input" value="${esc(prof.headline || '')}" placeholder="Senior Product Designer" /></div>
+        </div>
+        <div class="form-row">
+          <div class="field"><label for="ob-loc">Default Location</label><input id="ob-loc" class="input" value="${esc(prof.location || '')}" placeholder="San Francisco, CA" /></div>
+          <div class="field"><label for="ob-mode">Preferred Work Mode</label>
+            <select id="ob-mode" class="select">
+              ${['Remote', 'Hybrid', 'On-site'].map((m) => `<option value="${m}" ${m === (prof.preferredMode || 'Hybrid') ? 'selected' : ''}>${m}</option>`).join('')}
+            </select>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-ghost" onclick="closeModal()">${isOnboarding ? 'Skip for now' : 'Cancel'}</button>
+          <button class="btn btn-primary" id="ob-save-btn">${isOnboarding ? 'Save &amp; Continue' : 'Save Profile'}</button>
+        </div>
+      `);
+
+      const runObImport = async () => {
+        const url = $('#ob-linkedin').value.trim();
+        if (!url) return toast('Paste your LinkedIn URL first');
+        const btn = $('#ob-autofill-btn');
+        btn.disabled = true;
+        btn.textContent = 'Reading…';
+        try {
+          const info = await fetchPersonDetailsFromLinkedIn(url);
+          if (info.name) $('#ob-name').value = info.name;
+          if (info.title) $('#ob-headline').value = info.title;
+          $('#ob-status').textContent = info.name ? `Imported ${info.name}!` : 'URL saved — confirm your name below.';
+        } catch {
+          $('#ob-status').textContent = 'URL saved — confirm your name below.';
+        } finally {
+          btn.disabled = false;
+          btn.textContent = 'Auto-Fill';
+        }
+      };
+
+      $('#ob-autofill-btn')?.addEventListener('click', runObImport);
+      $('#ob-linkedin')?.addEventListener('paste', () => {
+        setTimeout(() => { if (/^https?:\/\//i.test($('#ob-linkedin').value.trim())) runObImport(); }, 40);
+      });
+
+      $('#ob-save-btn')?.addEventListener('click', async () => {
+        const nameEl = $('#ob-name');
+        const name = nameEl.value.trim();
+        nameEl.classList.toggle('input-error', !name);
+        if (!name) { nameEl.focus(); return toast('Please enter your name'); }
+        state.profile = {
+          linkedinUrl: $('#ob-linkedin').value.trim(),
+          name,
+          headline: $('#ob-headline').value.trim(),
+          location: $('#ob-loc').value.trim(),
+          preferredMode: $('#ob-mode').value
+        };
+        saveState();
+        closeModal();
+        updateAuthUI();
+        renderCurrentView();
+        updateSupabaseUserName(name);
+        toast(`Welcome, ${name.split(/\s+/)[0]}!`);
+      });
+    }
+
+    function maybePromptProfileSetup() {
+      if (state.sync.supaSession?.user && !(state.profile && state.profile.name && state.profile.name.trim())) {
+        setTimeout(() => openProfileSetupModal(true), 220);
+      }
+    }
+
     function openAuthModal() {
       const user = state.sync.supaSession?.user;
       if (user) {
@@ -5495,10 +5611,12 @@ Product Design, Design Systems, Interaction Design, Prototyping, Figma, User Res
             </div>
           </div>
           <div class="modal-footer">
-            <button class="btn" onclick="closeModal(); switchView('sync');">Settings &amp; Sync</button>
+            <button class="btn" id="modal-edit-profile-btn">Edit Profile</button>
+            <button class="btn" onclick="closeModal(); switchView('sync');">Settings</button>
             <button class="btn btn-danger" id="modal-signout-btn">Sign Out</button>
           </div>
         `);
+        $('#modal-edit-profile-btn')?.addEventListener('click', () => { closeModal(); openProfileSetupModal(false); });
         $('#modal-signout-btn')?.addEventListener('click', () => { closeModal(); signOutSupabase(); });
         return;
       }
