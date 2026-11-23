@@ -4145,10 +4145,6 @@ Product Design, Design Systems, Interaction Design, Prototyping, Figma, User Res
             <div style="display:flex; gap:8px; flex-wrap:wrap; margin-top:2px;">
               <button class="btn btn-primary btn-sm" id="home-add-job">+ Add Job</button>
               <button class="btn btn-sm" id="home-add-person">+ Add Person</button>
-              <button class="btn btn-sm" id="home-open-resume">${state.baseResumeName && state.baseResumeName !== 'Sample_Resume.txt' ? 'Update Resume' : 'Upload Resume'}</button>
-              ${state.profile?.linkedinUrl
-                ? `<a class="btn btn-ghost btn-sm" href="${esc(state.profile.linkedinUrl)}" target="_blank" rel="noopener" style="text-decoration:none;">My LinkedIn ↗</a>`
-                : `<button class="btn btn-ghost btn-sm" id="home-link-linkedin">Link LinkedIn →</button>`}
             </div>
           </div>
         </div>
@@ -4530,8 +4526,6 @@ Product Design, Design Systems, Interaction Design, Prototyping, Figma, User Res
 
       $('#home-add-job').addEventListener('click', () => openJobModal());
       $('#home-add-person').addEventListener('click', () => openPersonModal());
-      $('#home-open-resume').addEventListener('click', () => $('#resume-file-input')?.click());
-      $('#home-link-linkedin')?.addEventListener('click', () => switchView('sync'));
       $('#home-view-all-jobs')?.addEventListener('click', () => {
         ui.jobFilter = 'All';
         switchView('jobs');
