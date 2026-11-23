@@ -5082,33 +5082,36 @@ Product Design, Design Systems, Interaction Design, Prototyping, Figma, User Res
         </div>
 
         <!-- Resume Match Comparison -->
-        <div class="resume-callout" style="flex-direction:column; align-items:stretch; gap:12px;">
+        <div class="resume-callout" style="flex-direction:column; align-items:stretch; gap:14px;">
           <div style="display:flex; justify-content:space-between; align-items:center; gap:10px; flex-wrap:wrap;">
             <div>
-              <div style="font-size:15px; font-weight:650; display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+              <div style="font-size:16px; font-weight:680; display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
                 Resume Match
-                ${ats.total ? `<span class="badge ${ats.score >= 70 ? 'badge-offer' : 'badge-interviewing'}">${ats.score}% Match</span>` : ''}
+                ${ats.total ? `<span class="badge ${ats.score >= 75 ? 'badge-offer' : ats.score >= 55 ? 'badge-applied' : 'badge-interviewing'}">${ats.score}% · ${esc(ats.tier)}</span>` : ''}
               </div>
-              <div style="font-size:13px; color:var(--text-secondary); margin-top:2px;">
+              <div style="font-size:13.5px; color:var(--text-secondary); margin-top:3px;">
                 ${state.baseResumeName && state.baseResumeName !== 'Sample_Resume.txt'
-                  ? `Comparing against <strong>${esc(state.baseResumeName)}</strong>`
+                  ? `${ats.total ? `${ats.matched.length} of ${ats.total} key skills matched` : 'Add a job description to score fit'} · <strong>${esc(state.baseResumeName)}</strong>`
                   : 'Upload your resume to score fit and auto-fill your profile.'}
               </div>
             </div>
             <button type="button" class="btn btn-sm" id="open-studio-for-job">${state.baseResumeName && state.baseResumeName !== 'Sample_Resume.txt' ? 'Update Resume' : 'Upload Resume'}</button>
           </div>
           ${ats.total ? `
-            <div style="display:flex; flex-direction:column; gap:8px;">
+            <div style="height:7px; border-radius:999px; background:var(--divider); overflow:hidden;">
+              <div style="height:100%; width:${ats.score}%; border-radius:999px; background:${ats.score >= 75 ? 'var(--green)' : ats.score >= 55 ? 'var(--accent)' : 'var(--amber)'}; transition:width 0.35s ease;"></div>
+            </div>
+            <div style="display:flex; flex-direction:column; gap:10px;">
               ${ats.matched.length ? `
                 <div>
-                  <div style="font-size:12px; font-weight:650; color:var(--green); margin-bottom:5px;">Matched (${ats.matched.length})</div>
-                  <div class="kw-group">${ats.matched.slice(0, 10).map((w) => `<span class="kw-chip matched">${esc(w)}</span>`).join('')}</div>
+                  <div style="font-size:12.5px; font-weight:650; color:var(--green); margin-bottom:6px;">Matched Skills (${ats.matched.length})</div>
+                  <div class="kw-group">${ats.matched.slice(0, 12).map((w) => `<span class="kw-chip matched">✓ ${esc(w)}</span>`).join('')}</div>
                 </div>
               ` : ''}
               ${ats.missing.length ? `
                 <div>
-                  <div style="font-size:12px; font-weight:650; color:var(--amber); margin-bottom:5px;">Missing from Resume (${ats.missing.length})</div>
-                  <div class="kw-group">${ats.missing.slice(0, 10).map((w) => `<span class="kw-chip missing">${esc(w)}</span>`).join('')}</div>
+                  <div style="font-size:12.5px; font-weight:650; color:var(--amber); margin-bottom:6px;">Gaps to Highlight (${ats.missing.length})</div>
+                  <div class="kw-group">${ats.missing.slice(0, 12).map((w) => `<span class="kw-chip missing">${esc(w)}</span>`).join('')}</div>
                 </div>
               ` : ''}
             </div>
@@ -5757,51 +5760,153 @@ Product Design, Design Systems, Interaction Design, Prototyping, Figma, User Res
        VIEW 3: RESUME STUDIO (Upload, ATS Match, Local & AI Tailor, PDF Export)
        ========================================================================== */
     const STOP_WORDS = new Set([
-      'about','above','across','after','again','against','almost','alone','along','already','also','although','always','among','and','another','any','around','because','been','before','being','between','both','build','building','built','company','could','create','cross','deep','design','each','either','every','experience','from','have','having','help','high','into','join','just','lead','leading','like','looking','make','more','most','much','must','need','next','only','other','over','own','part','people','product','required','role','same','shape','should','some','strong','such','team','teams','than','that','their','them','then','there','these','they','this','through','time','under','used','using','very','want','well','were','what','when','where','which','while','will','with','within','work','working','years','your'
+      'about','above','across','after','again','against','almost','alone','along','already','also','although','always','among','and','another','any','around','available','ability','accountable','across','additional','advantage','align','aligning','allstate','apply','areas','aspects','balance','based','because','been','before','being','benefits','best','between','both','bring','build','building','built','business','candidate','capabilities','career','careers','center','close','closely','combine','combines','company','competitive','complex','connect','continuous','contribute','coordinate','could','create','cross','culture','customer','customers','daily','deep','define','deliver','deliverables','delivering','delivery','demonstrated','depend','dependencies','description','design','detail','details','develop','developing','different','differentiator','digital','direction','disciplined','diverse','diversity','drive','driving','each','either','employee','employees','employer','enable','enhance','enhancing','ensure','ensuring','environment','equal','evaluate','every','excellent','exciting','execute','execution','experience','experienced','external','facing','fast','features','feel','focus','focused','foster','from','full','fully','future','gender','global','good','great','greatest','growth','guide','have','having','help','high','higher','hiring','home','ideal','impact','improve','improvements','including','inclusive','incremental','independent','individual','industry','information','initiative','initiatives','innovative','inside','interdependent','interested','internal','into','join','just','keep','key','knowledge','large','launch','lead','leader','leading','level','levels','like','line','live','location','long','looking','make','manage','managed','management','manager','managing','market','markets','matrixed','measure','measurable','meet','member','members','milestones','mission','modern','more','most','much','multiple','must','national','need','needs','next','note','number','objectives','october','office','only','open','operating','operational','opportunities','opportunity','order','organization','organizations','origin','other','others','outcomes','over','oversight','overview','own','owner','ownership','pace','paced','part','partner','partners','passion','people','perform','performance','plan','planning','plans','platform','plus','position','posted','posting','practice','practices','preferred','priorities','prioritize','prioritized','process','processes','product','products','profile','program','project','projects','prospective','protected','provide','providing','qualification','qualifications','quality','race','range','readiness','related','relevant','religion','remote','report','require','required','requirements','respect','respected','responsibilities','responsibility','responsible','results','right','role','roles','salary','same','scale','scope','seeking','senior','serve','service','services','sexual','shape','shared','should','significant','similar','skills','solutions','some','specified','speed','standards','state','states','status','strategic','strategy','strong','success','successful','such','support','supporting','system','systems','take','talent','team','teams','technical','technology','than','that','their','them','then','there','these','they','thinking','this','through','time','timelines','together','tools','track','training','translate','understand','understanding','united','united','user','users','using','used','value','valued','values','various','very','veteran','vision','want','website','well','were','what','when','where','which','while','will','with','within','without','work','working','workplace','world','would','year','years','your'
     ]);
 
-    function extractKeywords(jdText) {
-      if (!jdText || !jdText.trim()) return [];
-      const phrases = [
-        'design systems', 'interaction design', 'user research', 'information architecture',
-        'product design', 'motion design', 'visual craft', 'design tokens', 'human interface',
-        'liquid glass', 'figma', 'prototyping', 'accessibility', 'wcag', 'typescript',
-        'javascript', 'react', 'html/css', 'ios', 'macos', 'ipados', 'android',
-        'typography', 'cross-functional', 'enterprise', 'analytics', 'b2b', 'saas',
-        'mobile', 'web', 'mentorship', 'leadership', 'roadmap', 'strategy', 'metrics',
-        'a/b testing', 'usability', 'wireframing', 'component architecture', 'developer handoff',
-        'systems thinking', 'minimalism', 'keyboard-first', 'sql', 'python', 'ai'
-      ];
-      const lower = jdText.toLowerCase();
-      const found = [];
-      phrases.forEach((p) => {
-        if (lower.includes(p)) found.push(p);
-      });
+    const SKILL_CATALOG = [
+      // Product Management & Agile
+      { label: 'Product Management', terms: ['product management', 'product manager', 'digital product manager', 'technical product manager'], weight: 2 },
+      { label: 'Product Roadmaps', terms: ['product roadmap', 'product roadmaps', 'roadmap', 'roadmaps', 'roadmap planning'], weight: 2 },
+      { label: 'Product Strategy', terms: ['product strategy', 'strategic direction', 'product vision', 'portfolio strategy'], weight: 2 },
+      { label: 'Agile / Scrum', terms: ['agile', 'scrum', 'kanban', 'sprint planning', 'sprint', 'safe agile'], weight: 2 },
+      { label: 'Backlog & Prioritization', terms: ['backlog', 'backlogs', 'prioritization', 'prioritize', 'backlog refinement', 'refinement'], weight: 2 },
+      { label: 'Epics & User Stories', terms: ['epics', 'user stories', 'user story', 'acceptance criteria', 'business requirements', 'prd', 'product requirements'], weight: 2 },
+      { label: 'Product Ownership', terms: ['product owner', 'product ownership', 'cspo'], weight: 2 },
+      { label: 'Product Discovery', terms: ['product discovery', 'customer discovery', 'problem discovery', 'opportunity assessment'], weight: 2 },
+      { label: 'Release Management', terms: ['release management', 'release plans', 'launch readiness', 'deployment releases', 'go-live'], weight: 2 },
+      { label: 'Go-to-Market (GTM)', terms: ['go-to-market', 'go to market', 'gtm', 'product launch', 'launch strategy'], weight: 2 },
+      { label: 'OKRs & KPIs', terms: ['okr', 'okrs', 'kpi', 'kpis', 'success metrics', 'success measures', 'measurable outcomes', 'north star metric'], weight: 2 },
+      { label: 'Platform Modernization', terms: ['platform modernization', 'modernization', 'legacy migration', 'replatforming', 'digital transformation'], weight: 2 },
+      { label: 'Technical Debt', terms: ['technical debt', 'tech debt', 'defect triage', 'bug triage'], weight: 1.5 },
+      { label: 'UAT & QA', terms: ['user acceptance testing', 'uat', 'quality assurance', 'qa testing'], weight: 1.5 },
+      { label: 'Vendor Management', terms: ['vendor management', 'external vendors', 'vendor oversight', 'third-party vendors'], weight: 1.5 },
 
-      // Supplement with high-signal single words from JD
-      const tokens = lower.match(/[a-z][a-z0-9+#/-]{3,}/g) || [];
-      const freq = {};
-      tokens.forEach((t) => {
-        if (!STOP_WORDS.has(t) && !found.some((f) => f.includes(t))) {
-          freq[t] = (freq[t] || 0) + 1;
+      // Growth, Digital & MarTech
+      { label: 'MarTech', terms: ['martech', 'marketing technology', 'marketing automation', 'marketo', 'hubspot', 'braze', 'adobe target', 'adobe analytics', 'adobe experience'], weight: 2 },
+      { label: 'Customer Experience (CX)', terms: ['customer experience', 'customer-facing', 'customer-centered', 'customer journey', 'cx'], weight: 2 },
+      { label: 'A/B Testing & Experimentation', terms: ['a/b testing', 'ab testing', 'experimentation', 'multivariate testing', 'split testing', 'optimization'], weight: 2 },
+      { label: 'Conversion & Funnel (CRO)', terms: ['conversion rate', 'cro', 'funnel', 'acquisition', 'retention', 'activation', 'onboarding', 'churn'], weight: 2 },
+      { label: 'Personalization', terms: ['personalization', 'personalized experiences', 'segmentation', 'targeting'], weight: 1.5 },
+      { label: 'SEO / SEM / Growth', terms: ['seo', 'sem', 'search engine optimization', 'growth product', 'growth marketing', 'demand generation'], weight: 1.5 },
+      { label: 'CMS & Web Platforms', terms: ['cms', 'content management', 'aem', 'adobe experience manager', 'contentful', 'wordpress', 'web experience', 'e-commerce', 'ecommerce'], weight: 2 },
+      { label: 'CRM / Salesforce', terms: ['salesforce', 'crm', 'dynamics 365'], weight: 2 },
+      { label: 'Pricing & Monetization', terms: ['pricing', 'monetization', 'packaging', 'subscription', 'p&l', 'revenue growth'], weight: 2 },
+
+      // Analytics, Data & AI
+      { label: 'Analytics & Insights', terms: ['analytics', 'product analytics', 'web analytics', 'data analysis', 'data-driven', 'quantitative'], weight: 2 },
+      { label: 'SQL', terms: ['sql', 'postgresql', 'mysql', 'bigquery', 'snowflake', 'redshift'], weight: 2 },
+      { label: 'Python', terms: ['python', 'pandas', 'jupyter'], weight: 2 },
+      { label: 'BI & Dashboards', terms: ['tableau', 'looker', 'power bi', 'powerbi', 'dashboards', 'data visualization'], weight: 2 },
+      { label: 'Product Analytics Tools', terms: ['amplitude', 'mixpanel', 'google analytics', 'ga4', 'heap', 'pendo', 'segment', 'fullstory'], weight: 2 },
+      { label: 'AI / Machine Learning', terms: ['artificial intelligence', 'ai', 'machine learning', 'ml', 'predictive modeling'], weight: 2 },
+      { label: 'Generative AI / LLMs', terms: ['generative ai', 'genai', 'llm', 'llms', 'prompt engineering', 'rag', 'ai agents', 'agentic'], weight: 2 },
+
+      // Design, UX & Research
+      { label: 'UX / Product Design', terms: ['user experience', 'ux', 'product design', 'interaction design', 'ui/ux', 'ux design'], weight: 2 },
+      { label: 'Design Systems', terms: ['design system', 'design systems', 'design tokens', 'component library', 'component architecture'], weight: 2 },
+      { label: 'User Research & Usability', terms: ['user research', 'usability testing', 'usability', 'customer interviews', 'qualitative research'], weight: 2 },
+      { label: 'Prototyping & Figma', terms: ['figma', 'prototyping', 'wireframing', 'wireframes', 'mockups', 'sketch'], weight: 2 },
+      { label: 'Accessibility (WCAG)', terms: ['accessibility', 'accessible', 'wcag', 'ada compliance', 'a11y'], weight: 2 },
+      { label: 'Mobile-First / Apps', terms: ['mobile-first', 'mobile app', 'ios', 'android', 'responsive design', 'native mobile'], weight: 2 },
+
+      // Engineering, Architecture & Tools
+      { label: 'APIs & Integrations', terms: ['api', 'apis', 'rest api', 'graphql', 'webhooks', 'integrations', 'microservices'], weight: 2 },
+      { label: 'Architecture & Scalability', terms: ['architecture', 'scalability', 'reliability', 'maintainability', 'system design', 'distributed systems'], weight: 1.5 },
+      { label: 'Security & Privacy', terms: ['security', 'cybersecurity', 'data privacy', 'gdpr', 'ccpa', 'soc2', 'authentication'], weight: 1.5 },
+      { label: 'Cloud (AWS / GCP / Azure)', terms: ['aws', 'amazon web services', 'gcp', 'google cloud', 'azure', 'cloud infrastructure', 'kubernetes', 'docker'], weight: 2 },
+      { label: 'Frontend / Web Tech', terms: ['react', 'typescript', 'javascript', 'html/css', 'next.js', 'node.js'], weight: 2 },
+      { label: 'Jira & Confluence', terms: ['jira', 'confluence', 'linear', 'asana', 'aha!', 'productboard', 'notion'], weight: 1.5 },
+
+      // Domain & Leadership
+      { label: 'Stakeholder Management', terms: ['stakeholder management', 'stakeholder expectations', 'stakeholders', 'executive alignment', 'facilitation'], weight: 2 },
+      { label: 'Cross-Functional Leadership', terms: ['cross-functional', 'cross-team', 'multiple agile teams', 'matrixed', 'interdepartmental'], weight: 2 },
+      { label: 'Executive Communication', terms: ['executive communication', 'executive presence', 'c-suite', 'board presentations', 'storytelling'], weight: 1.5 },
+      { label: 'B2B / SaaS', terms: ['b2b', 'saas', 'enterprise saas', 'enterprise software'], weight: 2 },
+      { label: 'B2C / Consumer', terms: ['b2c', 'consumer', 'direct-to-consumer', 'd2c'], weight: 1.5 },
+      { label: 'FinTech & Banking', terms: ['fintech', 'banking', 'financial services', 'wealth management', 'lending', 'payments', 'checkout'], weight: 2 },
+      { label: 'Insurance & Underwriting', terms: ['insurance', 'underwriting', 'claims', 'policyholder', 'actuarial'], weight: 2 },
+      { label: 'Regulated & Compliance', terms: ['regulated', 'regulatory', 'compliance', 'risk management', 'governance', 'audit', 'legal & compliance'], weight: 2 },
+      { label: 'Sales & Revenue', terms: ['sales growth', 'b2b sales', 'account management', 'revenue', 'pipeline', 'enterprise sales'], weight: 1.5 },
+      { label: 'People Leadership & Mentorship', terms: ['mentorship', 'mentoring', 'coaching', 'people management', 'hiring', 'team leadership'], weight: 1.5 }
+    ];
+
+    function escapeRegex(s) {
+      return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    }
+
+    function textHasTerm(text, term) {
+      if (!text || !term) return false;
+      const re = new RegExp(`(?:^|[^a-z0-9])${escapeRegex(term)}(?:s|es|ed|ing)?(?=$|[^a-z0-9])`, 'i');
+      return re.test(text);
+    }
+
+    function stripJdBoilerplate(jdText) {
+      if (!jdText) return '';
+      // Cut off EEO / legal / accommodations boilerplate at bottom of postings
+      const cutRe = /\n(?:equal opportunity employer|allstate is an equal|pnc is an equal|eeo statement|reasonable accommodation|pay transparency|notice to applicants)/i;
+      const m = jdText.match(cutRe);
+      return m && m.index > 200 ? jdText.slice(0, m.index) : jdText;
+    }
+
+    function extractSkillItems(jdText) {
+      const cleanJd = stripJdBoilerplate(jdText || '');
+      if (!cleanJd.trim()) return [];
+      const items = [];
+      SKILL_CATALOG.forEach((skill) => {
+        if (skill.terms.some((t) => textHasTerm(cleanJd, t))) {
+          items.push(skill);
         }
       });
-      const extra = Object.entries(freq)
-        .sort((a, b) => b[1] - a[1])
-        .slice(0, Math.max(0, 14 - found.length))
-        .map(([w]) => w);
 
-      return [...new Set([...found, ...extra])].slice(0, 16);
+      // If fewer than 6 catalog skills matched, supplement with high-signal domain terms from JD
+      if (items.length < 6) {
+        const lower = cleanJd.toLowerCase();
+        const tokens = lower.match(/\b[a-z][a-z0-9+#/-]{3,}\b/g) || [];
+        const freq = {};
+        const already = new Set(items.flatMap((i) => i.terms));
+        tokens.forEach((t) => {
+          if (!STOP_WORDS.has(t) && !already.has(t) && !/^\d/.test(t)) {
+            freq[t] = (freq[t] || 0) + 1;
+          }
+        });
+        Object.entries(freq)
+          .sort((a, b) => b[1] - a[1])
+          .slice(0, 8 - items.length)
+          .forEach(([w]) => {
+            items.push({ label: w.charAt(0).toUpperCase() + w.slice(1), terms: [w], weight: 1 });
+          });
+      }
+
+      return items.slice(0, 18);
+    }
+
+    function extractKeywords(jdText) {
+      return extractSkillItems(jdText).map((i) => i.label);
     }
 
     function computeATS(resumeText, jdText) {
-      const keywords = extractKeywords(jdText);
-      if (!keywords.length) return { score: 0, matched: [], missing: [], total: 0 };
-      const lowerRes = (resumeText || '').toLowerCase();
-      const matched = keywords.filter((k) => lowerRes.includes(k));
-      const missing = keywords.filter((k) => !lowerRes.includes(k));
-      const score = Math.round((matched.length / keywords.length) * 100);
-      return { score, matched, missing, total: keywords.length };
+      const items = extractSkillItems(jdText);
+      if (!items.length) return { score: 0, tier: '', matched: [], missing: [], total: 0 };
+      const res = resumeText || '';
+      const matched = [];
+      const missing = [];
+      let totalWeight = 0;
+      let matchedWeight = 0;
+
+      items.forEach((item) => {
+        const w = item.weight || 1;
+        totalWeight += w;
+        if (item.terms.some((t) => textHasTerm(res, t))) {
+          matched.push(item.label);
+          matchedWeight += w;
+        } else {
+          missing.push(item.label);
+        }
+      });
+
+      const score = totalWeight ? Math.round((matchedWeight / totalWeight) * 100) : 0;
+      const tier = score >= 75 ? 'Strong Fit' : score >= 55 ? 'Good Fit' : score >= 35 ? 'Moderate Fit' : 'Stretch';
+      return { score, tier, matched, missing, total: items.length };
     }
 
     function renderResumeStudio() {
