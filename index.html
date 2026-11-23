@@ -3132,6 +3132,32 @@
       .home-card div[style*="font-size:12.5px"],
       .home-card div[style*="font-size:12px"] { font-size: 15px !important; }
     }
+
+    /* Crisp SF-Style Scanability Icons */
+    .ico-inline {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+    }
+    .ico-svg {
+      flex-shrink: 0;
+      vertical-align: -2px;
+    }
+    .kpi-label {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .meta-label {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .section-title {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+    }
   </style>
 </head>
 <body class="signed-out">
@@ -3988,6 +4014,30 @@ Product Design, Design Systems, Interaction Design, Prototyping, Figma, User Res
       }
     }
 
+    const UI_ICONS = {
+      briefcase: '<rect x="2" y="7" width="20" height="14" rx="3"></rect><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"></path>',
+      calendar: '<rect x="3" y="4" width="18" height="18" rx="3"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line>',
+      users: '<path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path>',
+      user: '<path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle>',
+      target: '<circle cx="12" cy="12" r="9"></circle><circle cx="12" cy="12" r="5"></circle><circle cx="12" cy="12" r="1.5" fill="currentColor"></circle>',
+      activity: '<polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>',
+      sparkles: '<path d="M12 3l1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9L12 3z"></path><path d="M19 3l.8 2.2L22 6l-2.2.8L19 9l-.8-2.2L16 6l2.2-.8L19 3z"></path>',
+      checkSquare: '<polyline points="9 11 12 14 22 4"></polyline><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path>',
+      fileText: '<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line>',
+      message: '<path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>',
+      dollar: '<line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>',
+      layers: '<polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline>',
+      mapPin: '<path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle>',
+      clock: '<circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline>',
+      heart: '<path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>'
+    };
+
+    function ico(name, size = 15, color = 'currentColor') {
+      const path = UI_ICONS[name];
+      if (!path) return '';
+      return `<svg class="ico-svg" width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="${color}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${path}</svg>`;
+    }
+
     /* ==========================================================================
        Theme & Navigation
        ========================================================================== */
@@ -4172,9 +4222,9 @@ Product Design, Design Systems, Interaction Design, Prototyping, Figma, User Res
               You have <strong style="color:var(--text-primary)">${activeJobs.length}</strong> active role${activeJobs.length === 1 ? '' : 's'}, <strong style="color:var(--text-primary)">${interviewing}</strong> interview loop${interviewing === 1 ? '' : 's'}, and <strong style="color:var(--text-primary)">${agenda.length}</strong> upcoming event${agenda.length === 1 ? '' : 's'}.
             </p>
             <div style="display:flex; gap:8px; flex-wrap:wrap; margin-top:2px;">
-              <button class="btn btn-primary btn-sm" id="home-add-job">+ Add Job</button>
-              <button class="btn btn-sm" id="home-add-event">+ Add Event</button>
-              <button class="btn btn-sm" id="home-add-person">+ Add Person</button>
+              <button class="btn btn-primary btn-sm" id="home-add-job">${ico('briefcase', 14)} Add Job</button>
+              <button class="btn btn-sm" id="home-add-event">${ico('calendar', 14)} Add Event</button>
+              <button class="btn btn-sm" id="home-add-person">${ico('users', 14)} Add Person</button>
             </div>
           </div>
         </div>
@@ -4182,17 +4232,17 @@ Product Design, Design Systems, Interaction Design, Prototyping, Figma, User Res
         <!-- 4 Clean KPI Glass Cards -->
         <div class="home-kpi-grid">
           <div class="kpi-card glass" data-kpi-nav="jobs">
-            <span class="kpi-label">Active Roles <span style="color:var(--accent)">↗</span></span>
+            <span class="kpi-label">${ico('briefcase', 14, 'var(--accent)')} Active Roles</span>
             <span class="kpi-value">${activeJobs.length}</span>
             <span class="kpi-sub">${stageCounts.Applied || 0} applied · ${stageCounts.Saved || 0} saved</span>
           </div>
           <div class="kpi-card glass" data-kpi-stage="Interviewing">
-            <span class="kpi-label">Interviewing <span style="color:var(--amber)">↗</span></span>
+            <span class="kpi-label">${ico('calendar', 14, 'var(--amber)')} Interviewing</span>
             <span class="kpi-value">${interviewing}</span>
             <span class="kpi-sub">${screening} screening · ${offers} offer${offers === 1 ? '' : 's'}</span>
           </div>
           <div class="kpi-card glass" data-kpi-nav="people">
-            <span class="kpi-label">People Network <span style="color:var(--teal)">↗</span></span>
+            <span class="kpi-label">${ico('users', 14, 'var(--teal)')} People Network</span>
             <span class="kpi-value">${state.people.length}</span>
             <span class="kpi-sub">${state.people.filter((p) => p.roleType === 'Referral').length} referrals · ${state.people.filter((p) => p.roleType === 'Recruiter').length} recruiters</span>
           </div>
@@ -4201,7 +4251,7 @@ Product Design, Design Systems, Interaction Design, Prototyping, Figma, User Res
               const scored = activeJobs.map((j) => computeATS(state.baseResume, j.jd)).filter((a) => a.total > 0);
               const avg = scored.length ? Math.round(scored.reduce((s, a) => s + a.score, 0) / scored.length) : 0;
               return `
-                <span class="kpi-label">Avg Resume Match <span style="color:var(--green)">↗</span></span>
+                <span class="kpi-label">${ico('target', 14, 'var(--green)')} Avg Resume Match</span>
                 <span class="kpi-value">${scored.length ? `${avg}%` : '—'}</span>
                 <span class="kpi-sub">${state.baseResumeName && state.baseResumeName !== 'Sample_Resume.txt' ? esc(state.baseResumeName) : 'Upload resume to score fit'}</span>
               `;
@@ -4315,7 +4365,7 @@ Product Design, Design Systems, Interaction Design, Prototyping, Figma, User Res
 
             return `
               <div class="section-head" style="flex-wrap:wrap;">
-                <span class="section-title">Activity Timeline (${filteredEvents.length})</span>
+                <span class="section-title">${ico("activity", 16, "var(--accent)")} Activity Timeline (${filteredEvents.length})</span>
                 <div style="display:flex; gap:6px; flex-wrap:wrap; align-items:center;">
                   ${['All', 'Jobs', 'Interviews & Notes', 'People'].map((f) => `<button type="button" class="pill ${f === filter ? 'active' : ''}" style="padding:4px 10px; font-size:11.5px;" data-tl-filter="${f}">${f}</button>`).join('')}
                   <button type="button" class="btn btn-sm" id="home-log-event-btn">+ Log Event</button>
@@ -4352,7 +4402,7 @@ Product Design, Design Systems, Interaction Design, Prototyping, Figma, User Res
           <div style="display:flex; flex-direction:column; gap:14px;">
             <div class="home-panel glass">
               <div class="section-head">
-                <span class="section-title">Upcoming Focus &amp; Events</span>
+                <span class="section-title">${ico("calendar", 16, "var(--amber)")} Upcoming Focus &amp; Events</span>
                 <div style="display:flex; align-items:center; gap:8px;">
                   <span class="chip">${agenda.length} scheduled</span>
                   <button type="button" class="btn btn-sm" id="home-upcoming-add-event">+ Add Event</button>
@@ -4427,7 +4477,7 @@ Product Design, Design Systems, Interaction Design, Prototyping, Figma, User Res
 
                 return `
                   <div class="section-head">
-                    <span class="section-title">Smart Career Nudges</span>
+                    <span class="section-title">${ico("sparkles", 16, "var(--accent)")} Smart Career Nudges</span>
                     <span class="chip">${Math.min(3, nudges.length)} high-impact</span>
                   </div>
                   <div class="agenda-list">
@@ -4458,7 +4508,7 @@ Product Design, Design Systems, Interaction Design, Prototyping, Figma, User Res
           <div style="display:flex; flex-direction:column; gap:14px;">
 <div class="home-panel glass">
               <div class="section-head">
-                <span class="section-title">Recent Applications (${state.jobs.length})</span><button class="btn btn-ghost btn-sm" onclick="ui.jobFilter='All'; switchView('jobs');">View All →</button>
+                <span class="section-title">${ico("briefcase", 16, "var(--teal)")} Recent Applications (${state.jobs.length})</span><button class="btn btn-ghost btn-sm" onclick="ui.jobFilter='All'; switchView('jobs');">View All →</button>
               </div>
               <div class="agenda-list">
                 ${
@@ -5030,19 +5080,19 @@ Product Design, Design Systems, Interaction Design, Prototyping, Figma, User Res
 
         <div class="meta-grid">
           <div class="meta-tile">
-            <span class="meta-label">Compensation</span>
+            <span class="meta-label">${ico("dollar", 13, "var(--green)")} Compensation</span>
             <span class="meta-value">${esc(job.comp || 'Not set')}</span>
           </div>
           <div class="meta-tile">
-            <span class="meta-label">Role Level</span>
+            <span class="meta-label">${ico("layers", 13, "var(--accent)")} Role Level</span>
             <span class="meta-value">${esc(job.level || 'Not set')}</span>
           </div>
           <div class="meta-tile">
-            <span class="meta-label">Work Mode</span>
+            <span class="meta-label">${ico("mapPin", 13, "var(--teal)")} Work Mode</span>
             <span class="meta-value">${esc(job.workMode || 'Not set')}</span>
           </div>
           <div class="meta-tile">
-            <span class="meta-label">${job.nextStepDate ? 'Applied / Next Step' : 'Applied Date'}</span>
+            <span class="meta-label">${ico("calendar", 13, "var(--amber)")} ${job.nextStepDate ? 'Applied / Next Step' : 'Applied Date'}</span>
             <span class="meta-value">${job.nextStepDate ? `${formatDate(job.appliedDate)} · ${formatDate(job.nextStepDate)}` : formatDate(job.appliedDate)}</span>
           </div>
         </div>
@@ -5056,7 +5106,7 @@ Product Design, Design Systems, Interaction Design, Prototyping, Figma, User Res
             const evBadgeClass = (t) => (/interview|in-person/i.test(t) ? 'badge-interviewing' : /screening|recruiter/i.test(t) ? 'badge-screening' : 'badge-applied');
             return `
               <div class="section-head">
-                <span class="section-title">Interviews &amp; Events (${jobEvents.length})</span>
+                <span class="section-title">${ico("calendar", 16, "var(--amber)")} Interviews &amp; Events (${jobEvents.length})</span>
                 <button type="button" class="btn btn-sm" id="job-add-event-btn">+ Add Event</button>
               </div>
               <div class="agenda-list">
@@ -5084,7 +5134,7 @@ Product Design, Design Systems, Interaction Design, Prototyping, Figma, User Res
         <!-- Linked People -->
         <div class="section-block">
           <div class="section-head">
-            <span class="section-title">Linked People (${linkedPeople.length})</span>
+            <span class="section-title">${ico("users", 16, "var(--teal)")} Linked People (${linkedPeople.length})</span>
             <button class="btn btn-sm" id="link-person-btn">+ Link Person</button>
           </div>
           <div class="linked-list">
@@ -5108,7 +5158,7 @@ Product Design, Design Systems, Interaction Design, Prototyping, Figma, User Res
         <!-- Priority Rating & Interview Prep Checklist -->
         <div class="section-block">
           <div class="section-head">
-            <span class="section-title">Interview Prep Checklist (${(job.prepDone || []).length}/${PREP_STEPS.length})</span>
+            <span class="section-title">${ico("checkSquare", 16, "var(--green)")} Interview Prep Checklist (${(job.prepDone || []).length}/${PREP_STEPS.length})</span>
             <div style="display:flex; align-items:center; gap:10px;">
               <div class="star-row" aria-label="Role excitement rating">
                 ${[1, 2, 3, 4, 5].map((n) => `<button type="button" class="star-btn ${(job.rating || 4) >= n ? 'on' : ''}" data-job-star="${n}" aria-label="Rate ${n} out of 5"><svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg></button>`).join('')}
@@ -5129,7 +5179,7 @@ Product Design, Design Systems, Interaction Design, Prototyping, Figma, User Res
           <div style="display:flex; justify-content:space-between; align-items:center; gap:10px; flex-wrap:wrap;">
             <div>
               <div style="font-size:16px; font-weight:680; display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
-                Resume Match
+                ${ico("target", 16, "var(--green)")} Resume Match
                 ${ats.total ? `<span class="badge ${ats.score >= 75 ? 'badge-offer' : ats.score >= 55 ? 'badge-applied' : 'badge-interviewing'}">${ats.score}% · ${esc(ats.tier)}</span>` : ''}
               </div>
               <div style="font-size:13.5px; color:var(--text-secondary); margin-top:3px;">
@@ -5164,7 +5214,7 @@ Product Design, Design Systems, Interaction Design, Prototyping, Figma, User Res
         <!-- Job Description -->
         <div class="section-block">
           <div class="section-head">
-            <span class="section-title">Job Description</span>
+            <span class="section-title">${ico("fileText", 16, "var(--text-secondary)")} Job Description</span>
             <span style="font-size:12px; color:var(--text-tertiary)">Powers ATS keyword matching</span>
           </div>
           <textarea class="notes-area" id="detail-job-jd" placeholder="Paste the job description here…">${esc(job.jd)}</textarea>
@@ -5173,7 +5223,7 @@ Product Design, Design Systems, Interaction Design, Prototyping, Figma, User Res
         <!-- Activity & Discussion Notes -->
         <div class="section-block">
           <div class="section-head">
-            <span class="section-title">Activity &amp; Discussion Notes (${job.comments.length})</span>
+            <span class="section-title">${ico("message", 16, "var(--accent)")} Activity &amp; Discussion Notes (${job.comments.length})</span>
             <span style="font-size:12px; color:var(--text-tertiary);">⌘Enter to post</span>
           </div>
           <div class="comment-composer">
@@ -5547,19 +5597,19 @@ Product Design, Design Systems, Interaction Design, Prototyping, Figma, User Res
 
         <div class="meta-grid">
           <div class="meta-tile">
-            <span class="meta-label">Role</span>
+            <span class="meta-label">${ico("user", 13, "var(--accent)")} Role</span>
             <span class="meta-value">${esc(person.roleType)}</span>
           </div>
           <div class="meta-tile">
-            <span class="meta-label">Relationship</span>
+            <span class="meta-label">${ico("heart", 13, "var(--accent)")} Relationship</span>
             <span class="meta-value">${esc(person.warmth || 'Warm')}</span>
           </div>
           <div class="meta-tile">
-            <span class="meta-label">Last Talked</span>
+            <span class="meta-label">${ico("clock", 13, "var(--teal)")} Last Talked</span>
             <span class="meta-value">${formatDate(person.lastContact)}</span>
           </div>
           <div class="meta-tile">
-            <span class="meta-label">Next Follow-Up</span>
+            <span class="meta-label">${ico("calendar", 13, "var(--amber)")} Next Follow-Up</span>
             <span class="meta-value">${formatDate(person.followUpDate)}</span>
           </div>
         </div>
@@ -5574,7 +5624,7 @@ Product Design, Design Systems, Interaction Design, Prototyping, Figma, User Res
         <!-- Linked Jobs -->
         <div class="section-block">
           <div class="section-head">
-            <span class="section-title">Linked Job Applications (${linkedJobs.length})</span>
+            <span class="section-title">${ico("briefcase", 16, "var(--accent)")} Linked Job Applications (${linkedJobs.length})</span>
             <button class="btn btn-sm" id="link-job-to-person-btn">+ Link Job</button>
           </div>
           <div class="linked-list">
@@ -5598,7 +5648,7 @@ Product Design, Design Systems, Interaction Design, Prototyping, Figma, User Res
         <!-- Conversation Notes (Multiple Notes with Add, Edit, Pin & Delete) -->
         <div class="section-block">
           <div class="section-head">
-            <span class="section-title">Conversation Notes (${person.comments.length})</span>
+            <span class="section-title">${ico("message", 16, "var(--teal)")} Conversation Notes (${person.comments.length})</span>
             <span style="font-size:12px; color:var(--text-tertiary);">⌘Enter to save</span>
           </div>
           <div class="comment-composer">
