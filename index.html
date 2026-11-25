@@ -3453,6 +3453,7 @@
         <div class="visual-hero glass" id="jobs-visual-hero"></div>
         <div class="filter-row-wrap">
           <div class="filter-bar" id="job-filters" style="flex:1;"></div>
+          <button type="button" class="btn btn-sm" id="jobs-paste-job-btn" style="flex-shrink:0;" title="Paste copied job link from clipboard"><svg class="ico-svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg> Paste Link</button>
           <div class="view-seg" role="tablist" aria-label="Jobs view mode">
             <button class="view-seg-btn active" id="jobs-mode-list" role="tab" aria-selected="true">List</button>
             <button class="view-seg-btn" id="jobs-mode-board" role="tab" aria-selected="false">Board</button>
@@ -4147,7 +4148,8 @@ Product Design, Design Systems, Interaction Design, Prototyping, Figma, User Res
       layers: '<polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline>',
       mapPin: '<path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle>',
       clock: '<circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline>',
-      heart: '<path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>'
+      heart: '<path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>',
+      link: '<path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>'
     };
 
     function ico(name, size = 15, color = 'currentColor') {
@@ -4341,6 +4343,7 @@ Product Design, Design Systems, Interaction Design, Prototyping, Figma, User Res
             </p>
             <div style="display:flex; gap:8px; flex-wrap:wrap; margin-top:2px;">
               <button class="btn btn-primary btn-sm" id="home-add-job">${ico('briefcase', 14)} Add Job</button>
+              <button class="btn btn-sm" id="home-paste-job">${ico('link', 14, 'var(--accent)')} Paste Job Link</button>
               <button class="btn btn-sm" id="home-add-event">${ico('calendar', 14)} Add Event</button>
               <button class="btn btn-sm" id="home-add-person">${ico('users', 14)} Add Person</button>
             </div>
@@ -4763,6 +4766,7 @@ Product Design, Design Systems, Interaction Design, Prototyping, Figma, User Res
       $('#home-add-event')?.addEventListener('click', () => openEventModal());
       $('#home-upcoming-add-event')?.addEventListener('click', () => openEventModal());
       $('#home-add-job').addEventListener('click', () => openJobModal());
+      $('#home-paste-job')?.addEventListener('click', () => pasteJobFromClipboard());
       $('#home-add-person').addEventListener('click', () => openPersonModal());
       $('#home-view-all-jobs')?.addEventListener('click', () => {
         ui.jobFilter = 'All';
@@ -8727,6 +8731,25 @@ create policy "Users manage own Lumen data"
         prompt('Copy this Quick-Save URL for Apple Shortcuts:', base);
       }
     });
+
+    async function pasteJobFromClipboard() {
+      let clipText = '';
+      try {
+        if (navigator.clipboard && navigator.clipboard.readText) {
+          clipText = (await navigator.clipboard.readText()) || '';
+        }
+      } catch {}
+      const urlMatch = clipText.match(/https?:\/\/[^\s<>"']+/i);
+      if (urlMatch) {
+        const foundUrl = urlMatch[0].replace(/[).,;!?]+$/, '');
+        openJobModal(null, { url: foundUrl, status: 'Saved', autoFill: true });
+        return;
+      }
+      openJobModal(null, { status: 'Saved' });
+      setTimeout(() => $('#m-j-url')?.focus(), 60);
+      toast(clipText.trim() ? 'No URL found in clipboard — paste your job link below' : 'Paste your copied job link below');
+    }
+    $('#jobs-paste-job-btn')?.addEventListener('click', () => pasteJobFromClipboard());
 
     function captureQuickSaveParams() {
       try {
