@@ -4285,7 +4285,7 @@ Product Design, Design Systems, Interaction Design, Prototyping, Figma, User Res
         if (!ev.completed && ev.date) {
           const linkedJob = ev.jobId ? state.jobs.find((j) => j.id === ev.jobId) : null;
           const linkedPerson = ev.personId ? state.people.find((p) => p.id === ev.personId) : null;
-          const subParts = [ev.type || 'Event'];
+          const subParts = [ev.round, ev.type || 'Event'].filter(Boolean);
           if (ev.time) subParts.push(formatEventTime(ev.time));
           if (linkedJob) subParts.push(linkedJob.company);
           if (linkedPerson) subParts.push(linkedPerson.name);
@@ -4819,6 +4819,7 @@ Product Design, Design Systems, Interaction Design, Prototyping, Figma, User Res
     }
 
     const EVENT_TYPES = ['Interview', 'Screening', 'In-Person', 'Recruiter Call', 'Meeting', 'Coffee Chat', 'Follow-Up', 'Deadline', 'Other'];
+    const EVENT_ROUNDS = ['', 'Recruiter Screen', 'Round 1', 'Round 2', 'Round 3', 'Round 4', 'Panel / Case Study', 'Final Round', 'Offer / Executive'];
     function formatEventTimeGlobal(t) {
       if (!t) return '';
       const [hh, mm] = t.split(':').map(Number);
@@ -4831,6 +4832,7 @@ Product Design, Design Systems, Interaction Design, Prototyping, Figma, User Res
     function openEventModal(existing = null, defaults = {}) {
       const ev = existing || {
         type: defaults.type || 'Interview',
+        round: defaults.round || '',
         title: defaults.title || '',
         date: defaults.date || new Date().toISOString().slice(0, 10),
         time: defaults.time || '',
@@ -4856,15 +4858,23 @@ Product Design, Design Systems, Interaction Design, Prototyping, Figma, User Res
             </select>
           </div>
           <div class="field">
-            <label for="m-ev-date">Date *</label>
-            <input id="m-ev-date" class="input" type="date" value="${esc(ev.date)}" />
+            <label for="m-ev-round">Interview Round (optional)</label>
+            <select id="m-ev-round" class="select">
+              ${EVENT_ROUNDS.map((r) => `<option value="${r}" ${r === (ev.round || '') ? 'selected' : ''}>${r || 'None'}</option>`).join('')}
+            </select>
           </div>
         </div>
         <div class="form-row">
           <div class="field">
+            <label for="m-ev-date">Date *</label>
+            <input id="m-ev-date" class="input" type="date" value="${esc(ev.date)}" />
+          </div>
+          <div class="field">
             <label for="m-ev-time">Time (optional)</label>
             <input id="m-ev-time" class="input" type="time" value="${esc(ev.time || '')}" />
           </div>
+        </div>
+        <div class="form-row">
           <div class="field">
             <label for="m-ev-job">Link to Job (optional)</label>
             <select id="m-ev-job" class="select">
@@ -4872,13 +4882,13 @@ Product Design, Design Systems, Interaction Design, Prototyping, Figma, User Res
               ${state.jobs.map((j) => `<option value="${j.id}" ${j.id === ev.jobId ? 'selected' : ''}>${esc(j.company)} — ${esc(j.role)}</option>`).join('')}
             </select>
           </div>
-        </div>
-        <div class="field">
-          <label for="m-ev-person">Link to Person (optional)</label>
-          <select id="m-ev-person" class="select">
-            <option value="">None</option>
-            ${state.people.map((p) => `<option value="${p.id}" ${p.id === ev.personId ? 'selected' : ''}>${esc(p.name)}${p.company ? ' · ' + esc(p.company) : ''}</option>`).join('')}
-          </select>
+          <div class="field">
+            <label for="m-ev-person">Link to Person (optional)</label>
+            <select id="m-ev-person" class="select">
+              <option value="">None</option>
+              ${state.people.map((p) => `<option value="${p.id}" ${p.id === ev.personId ? 'selected' : ''}>${esc(p.name)}${p.company ? ' · ' + esc(p.company) : ''}</option>`).join('')}
+            </select>
+          </div>
         </div>
         <div class="field">
           <label for="m-ev-detail">Notes / Meeting Link / Location (optional)</label>
@@ -4933,6 +4943,7 @@ Product Design, Design Systems, Interaction Design, Prototyping, Figma, User Res
 
         const payload = {
           type: $('#m-ev-type').value,
+          round: $('#m-ev-round')?.value || '',
           title,
           date,
           time: $('#m-ev-time').value,
@@ -4952,6 +4963,7 @@ Product Design, Design Systems, Interaction Design, Prototyping, Figma, User Res
           const linkedJob = payload.jobId ? state.jobs.find((j) => j.id === payload.jobId) : null;
           const linkedPerson = payload.personId ? state.people.find((p) => p.id === payload.personId) : null;
           const detailBits = [
+            payload.round,
             payload.type,
             formatDate(payload.date) + (payload.time ? ' at ' + formatEventTimeGlobal(payload.time) : ''),
             linkedJob ? linkedJob.company : '',
@@ -5069,6 +5081,8 @@ Product Design, Design Systems, Interaction Design, Prototyping, Figma, User Res
             const hasResume = Boolean(j.tailoredResume && j.tailoredResume.trim());
             const addedStr = j.addedDate || j.appliedDate || '';
             const showApplied = Boolean(j.appliedDate && j.status !== 'Saved');
+            const jobRoundEvs = (state.events || []).filter((ev) => ev.jobId === j.id && ev.round);
+            const latestRound = (jobRoundEvs.find((ev) => !ev.completed) || jobRoundEvs[jobRoundEvs.length - 1])?.round || '';
             return `
               <div class="item-card ${j.id === ui.selectedJobId ? 'selected' : ''}" data-job-id="${j.id}">
                 <div class="item-card-top">
@@ -5084,6 +5098,7 @@ Product Design, Design Systems, Interaction Design, Prototyping, Figma, User Res
                 <div class="item-meta-row">
                   ${j.comp ? `<span class="chip">${esc(j.comp)}</span>` : ''}
                   ${j.workMode ? `<span class="chip">${esc(j.workMode)}</span>` : ''}
+                  ${latestRound ? `<span class="chip" style="background:var(--accent-soft); color:var(--accent-text); border-color:transparent; font-weight:620;">${esc(latestRound)}</span>` : ''}
                   ${linkedCount ? `<span class="chip">${linkedCount} contact${linkedCount > 1 ? 's' : ''}</span>` : ''}
                   ${hasResume ? `<span class="chip" style="color:var(--green); border-color:transparent; background:var(--green-soft)">Tailored CV</span>` : ''}
                 </div>
@@ -5320,6 +5335,11 @@ Product Design, Design Systems, Interaction Design, Prototyping, Figma, User Res
                 <span class="section-title">${ico("calendar", 16, "var(--amber)")} Interviews &amp; Events (${jobEvents.length})</span>
                 <button type="button" class="btn btn-sm" id="job-add-event-btn">+ Add Event</button>
               </div>
+              ${(() => {
+                const rounds = jobEvents.filter((ev) => ev.round);
+                if (!rounds.length) return '';
+                return `<div style="display:flex; align-items:center; gap:6px; flex-wrap:wrap; margin-bottom:10px;">${rounds.map((r, i) => `${i > 0 ? '<span style="color:var(--text-tertiary); font-size:12px;">→</span>' : ''}<span class="chip" style="${r.completed ? 'background:var(--green-soft); color:var(--green); border-color:transparent;' : 'background:var(--accent-soft); color:var(--accent-text); border-color:transparent; font-weight:650;'}">${r.completed ? '✓ ' : '● '}${esc(r.round)}</span>`).join('')}</div>`;
+              })()}
               <div class="agenda-list">
                 ${
                   jobEvents.length
@@ -5327,6 +5347,7 @@ Product Design, Design Systems, Interaction Design, Prototyping, Figma, User Res
                         <div class="agenda-row" data-job-event-id="${ev.id}" style="${ev.completed ? 'opacity:0.62;' : ''}">
                           <div style="min-width:0;">
                             <div style="display:flex; align-items:center; gap:7px; flex-wrap:wrap;">
+                              ${ev.round ? `<span class="badge badge-applied">${esc(ev.round)}</span>` : ''}
                               <span class="badge ${ev.completed ? 'badge-offer' : evBadgeClass(ev.type)}">${esc(ev.completed ? '✓ ' + (ev.type || 'Event') : (ev.type || 'Event'))}</span>
                               <span style="font-weight:630; ${ev.completed ? 'text-decoration:line-through;' : ''}">${esc(ev.title)}</span>
                             </div>
