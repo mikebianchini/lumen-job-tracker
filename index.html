@@ -3630,6 +3630,38 @@
             </div>
           </div>
 
+          <!-- Quick-Save Jobs From Anywhere (Desktop Bookmarklet + iPhone Share Sheet) -->
+          <div class="sync-card glass" style="grid-column: 1 / -1;">
+            <span class="sync-tag" style="background: var(--green-soft); color: var(--green);">1-Click Capture · Desktop &amp; iPhone</span>
+            <div>
+              <h2 style="font-size: 17px; font-weight: 700; letter-spacing: -0.02em;">Save Jobs From Anywhere</h2>
+              <p style="font-size: 13px; color: var(--text-secondary); margin-top: 4px; line-height: 1.5;">
+                Capture jobs directly from LinkedIn, Greenhouse, Lever, or any company career page without opening Lumen first.
+              </p>
+            </div>
+            <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap:14px;">
+              <div style="padding:14px; border-radius:var(--radius-md); background:var(--glass-bg-subtle); border:1px solid var(--divider); display:flex; flex-direction:column; gap:10px;">
+                <div style="font-weight:680; font-size:15px;">Desktop Browser (Bookmarklet)</div>
+                <div style="font-size:13.5px; color:var(--text-secondary); line-height:1.45;">
+                  Drag this button onto your bookmarks bar. Click it on any job posting to open Lumen with everything auto-filled.
+                </div>
+                <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin-top:auto;">
+                  <a id="lumen-bookmarklet" class="btn btn-primary btn-sm" style="cursor:grab; text-decoration:none;" href="javascript:(function(){var u=location.href,t=document.title||'',s=(window.getSelection?String(window.getSelection()):'').trim().slice(0,1800);window.open('https://lumen-jobtracker.pages.dev/?addJob='+encodeURIComponent(u)+'&title='+encodeURIComponent(t)+(s?'&jd='+encodeURIComponent(s):''),'_blank');})();">★ Save to Lumen</a>
+                  <span style="font-size:12px; color:var(--text-tertiary);">← Drag to bookmarks bar</span>
+                </div>
+              </div>
+              <div style="padding:14px; border-radius:var(--radius-md); background:var(--glass-bg-subtle); border:1px solid var(--divider); display:flex; flex-direction:column; gap:10px;">
+                <div style="font-weight:680; font-size:15px;">iPhone Share Sheet (Apple Shortcuts)</div>
+                <div style="font-size:13.5px; color:var(--text-secondary); line-height:1.45;">
+                  In the iOS <strong>Shortcuts</strong> app: create a Shortcut → enable <strong>Show in Share Sheet</strong> (URLs) → add <strong>Open URLs</strong> set to <code>https://lumen-jobtracker.pages.dev/?addJob=[Shortcut Input]</code>.
+                </div>
+                <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin-top:auto;">
+                  <button type="button" class="btn btn-sm" id="copy-quicksave-url-btn">Copy Quick-Save URL</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
           <!-- Option 1: Google Sheets (Admin Only) -->
           <div class="sync-card glass" id="admin-gsheets-card" style="display:none;">
             <span class="sync-tag" style="background: var(--green-soft); color: var(--green);">Admin · Google Sheets</span>
@@ -6793,6 +6825,7 @@ Product Design, Design Systems, Interaction Design, Prototyping, Figma, User Res
         if (status) status.innerHTML = `Signed in as <strong style="color:var(--text-primary)">${esc(fullName)}</strong> (${esc(user.email || '')})${admin ? ' · <strong style="color:var(--accent-text)">Admin</strong>' : ''} · Auto-Sync active`;
         if (signOutBtn) signOutBtn.style.display = '';
         if (liBtn) liBtn.style.display = 'none';
+        if (typeof launchPendingQuickSave === 'function' && window._pendingQuickSave) setTimeout(launchPendingQuickSave, 180);
       } else {
         if (label) label.textContent = 'Sign in';
         if (avatar) {
@@ -7631,10 +7664,20 @@ Product Design, Design Systems, Interaction Design, Prototyping, Figma, User Res
       return fallback;
     }
 
-    window.openJobModal = function (existing = null) {
+    window.openJobModal = function (existing = null, prefill = null) {
       const j = existing || {
-        company: '', role: '', level: '', status: 'Applied', comp: '', location: state.profile?.location || '', workMode: state.profile?.preferredMode || 'Hybrid',
-        url: '', appliedDate: new Date().toISOString().slice(0, 10), nextStepDate: '', jd: '', notes: ''
+        company: prefill?.company || '',
+        role: prefill?.role || '',
+        level: prefill?.level || '',
+        status: prefill?.status || 'Saved',
+        comp: prefill?.comp || '',
+        location: prefill?.location || state.profile?.location || '',
+        workMode: prefill?.workMode || state.profile?.preferredMode || 'Hybrid',
+        url: prefill?.url || '',
+        appliedDate: '',
+        nextStepDate: '',
+        jd: prefill?.jd || '',
+        notes: ''
       };
       openModal(`
         <div class="modal-header">
@@ -7720,6 +7763,9 @@ Product Design, Design Systems, Interaction Design, Prototyping, Figma, User Res
           if (/^https?:\/\//i.test(val)) runAutoFill(false);
         }, 40);
       });
+      if (!existing && prefill?.autoFill && prefill?.url) {
+        setTimeout(() => runAutoFill(false), 60);
+      }
 
       $('#save-job-modal-btn').addEventListener('click', () => {
         const company = $('#m-j-company').value.trim();
@@ -8667,13 +8713,57 @@ create policy "Users manage own Lumen data"
       }, { passive: true });
     })();
 
+    // Quick-Save Bookmarklet & iPhone Share Sheet (?addJob=<url>)
+    $('#lumen-bookmarklet')?.addEventListener('click', (e) => {
+      e.preventDefault();
+      toast('Drag this button up to your browser bookmarks bar!');
+    });
+    $('#copy-quicksave-url-btn')?.addEventListener('click', async () => {
+      const base = 'https://lumen-jobtracker.pages.dev/?addJob=';
+      try {
+        await navigator.clipboard.writeText(base);
+        toast('Copied Quick-Save URL for Apple Shortcuts');
+      } catch {
+        prompt('Copy this Quick-Save URL for Apple Shortcuts:', base);
+      }
+    });
+
+    function captureQuickSaveParams() {
+      try {
+        const sp = new URLSearchParams(window.location.search);
+        const rawUrl = (sp.get('addJob') || sp.get('url') || '').trim();
+        if (!rawUrl) return;
+        window._pendingQuickSave = {
+          url: rawUrl,
+          title: (sp.get('title') || '').trim(),
+          jd: (sp.get('jd') || '').trim()
+        };
+        history.replaceState({}, '', window.location.pathname + window.location.hash);
+      } catch {}
+    }
+
+    function launchPendingQuickSave() {
+      const pending = window._pendingQuickSave;
+      if (!pending || document.body.classList.contains('signed-out')) return;
+      window._pendingQuickSave = null;
+      switchView('jobs');
+      openJobModal(null, {
+        url: pending.url,
+        jd: pending.jd,
+        status: 'Saved',
+        autoFill: true
+      });
+    }
+
     // Boot
+    captureQuickSaveParams();
     applyTheme();
     updateSidebarStats();
     updateAuthUI();
     renderHome();
     handleSupabaseOAuthCallback().then(() => {
       if (hasCloudConfig() && !window.location.hash.includes('access_token=')) autoPullFromCloud(true);
+      launchPendingQuickSave();
     });
     if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
       const hadController = Boolean(navigator.serviceWorker.controller);
