@@ -5030,6 +5030,8 @@ Product Design, Design Systems, Interaction Design, Prototyping, Figma, User Res
             const [bg, fg] = tintFor(j.company);
             const linkedCount = (j.personIds || []).filter((pid) => state.people.some((p) => p.id === pid)).length;
             const hasResume = Boolean(j.tailoredResume && j.tailoredResume.trim());
+            const addedStr = j.addedDate || j.appliedDate || '';
+            const showApplied = Boolean(j.appliedDate && j.status !== 'Saved');
             return `
               <div class="item-card ${j.id === ui.selectedJobId ? 'selected' : ''}" data-job-id="${j.id}">
                 <div class="item-card-top">
@@ -5048,6 +5050,12 @@ Product Design, Design Systems, Interaction Design, Prototyping, Figma, User Res
                   ${linkedCount ? `<span class="chip">${linkedCount} contact${linkedCount > 1 ? 's' : ''}</span>` : ''}
                   ${hasResume ? `<span class="chip" style="color:var(--green); border-color:transparent; background:var(--green-soft)">Tailored CV</span>` : ''}
                 </div>
+                ${addedStr || showApplied ? `
+                  <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap; font-size:12.5px; color:var(--text-tertiary); margin-top:2px;">
+                    ${addedStr ? `<span class="ico-inline" style="gap:4px;">${ico('calendar', 12)} Added ${formatDate(addedStr)}</span>` : ''}
+                    ${showApplied ? `<span class="ico-inline" style="gap:4px; color:var(--text-secondary);">${ico('checkSquare', 12, 'var(--accent)')} Applied ${formatDate(j.appliedDate)}</span>` : ''}
+                  </div>
+                ` : ''}
               </div>`;
           })
           .join('');
@@ -5124,6 +5132,7 @@ Product Design, Design Systems, Interaction Design, Prototyping, Figma, User Res
             if (job && targetStage && job.status !== targetStage) {
               const prev = job.status;
               job.status = targetStage;
+              if (job.status !== "Saved" && !job.appliedDate) job.appliedDate = new Date().toISOString().slice(0, 10);
               logActivity({
                 kind: targetStage === 'Interviewing' ? 'interview' : targetStage === 'Offer' ? 'offer' : 'status',
                 title: `Moved ${job.company} to ${targetStage}`,
@@ -5154,6 +5163,7 @@ Product Design, Design Systems, Interaction Design, Prototyping, Figma, User Res
             if (job) {
               const prev = job.status;
               job.status = btn.dataset.knext;
+              if (job.status !== "Saved" && !job.appliedDate) job.appliedDate = new Date().toISOString().slice(0, 10);
               logActivity({
                 kind: job.status === 'Interviewing' ? 'interview' : job.status === 'Offer' ? 'offer' : 'status',
                 title: `Moved ${job.company} to ${job.status}`,
@@ -5422,6 +5432,7 @@ Product Design, Design Systems, Interaction Design, Prototyping, Figma, User Res
       $('#detail-job-status').addEventListener('change', (e) => {
         const prev = job.status;
         job.status = e.target.value;
+        if (job.status !== "Saved" && !job.appliedDate) job.appliedDate = new Date().toISOString().slice(0, 10);
         logActivity({
           kind: job.status === 'Interviewing' ? 'interview' : job.status === 'Offer' ? 'offer' : 'status',
           title: `Moved ${job.company} to ${job.status}`,
@@ -7714,16 +7725,19 @@ Product Design, Design Systems, Interaction Design, Prototyping, Figma, User Res
         const role = $('#m-j-role').value.trim();
         const cEl = $('#m-j-company'), rEl = $('#m-j-role'); cEl.classList.toggle('input-error', !company); rEl.classList.toggle('input-error', !role); if (!company || !role) { (!company ? cEl : rEl).focus(); return toast('Please enter both Company and Role'); }
 
+        const todayIso = new Date().toISOString().slice(0, 10);
+        const statusVal = $('#m-j-status').value;
         const payload = {
           company,
           role,
-          status: $('#m-j-status').value,
+          status: statusVal,
           level: $('#m-j-level').value.trim(),
           comp: $('#m-j-comp').value.trim(),
           workMode: $('#m-j-mode').value,
           location: $('#m-j-loc').value.trim(),
           url: $('#m-j-url').value.trim(),
-          appliedDate: existing?.appliedDate || new Date().toISOString().slice(0, 10),
+          addedDate: existing?.addedDate || existing?.appliedDate || todayIso,
+          appliedDate: statusVal === 'Saved' ? (existing?.appliedDate || '') : (existing?.appliedDate || todayIso),
           nextStepDate: existing?.nextStepDate || '',
           jd: $('#m-j-jd').value.trim()
         };
