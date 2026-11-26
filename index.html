@@ -3511,6 +3511,15 @@
       .toast { bottom: calc(112px + env(safe-area-inset-bottom, 0px)); }
     }
     @media (prefers-reduced-motion: reduce) { .mobile-fab { transition: none; } }
+
+    /* Header: tinted surface and soft shadow so it separates from the page */
+    .hub-topbar.hub-topbar {
+      background: color-mix(in srgb, var(--text-primary) 5%, var(--bg-solid));
+      -webkit-backdrop-filter: none; backdrop-filter: none;
+      border-bottom: 1px solid color-mix(in srgb, var(--text-primary) 11%, transparent);
+      box-shadow: 0 6px 16px -10px rgba(0, 0, 0, 0.22);
+    }
+    [data-theme="dark"] .hub-topbar.hub-topbar { box-shadow: 0 6px 16px -10px rgba(0, 0, 0, 0.8); }
   </style>
 </head>
 <body class="signed-out">
@@ -9366,7 +9375,7 @@ create policy "Users manage own Lumen data"
     })();
 
     /* App version label (Sync & Cloud). Keep APP_VERSION in step with CACHE_NAME in sw.js. */
-    const APP_VERSION = 'v16';
+    const APP_VERSION = 'v17';
     const APP_VERSION_DATE = '2026-11-26';
     (function showAppVersion() {
       const el = document.getElementById('app-version');
