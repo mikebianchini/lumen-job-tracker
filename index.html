@@ -1787,6 +1787,26 @@
       }
     }
 
+    /* Toast with action (e.g. Undo) */
+    .toast.has-action { pointer-events: auto; display: flex; align-items: center; gap: 12px; }
+    .toast-action { background: none; border: 0; color: var(--accent-text); font: inherit; font-weight: 700; padding: 6px 4px; min-height: 32px; cursor: pointer; }
+
+    /* Swipe gestures (touch) */
+    .item-card[data-job-id] { touch-action: pan-y; position: relative; }
+    #jobs-list.is-swiping { overflow-x: clip; }
+    .item-card.swiping { transition: none; z-index: 2; }
+    .item-card.swipe-settle { transition: transform 0.22s var(--ease-spring), opacity 0.22s; }
+    .item-card.swiping::after {
+      content: attr(data-swipe-label);
+      position: absolute; top: 50%; transform: translateY(-50%);
+      width: 120px; text-align: center; font-size: 13px; font-weight: 700; letter-spacing: 0.01em;
+      color: var(--swipe-fg, var(--text-secondary)); opacity: var(--swipe-progress, 0);
+    }
+    .item-card.swiping[data-swipe-dir="right"]::after { right: calc(100% + 8px); }
+    .item-card.swiping[data-swipe-dir="left"]::after { left: calc(100% + 8px); }
+    .item-card.swiping.swipe-armed { box-shadow: inset 0 0 0 2px var(--swipe-fg); }
+    @media (prefers-reduced-motion: reduce) { .item-card.swipe-settle { transition: none; } }
+
     /* Utilities (replace repeated inline styles) */
     .u-row8 { display: flex; gap: 8px; }
     .u-min0 { min-width: 0; }
@@ -4146,12 +4166,24 @@ Product Design, Design Systems, Interaction Design, Prototyping, Figma, User Res
       return palette[Math.abs(hash) % palette.length];
     }
 
-    function toast(msg) {
+    function toast(msg, action) {
       const el = $('#toast');
       el.textContent = msg;
+      el.classList.toggle('has-action', Boolean(action));
+      if (action) {
+        const b = document.createElement('button');
+        b.type = 'button';
+        b.className = 'toast-action';
+        b.textContent = action.label;
+        b.addEventListener('click', () => {
+          el.classList.remove('show');
+          action.run();
+        });
+        el.appendChild(b);
+      }
       el.classList.add('show');
       clearTimeout(toast._t);
-      toast._t = setTimeout(() => el.classList.remove('show'), 2600);
+      toast._t = setTimeout(() => el.classList.remove('show'), action ? 5000 : 2600);
     }
 
     function statusClass(status) {
@@ -8865,6 +8897,167 @@ create policy "Users manage own Lumen data"
         });
       }).catch(() => {});
     }
+
+    /* ==========================================================================
+       Touch gestures: swipe job cards (right = advance, left = archive/restore),
+       swipe from the left edge to go back from a detail view.
+       Buttons and menus remain the non-gesture path for every action.
+       ========================================================================== */
+    (function initSwipeGestures() {
+      const COMMIT_PX = 88;
+      const LOCK_PX = 10;
+      const EDGE_PX = 32;
+      const flow = JOB_STATUSES.filter((x) => x.id !== 'Archived').map((x) => x.id);
+      let lastSwipeAt = 0;
+
+      function moveJob(job, status) {
+        const prev = job.status;
+        const prevApplied = job.appliedDate;
+        job.status = status;
+        if (status !== 'Saved' && status !== 'Archived' && !job.appliedDate) job.appliedDate = new Date().toISOString().slice(0, 10);
+        logActivity({
+          kind: status === 'Interviewing' ? 'interview' : status === 'Offer' ? 'offer' : 'status',
+          title: `Moved ${job.company} to ${status}`,
+          detail: `${job.role} (from ${prev})`,
+          targetType: 'job',
+          targetId: job.id
+        });
+        saveState();
+        renderJobs();
+        toast(status === 'Archived' ? `Archived ${job.company}` : `${job.company} → ${status}`, {
+          label: 'Undo',
+          run: () => {
+            job.status = prev;
+            job.appliedDate = prevApplied;
+            saveState();
+            renderJobs();
+          }
+        });
+      }
+
+      function plan(job, dir) {
+        if (dir === 'right') {
+          if (job.status === 'Archived') return { to: 'Saved', label: 'Restore', color: 'var(--green)' };
+          const i = flow.indexOf(job.status);
+          if (i < 0 || i >= flow.length - 1) return null;
+          return { to: flow[i + 1], label: `${flow[i + 1]} →`, color: 'var(--green)' };
+        }
+        if (job.status === 'Archived') return null;
+        return { to: 'Archived', label: '← Archive', color: 'var(--red)' };
+      }
+
+      const list = document.getElementById('jobs-list');
+      if (list) {
+        let g = null;
+        list.addEventListener('touchstart', (e) => {
+          if (e.touches.length !== 1) return;
+          const card = e.target.closest('.item-card[data-job-id]');
+          if (!card) return;
+          const t = e.touches[0];
+          g = { card, x: t.clientX, y: t.clientY, dx: 0, locked: false, dead: false, armed: false };
+        }, { passive: true });
+
+        list.addEventListener('touchmove', (e) => {
+          if (!g || g.dead) return;
+          const t = e.touches[0];
+          const dx = t.clientX - g.x;
+          const dy = t.clientY - g.y;
+          if (!g.locked) {
+            if (Math.abs(dy) > LOCK_PX && Math.abs(dy) > Math.abs(dx)) { g.dead = true; return; }
+            if (Math.abs(dx) < LOCK_PX || Math.abs(dx) < Math.abs(dy) * 1.5) return;
+            g.locked = true;
+            g.card.classList.add('swiping');
+            g.card.classList.remove('swipe-settle');
+            list.classList.add('is-swiping');
+          }
+          const job = state.jobs.find((j) => j.id === g.card.dataset.jobId);
+          const dir = dx > 0 ? 'right' : 'left';
+          const p = job && plan(job, dir);
+          // Rubber-band when there is nothing to do in this direction.
+          g.dx = p ? dx : dx * 0.25;
+          g.plan = p;
+          g.dir = dir;
+          const prog = Math.min(1, Math.abs(g.dx) / COMMIT_PX);
+          g.card.dataset.swipeDir = dir;
+          g.card.dataset.swipeLabel = p ? p.label : (dir === 'right' ? 'Last stage' : 'Archived');
+          g.card.style.setProperty('--swipe-fg', p ? p.color : 'var(--text-tertiary)');
+          g.card.style.setProperty('--swipe-progress', String(prog));
+          g.card.style.transform = `translateX(${g.dx}px)`;
+          const armed = Boolean(p) && Math.abs(g.dx) >= COMMIT_PX;
+          if (armed !== g.armed) {
+            g.armed = armed;
+            g.card.classList.toggle('swipe-armed', armed);
+            if (armed && navigator.vibrate) navigator.vibrate(8);
+          }
+        }, { passive: true });
+
+        const end = (cancel) => {
+          if (!g) return;
+          const cur = g; g = null;
+          list.classList.remove('is-swiping');
+          if (!cur.locked) return;
+          lastSwipeAt = Date.now();
+          const card = cur.card;
+          const finish = () => {
+            card.classList.remove('swiping', 'swipe-armed');
+            card.removeAttribute('data-swipe-dir');
+            card.style.transform = '';
+          };
+          if (!cancel && cur.armed && cur.plan) {
+            const job = state.jobs.find((j) => j.id === card.dataset.jobId);
+            card.classList.add('swipe-settle');
+            card.style.transform = `translateX(${cur.dir === 'right' ? 110 : -110}%)`;
+            card.style.opacity = '0';
+            setTimeout(() => { if (job) moveJob(job, cur.plan.to); }, 180);
+          } else {
+            card.classList.add('swipe-settle');
+            card.style.transform = 'translateX(0)';
+            setTimeout(() => { card.classList.remove('swipe-settle'); finish(); }, 230);
+          }
+        };
+        list.addEventListener('touchend', () => end(false));
+        list.addEventListener('touchcancel', () => end(true));
+
+        // A swipe must not also open the card.
+        list.addEventListener('click', (e) => {
+          if (Date.now() - lastSwipeAt < 400) { e.stopPropagation(); e.preventDefault(); }
+        }, true);
+      }
+
+      // Edge-swipe back from a detail view (Jobs / People).
+      let b = null;
+      document.addEventListener('touchstart', (e) => {
+        b = null;
+        if (e.touches.length !== 1 || !ui.mobileDetailOpen) return;
+        const t = e.touches[0];
+        if (t.clientX > EDGE_PX) return;
+        if (document.querySelector('.modal-backdrop.open')) return;
+        b = { x: t.clientX, y: t.clientY };
+      }, { passive: true });
+      document.addEventListener('touchend', (e) => {
+        if (!b) return;
+        const t = e.changedTouches[0];
+        const dx = t.clientX - b.x;
+        const dy = Math.abs(t.clientY - b.y);
+        b = null;
+        if (dx > 70 && dx > dy * 1.5) {
+          const back = document.querySelector('#view-jobs.active #job-mobile-back, #view-people.active #person-mobile-back');
+          if (back) back.click();
+        }
+      }, { passive: true });
+
+      // One-time hint on touch devices.
+      try {
+        if (window.matchMedia('(pointer: coarse)').matches && !localStorage.getItem('lumen-swipe-hint')) {
+          setTimeout(() => {
+            if (ui.view === 'jobs' && state.jobs.length) {
+              toast('Tip: swipe a job right to advance, left to archive');
+              localStorage.setItem('lumen-swipe-hint', '1');
+            }
+          }, 2500);
+        }
+      } catch {}
+    })();
   </script>
 </body>
 </html>
