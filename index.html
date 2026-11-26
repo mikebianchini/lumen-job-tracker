@@ -3907,8 +3907,8 @@ Product Design, Design Systems, Interaction Design, Prototyping, Figma, User Res
         sync: {
           autoSync: true,
           gsheetsUrl: '',
-          supaUrl: 'https://qyrzolvejabspgyuikba.supabase.co',
-          supaKey: 'sb_publishable_7IVH5r3zpjW9_rDebvSK6A_QwDK0L2J',
+          supaUrl: '',
+          supaKey: '',
           aiApiKey: '',
           supaSession: null
         },
@@ -4052,8 +4052,8 @@ Product Design, Design Systems, Interaction Design, Prototyping, Figma, User Res
           sync: {
             ...getDefaultState().sync,
             ...(parsed.sync || {}),
-            supaUrl: (parsed.sync && parsed.sync.supaUrl) || 'https://qyrzolvejabspgyuikba.supabase.co',
-            supaKey: (parsed.sync && parsed.sync.supaKey) || 'sb_publishable_7IVH5r3zpjW9_rDebvSK6A_QwDK0L2J'
+            supaUrl: (parsed.sync && parsed.sync.supaUrl) || '',
+            supaKey: (parsed.sync && parsed.sync.supaKey) || ''
           },
           profile: { ...getDefaultState().profile, ...(parsed.profile || {}) }
         };
@@ -4086,6 +4086,14 @@ Product Design, Design Systems, Interaction Design, Prototyping, Figma, User Res
 
     function esc(str) {
       return String(str || '').replace(/[&<>"']/g, (m) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m]));
+    }
+
+    function safeUrl(u) {
+      const v = String(u || '').trim();
+      try {
+        const p = new URL(v, location.href).protocol;
+        return p === 'http:' || p === 'https:' || p === 'mailto:' ? v : '';
+      } catch { return ''; }
     }
 
     function uid(prefix) {
@@ -5291,7 +5299,7 @@ Product Design, Design Systems, Interaction Design, Prototyping, Figma, User Res
               <div class="detail-company">
                 <strong style="color:var(--text-primary)">${esc(job.company)}</strong>
                 ${job.location ? `<span>· ${esc(job.location)}</span>` : ''}
-                ${job.url ? `<a href="${esc(job.url)}" target="_blank" rel="noopener" style="color:var(--accent-text); text-decoration:none; font-weight:560;">View Posting ↗</a>` : ''}
+                ${safeUrl(job.url) ? `<a href="${esc(safeUrl(job.url))}" target="_blank" rel="noopener" style="color:var(--accent-text); text-decoration:none; font-weight:560;">View Posting ↗</a>` : ''}
               </div>
             </div>
           </div>
@@ -5844,7 +5852,7 @@ Product Design, Design Systems, Interaction Design, Prototyping, Figma, User Res
         ${person.email || person.linkedin ? `
           <div style="display:flex; gap:10px; flex-wrap:wrap;">
             ${person.email ? `<a class="btn btn-sm" href="mailto:${esc(person.email)}" style="text-decoration:none;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg> ${esc(person.email)}</a>` : ''}
-            ${person.linkedin ? `<a class="btn btn-sm" href="${esc(person.linkedin)}" target="_blank" rel="noopener" style="text-decoration:none;">LinkedIn ↗</a>` : ''}
+            ${safeUrl(person.linkedin) ? `<a class="btn btn-sm" href="${esc(safeUrl(person.linkedin))}" target="_blank" rel="noopener" style="text-decoration:none;">LinkedIn ↗</a>` : ''}
           </div>
         ` : ''}
 
@@ -6420,9 +6428,9 @@ Product Design, Design Systems, Interaction Design, Prototyping, Figma, User Res
             const timer = setTimeout(() => controller.abort(), target.timeoutMs);
             try {
               btn.textContent = target.model === 'gemini-3.8-flash' ? 'Rewriting…' : 'Trying fast model…';
-              const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${target.model}:generateContent?key=${encodeURIComponent(apiKey)}`, {
+              const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${target.model}:generateContent`, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: { 'Content-Type': 'application/json', 'x-goog-api-key': apiKey },
                 body: JSON.stringify(target.body),
                 signal: controller.signal
               });
@@ -6622,7 +6630,6 @@ Product Design, Design Systems, Interaction Design, Prototyping, Figma, User Res
         profile: state.profile || {},
         baseResume: state.baseResume,
         baseResumeName: state.baseResumeName,
-        aiApiKey: state.sync?.aiApiKey || '',
         updatedAt: state.updatedAt || new Date().toISOString()
       };
     }
@@ -6641,7 +6648,6 @@ Product Design, Design Systems, Interaction Design, Prototyping, Figma, User Res
       if (data.profile && typeof data.profile === 'object') state.profile = { ...state.profile, ...data.profile };
       if (typeof data.baseResume === 'string') state.baseResume = data.baseResume;
       if (typeof data.baseResumeName === 'string') state.baseResumeName = data.baseResumeName;
-      if (typeof data.aiApiKey === 'string' && data.aiApiKey) state.sync.aiApiKey = data.aiApiKey;
       state.updatedAt = data.updatedAt || new Date().toISOString();
       saveState(true);
       renderCurrentView();
@@ -6809,9 +6815,16 @@ Product Design, Design Systems, Interaction Design, Prototyping, Figma, User Res
     /* ==========================================================================
        SUPABASE LINKEDIN OIDC AUTHENTICATION
        ========================================================================== */
-    const ADMIN_EMAIL = 'mikebianchini@gmail.com';
+    // Sync settings are editable until someone signs in; after that only the account
+    // that first signed in on this device (the owner) can change them.
     function isAdminUser() {
-      return (state.sync.supaSession?.user?.email || '').trim().toLowerCase() === ADMIN_EMAIL;
+      const email = (state.sync.supaSession?.user?.email || '').trim().toLowerCase();
+      if (!email) return true;
+      if (!state.sync.adminEmail) {
+        state.sync.adminEmail = email;
+        saveState(true);
+      }
+      return email === state.sync.adminEmail;
     }
 
     function updateAuthUI() {
@@ -7364,7 +7377,7 @@ Product Design, Design Systems, Interaction Design, Prototyping, Figma, User Res
       const openLink = $('#prof-open-link');
       if (openLink) {
         openLink.style.display = prof.linkedinUrl ? '' : 'none';
-        if (prof.linkedinUrl) openLink.href = prof.linkedinUrl;
+        if (prof.linkedinUrl) openLink.href = safeUrl(prof.linkedinUrl) || "#";
       }
       const resStatus = $('#prof-resume-status');
       if (resStatus) {

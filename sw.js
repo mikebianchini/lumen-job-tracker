@@ -1,7 +1,13 @@
-const CACHE_NAME = 'lumen-v9';
+const CACHE_NAME = 'lumen-v10';
+const PRECACHE = ['./', './index.html', './manifest.json', './assets/favicon.png', './assets/icon-192.png', './assets/icon-512.png', './assets/apple-touch-icon.png'];
 
-self.addEventListener('install', () => {
-  self.skipWaiting();
+self.addEventListener('install', (e) => {
+  e.waitUntil(
+    caches.open(CACHE_NAME)
+      .then((c) => c.addAll(PRECACHE))
+      .catch(() => {})
+      .then(() => self.skipWaiting())
+  );
 });
 
 self.addEventListener('activate', (e) => {
