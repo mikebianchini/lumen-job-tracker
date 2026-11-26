@@ -4205,8 +4205,9 @@ Product Design, Design Systems, Interaction Design, Prototyping, Figma, User Res
         sync: {
           autoSync: true,
           gsheetsUrl: '',
-          supaUrl: '',
-          supaKey: '',
+          // Public client config (publishable key is designed to be public; row-level security protects data).
+          supaUrl: 'https://qyrzolvejabspgyuikba.supabase.co',
+          supaKey: 'sb_publishable_7IVH5r3zpjW9_rDebvSK6A_QwDK0L2J',
           aiApiKey: '',
           supaSession: null
         },
@@ -4350,8 +4351,8 @@ Product Design, Design Systems, Interaction Design, Prototyping, Figma, User Res
           sync: {
             ...getDefaultState().sync,
             ...(parsed.sync || {}),
-            supaUrl: (parsed.sync && parsed.sync.supaUrl) || '',
-            supaKey: (parsed.sync && parsed.sync.supaKey) || ''
+            supaUrl: (parsed.sync && parsed.sync.supaUrl) || 'https://qyrzolvejabspgyuikba.supabase.co',
+            supaKey: (parsed.sync && parsed.sync.supaKey) || 'sb_publishable_7IVH5r3zpjW9_rDebvSK6A_QwDK0L2J'
           },
           profile: { ...getDefaultState().profile, ...(parsed.profile || {}) }
         };
@@ -9381,7 +9382,7 @@ create policy "Users manage own Lumen data"
     })();
 
     /* App version label (Sync & Cloud). Keep APP_VERSION in step with CACHE_NAME in sw.js. */
-    const APP_VERSION = 'v18';
+    const APP_VERSION = 'v19';
     const APP_VERSION_DATE = '2026-11-26';
     (function showAppVersion() {
       const el = document.getElementById('app-version');
