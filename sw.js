@@ -1,4 +1,4 @@
-const CACHE_NAME = 'lumen-v17';
+const CACHE_NAME = 'lumen-v18';
 const PRECACHE = ['./', './index.html', './manifest.json', './assets/favicon.png', './assets/icon-192.png', './assets/icon-512.png', './assets/apple-touch-icon.png'];
 
 self.addEventListener('install', (e) => {
