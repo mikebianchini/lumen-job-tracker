@@ -19,38 +19,25 @@ Token files are master-level only; `--page` overrides do not emit tokens.
 
 ### Color Palette
 
-| Role | Hex | CSS Variable |
-|------|-----|--------------|
-| Primary | `#0369A1` | `--color-primary` |
-| On Primary | `#FFFFFF` | `--color-on-primary` |
-| Secondary | `#0EA5E9` | `--color-secondary` |
-| On Secondary | `#0F172A` | `--color-on-secondary` |
-| Accent/CTA | `#16A34A` | `--color-accent` |
-| On Accent/CTA | `#000000` | `--color-on-accent` |
-| Background | `#F0F9FF` | `--color-background` |
-| Foreground | `#0C4A6E` | `--color-foreground` |
-| Card | `#FFFFFF` | `--color-card` |
-| Card Foreground | `#0C4A6E` | `--color-card-foreground` |
-| Muted | `#E7EFF5` | `--color-muted` |
-| Muted Foreground | `#475569` | `--color-muted-foreground` |
-| Border | `#BAE6FD` | `--color-border` |
-| Destructive | `#DC2626` | `--color-destructive` |
-| On Destructive | `#FFFFFF` | `--color-on-destructive` |
-| Ring | `#0369A1` | `--color-ring` |
+Source of truth: `tokens.json` / `tokens.css`, which mirror the `:root` variables in `index.html`.
 
-**Color Notes:** Professional blue + success green [Accent adjusted from #22C55E]
+| Role | Light | Dark | CSS Variable |
+|------|-------|------|--------------|
+| Accent (primary action) | `#ff385c` | `#ff5a75` | `--lumen-accent` |
+| Accent text | `#d1123f` | `#ff8ea1` | `--lumen-accent-text` |
+| Background | `#faf8f5` | `#121212` | `--lumen-background` |
+| Surface | `#ffffff` | `#1c1c1c` | `--lumen-surface` |
+| Text primary | `#222222` | `#f2f2f2` | `--lumen-text-primary` |
+| Text secondary | `#555555` | `#c0c0c0` | `--lumen-text-secondary` |
+| Success / Warning / Danger / Info | `#166534` / `#b45309` / `#b91c1c` / `#0f766e` | `#34d399` / `#fbbf24` / `#f87171` / `#5eead4` | `--lumen-success` etc. |
+
+**Rules:** one filled accent button per screen; every stage badge pairs color with a glyph; surfaces are opaque (with a fallback when transparency is reduced).
 
 ### Typography
 
-- **Heading Font:** Inter
-- **Body Font:** Playfair Display
-- **Mood:** bold typography, editorial, poster, near-black, vermillion, luxury, type-as-hero, manifesto, high-contrast
-- **Google Fonts:** [Inter + Playfair Display](https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&family=JetBrains+Mono:wght@400&family=Playfair+Display:ital@1)
-
-**CSS Import:**
-```css
-@import url('https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&family=JetBrains+Mono:wght@400&family=Playfair+Display:ital@1&display=swap');
-```
+- **Font:** system sans (`--font-sans`) for all UI and body text. Use a serif only for optional page titles, never for body text.
+- **Floor:** 12px minimum for any text, 14px body, 16px for mobile inputs (prevents iOS zoom).
+- **Touch targets:** 44px minimum on touch devices.
 
 ### Spacing Variables
 
@@ -82,7 +69,7 @@ Token files are master-level only; `--page` overrides do not emit tokens.
 ```css
 /* Primary Button */
 .btn-primary {
-  background: #16A34A;
+  background: var(--lumen-accent);
   color: #000000;
   padding: 12px 24px;
   border-radius: 8px;
@@ -99,8 +86,8 @@ Token files are master-level only; `--page` overrides do not emit tokens.
 /* Secondary Button */
 .btn-secondary {
   background: transparent;
-  color: #0369A1;
-  border: 2px solid #0369A1;
+  color: var(--lumen-accent);
+  border: 2px solid var(--lumen-accent);
   padding: 12px 24px;
   border-radius: 8px;
   font-weight: 600;
@@ -113,7 +100,7 @@ Token files are master-level only; `--page` overrides do not emit tokens.
 
 ```css
 .card {
-  background: #F0F9FF;
+  background: var(--lumen-accent-soft);
   border-radius: 12px;
   padding: 24px;
   box-shadow: var(--shadow-md);
@@ -139,9 +126,9 @@ Token files are master-level only; `--page` overrides do not emit tokens.
 }
 
 .input:focus {
-  border-color: #0369A1;
+  border-color: var(--lumen-accent);
   outline: none;
-  box-shadow: 0 0 0 3px #0369A120;
+  box-shadow: 0 0 0 3px var(--lumen-accent-soft);
 }
 ```
 
