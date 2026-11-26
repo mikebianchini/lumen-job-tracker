@@ -3357,6 +3357,73 @@
       .mobile-tab.active svg { transform: none; }
       .toast { bottom: calc(76px + env(safe-area-inset-bottom, 0px)); }
     }
+
+    /* ==========================================================================
+       Home hero: bold coral card with drifting light, entrance animation and a
+       weekly-goal ring. All motion is disabled for prefers-reduced-motion.
+       ========================================================================== */
+    .hero-bold {
+      background: linear-gradient(135deg, #e61e4d 0%, #d70466 55%, #bd1e59 100%);
+      border: 0; color: #fff; min-height: 188px; padding: 28px 30px;
+      box-shadow: 0 10px 30px -8px rgba(215, 4, 102, 0.45);
+    }
+    [data-theme="dark"] .hero-bold { background: linear-gradient(135deg, #c21645 0%, #a8035a 55%, #8f1749 100%); box-shadow: 0 10px 30px -8px rgba(0, 0, 0, 0.6); }
+    .hero-main { display: flex; flex-direction: column; gap: 10px; min-width: 0; flex: 1; }
+    .hero-bold .hero-kicker { color: rgba(255, 255, 255, 0.92); display: inline-flex; align-items: center; gap: 8px; }
+    .hero-bold .hero-kicker .ico-svg { animation: heroFloat 4.5s ease-in-out infinite; }
+    .hero-bold .home-greeting { color: #fff; font-size: 30px; max-width: 640px; text-wrap: balance; }
+    .hero-sub { font-size: 14.5px; line-height: 1.5; color: rgba(255, 255, 255, 0.92); max-width: 540px; }
+    .hero-sub strong { color: #fff; font-weight: 750; }
+    .hero-actions { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 6px; }
+    .hero-bold.hero-bold .btn.hero-btn.hero-btn { background: rgba(255, 255, 255, 0.16); color: #fff; border: 1px solid rgba(255, 255, 255, 0.5); border-radius: var(--radius-sm); backdrop-filter: none; transition: transform .18s var(--ease-spring), background .18s, box-shadow .18s; }
+    .hero-bold.hero-bold .btn.hero-btn.hero-btn:hover { background: rgba(255, 255, 255, 0.28); transform: translateY(-2px); border-color: #fff; }
+    .hero-bold.hero-bold .btn.hero-btn.hero-btn .ico-svg { stroke: currentColor; }
+    .hero-bold.hero-bold .btn.hero-btn.hero-btn-primary { background: #fff; color: #c1124f; border-color: #fff; font-weight: 700; }
+    .hero-bold.hero-bold .btn.hero-btn.hero-btn-primary:hover { background: #fff; box-shadow: 0 6px 16px rgba(0, 0, 0, 0.22); }
+
+    .hero-orb { position: absolute; border-radius: 50%; pointer-events: none; z-index: 0 !important; filter: blur(34px); background: rgba(255, 255, 255, 0.28); }
+    .hero-orb.o1 { width: 260px; height: 260px; right: -60px; top: -90px; animation: orbDrift1 16s ease-in-out infinite; }
+    .hero-orb.o2 { width: 200px; height: 200px; left: 28%; bottom: -110px; background: rgba(255, 190, 120, 0.35); animation: orbDrift2 19s ease-in-out infinite; }
+    .hero-orb.o3 { width: 150px; height: 150px; left: -40px; top: -50px; background: rgba(255, 255, 255, 0.18); animation: orbDrift1 22s ease-in-out infinite reverse; }
+    .hero-shine { position: absolute; inset: 0; z-index: 0 !important; pointer-events: none; background: linear-gradient(110deg, transparent 35%, rgba(255, 255, 255, 0.22) 50%, transparent 65%); transform: translateX(-120%); }
+    .hero-anim .hero-shine { animation: heroShine 1.4s .35s ease-out 1 forwards; }
+
+    .hero-goal { position: relative; width: 132px; height: 132px; flex-shrink: 0; }
+    .goal-ring { width: 100%; height: 100%; transform: rotate(-90deg); }
+    .goal-track, .goal-bar { fill: none; stroke-width: 9; }
+    .goal-track { stroke: rgba(255, 255, 255, 0.25); }
+    .goal-bar { stroke: #fff; stroke-linecap: round; transition: stroke-dashoffset 1.3s .45s cubic-bezier(0.22, 1, 0.36, 1); filter: drop-shadow(0 0 6px rgba(255, 255, 255, 0.55)); }
+    .goal-center { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+    .goal-num { font-size: 34px; font-weight: 780; letter-spacing: -0.04em; font-variant-numeric: tabular-nums; line-height: 1; }
+    .goal-of { font-size: 16px; font-weight: 600; opacity: 0.8; margin-left: 1px; }
+    .goal-label { font-size: 12px; font-weight: 650; opacity: 0.9; margin-top: 4px; text-transform: uppercase; letter-spacing: 0.06em; }
+
+    .hero-anim .hero-rise { opacity: 0; animation: heroRise .6s calc(var(--i, 0) * 90ms + 80ms) var(--ease-spring) forwards; }
+    .hero-anim .hero-goal { animation-name: heroPop; }
+
+    @keyframes heroRise { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+    @keyframes heroPop { from { opacity: 0; transform: scale(0.8) rotate(-6deg); } to { opacity: 1; transform: none; } }
+    @keyframes heroShine { to { transform: translateX(120%); } }
+    @keyframes heroFloat { 0%, 100% { transform: translateY(0) rotate(0); } 50% { transform: translateY(-2px) rotate(8deg); } }
+    @keyframes orbDrift1 { 0%, 100% { transform: translate(0, 0) scale(1); } 50% { transform: translate(-30px, 24px) scale(1.12); } }
+    @keyframes orbDrift2 { 0%, 100% { transform: translate(0, 0) scale(1); } 50% { transform: translate(40px, -18px) scale(0.92); } }
+
+    @media (max-width: 980px) {
+      .hero-bold { padding: 22px 18px; min-height: 0; flex-direction: column; align-items: stretch; }
+      .hero-bold .home-greeting { font-size: 24px; }
+      .hero-goal { position: absolute; right: 16px; top: 14px; width: 76px; height: 76px; }
+      .hero-goal .goal-num { font-size: 20px; }
+      .hero-goal .goal-of { font-size: 11px; }
+      .hero-goal .goal-label { display: none; }
+      .hero-bold .hero-kicker { padding-right: 84px; }
+      .hero-bold .home-greeting { padding-right: 0; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .hero-orb, .hero-shine, .hero-bold .hero-kicker .ico-svg { animation: none !important; }
+      .hero-rise, .hero-goal { animation: none !important; opacity: 1 !important; transform: none !important; }
+      .goal-bar { transition: none !important; }
+      .hero-bold.hero-bold .btn.hero-btn.hero-btn:hover { transform: none; }
+    }
   </style>
 </head>
 <body class="signed-out">
@@ -4276,6 +4343,9 @@ Product Design, Design Systems, Interaction Design, Prototyping, Figma, User Res
     }
 
     const UI_ICONS = {
+      sun: '<circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"></path>',
+      moon: '<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>',
+      sunrise: '<path d="M17 18a5 5 0 0 0-10 0"></path><line x1="12" y1="2" x2="12" y2="9"></line><line x1="4.22" y1="10.22" x2="5.64" y2="11.64"></line><line x1="1" y1="18" x2="3" y2="18"></line><line x1="21" y1="18" x2="23" y2="18"></line><line x1="18.36" y1="11.64" x2="19.78" y2="10.22"></line><line x1="23" y1="22" x2="1" y2="22"></line><polyline points="8 6 12 2 16 6"></polyline>',
       bookmark: '<path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path>',
       send: '<line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>',
       phone: '<path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"></path>',
@@ -4338,7 +4408,34 @@ Product Design, Design Systems, Interaction Design, Prototyping, Figma, User Res
       saveState(true);
     }
 
+
+    /* Home hero: count-up number and progress ring. Entrance plays once per visit to Home. */
+    function playHeroAnimations() {
+      const bar = document.querySelector('.goal-bar');
+      if (!bar) return;
+      const C = 2 * Math.PI * 52;
+      const pct = Number(bar.dataset.pct) || 0;
+      bar.style.strokeDasharray = String(C);
+      const target = C * (1 - pct / 100);
+      const hero = document.querySelector('.hero-bold');
+      if (!hero || !hero.classList.contains('hero-anim')) { bar.style.strokeDashoffset = String(target); return; }
+      bar.style.strokeDashoffset = String(C);
+      requestAnimationFrame(() => requestAnimationFrame(() => { bar.style.strokeDashoffset = String(target); }));
+      const num = document.querySelector('.goal-num [data-count]');
+      if (num) {
+        const end = Number(num.dataset.count) || 0;
+        const t0 = performance.now();
+        const step = (t) => {
+          const k = Math.min(1, (t - t0 - 500) / 900);
+          if (k > 0) num.textContent = String(Math.round(end * (1 - Math.pow(1 - k, 3))));
+          if (k < 1) requestAnimationFrame(step); else num.textContent = String(end);
+        };
+        requestAnimationFrame(step);
+      }
+    }
+
     function switchView(viewName) {
+      if (viewName === 'home' && ui.view !== 'home') ui._heroPlayed = false;
       ui.view = viewName;
       ui.mobileDetailOpen = false;
       $$('.view').forEach((v) => v.classList.toggle('active', v.id === `view-${viewName}`));
@@ -4416,6 +4513,12 @@ Product Design, Design Systems, Interaction Design, Prototyping, Figma, User Res
           ? `Good afternoon${namePart} — one thoughtful step at a time.`
           : `Good evening${namePart} — celebrate how far you've come.`;
       const todayLabel = new Date().toLocaleDateString(undefined, { weekday: 'long', month: 'long', day: 'numeric' });
+      const heroWeekAgo = new Date(Date.now() - 7 * 86400000).toISOString().slice(0, 10);
+      const heroApplied = state.jobs.filter((j) => j.appliedDate && j.appliedDate >= heroWeekAgo).length;
+      const heroGoal = Math.max(1, Number(state.weeklyGoal) || 5);
+      const heroPct = Math.min(100, Math.round((heroApplied / heroGoal) * 100));
+      const heroPlay = !ui._heroPlayed && !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      ui._heroPlayed = true;
 
       const activeJobs = state.jobs.filter((j) => j.status !== 'Archived');
       const interviewing = state.jobs.filter((j) => j.status === 'Interviewing').length;
@@ -4491,18 +4594,32 @@ Product Design, Design Systems, Interaction Design, Prototyping, Figma, User Res
 
       $('#home-dashboard').innerHTML = `
         <!-- Hero Greeting & Momentum -->
-        <div class="visual-hero glass home-hero">
-          <div style="display:flex; flex-direction:column; gap:10px; min-width:0;">
-            <div class="hero-kicker">${esc(todayLabel)}</div>
-            <h2 class="home-greeting">${greeting}</h2>
-            <p style="font-size:13.5px; color:var(--text-secondary); max-width:520px; line-height:1.45;">
-              You have <strong style="color:var(--text-primary)">${activeJobs.length}</strong> active role${activeJobs.length === 1 ? '' : 's'}, <strong style="color:var(--text-primary)">${interviewing}</strong> interview loop${interviewing === 1 ? '' : 's'}, and <strong style="color:var(--text-primary)">${agenda.length}</strong> upcoming event${agenda.length === 1 ? '' : 's'}.
+        <div class="visual-hero glass home-hero hero-bold ${heroPlay ? 'hero-anim' : ''}">
+          <span class="hero-orb o1" aria-hidden="true"></span>
+          <span class="hero-orb o2" aria-hidden="true"></span>
+          <span class="hero-orb o3" aria-hidden="true"></span>
+          <span class="hero-shine" aria-hidden="true"></span>
+          <div class="hero-main">
+            <div class="hero-kicker hero-rise" style="--i:0">${ico(hour < 6 || hour >= 18 ? 'moon' : hour < 10 ? 'sunrise' : 'sun', 15)} ${esc(todayLabel)}</div>
+            <h2 class="home-greeting hero-rise" style="--i:1">${greeting}</h2>
+            <p class="hero-sub hero-rise" style="--i:2">
+              You have <strong>${activeJobs.length}</strong> active role${activeJobs.length === 1 ? '' : 's'}, <strong>${interviewing}</strong> interview loop${interviewing === 1 ? '' : 's'}, and <strong>${agenda.length}</strong> upcoming event${agenda.length === 1 ? '' : 's'}.
             </p>
-            <div style="display:flex; gap:8px; flex-wrap:wrap; margin-top:2px;">
-              <button class="btn btn-primary btn-sm" id="home-add-job">${ico('briefcase', 14)} Add Job</button>
-              <button class="btn btn-sm" id="home-paste-job">${ico('link', 14, 'var(--accent)')} Paste Job Link</button>
-              <button class="btn btn-sm" id="home-add-event">${ico('calendar', 14)} Add Event</button>
-              <button class="btn btn-sm" id="home-add-person">${ico('users', 14)} Add Person</button>
+            <div class="hero-actions hero-rise" style="--i:3">
+              <button class="btn hero-btn hero-btn-primary" id="home-add-job">${ico('plus', 14)} Add Job</button>
+              <button class="btn hero-btn" id="home-paste-job">${ico('link', 14)} Paste Job Link</button>
+              <button class="btn hero-btn" id="home-add-event">${ico('calendar', 14)} Add Event</button>
+              <button class="btn hero-btn" id="home-add-person">${ico('users', 14)} Add Person</button>
+            </div>
+          </div>
+          <div class="hero-goal hero-rise" style="--i:2" role="img" aria-label="${heroApplied} of ${heroGoal} applications this week">
+            <svg class="goal-ring" viewBox="0 0 120 120" aria-hidden="true">
+              <circle class="goal-track" cx="60" cy="60" r="52"></circle>
+              <circle class="goal-bar" cx="60" cy="60" r="52" data-pct="${heroPct}"></circle>
+            </svg>
+            <div class="goal-center">
+              <span class="goal-num"><span data-count="${heroApplied}">${heroPlay ? 0 : heroApplied}</span><span class="goal-of">/${heroGoal}</span></span>
+              <span class="goal-label">this week</span>
             </div>
           </div>
         </div>
@@ -4922,6 +5039,7 @@ Product Design, Design Systems, Interaction Design, Prototyping, Figma, User Res
       $('#home-log-event-btn')?.addEventListener('click', () => openEventModal());
       $('#home-add-event')?.addEventListener('click', () => openEventModal());
       $('#home-upcoming-add-event')?.addEventListener('click', () => openEventModal());
+      playHeroAnimations();
       $('#home-add-job').addEventListener('click', () => openJobModal());
       $('#home-paste-job')?.addEventListener('click', () => pasteJobFromClipboard());
       $('#home-add-person').addEventListener('click', () => openPersonModal());
@@ -9150,7 +9268,7 @@ create policy "Users manage own Lumen data"
     })();
 
     /* App version label (Sync & Cloud). Keep APP_VERSION in step with CACHE_NAME in sw.js. */
-    const APP_VERSION = 'v11';
+    const APP_VERSION = 'v12';
     const APP_VERSION_DATE = '2026-11-26';
     (function showAppVersion() {
       const el = document.getElementById('app-version');
