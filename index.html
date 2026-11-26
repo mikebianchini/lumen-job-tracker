@@ -3430,6 +3430,50 @@
       .goal-bar { transition: none !important; }
       .hero-bold.hero-bold .btn.hero-btn.hero-btn:hover { transform: none; }
     }
+
+    /* ==========================================================================
+       Menu bar emphasis: raised pill container with a solid coral active tab
+       (desktop) and a top indicator on the active tab (mobile).
+       ========================================================================== */
+    .hub-nav.hub-nav {
+      padding: 5px; gap: 4px; border-radius: var(--radius-pill);
+      background: var(--glass-bg); border: 1px solid var(--glass-border);
+      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+    }
+    .hub-nav.hub-nav .nav-btn {
+      padding: 10px 16px; font-weight: 650; color: var(--text-secondary); white-space: nowrap;
+      transition: background .2s, color .2s, transform .2s var(--ease-spring), box-shadow .2s;
+    }
+    .hub-nav.hub-nav .nav-btn:hover { background: var(--accent-soft); color: var(--accent-text); transform: translateY(-1px); }
+    .hub-nav.hub-nav .nav-btn.active {
+      background: linear-gradient(135deg, #e61e4d 0%, #d70466 55%, #bd1e59 100%);
+      color: #fff; font-weight: 700; transform: none;
+      box-shadow: 0 4px 12px rgba(215, 4, 102, 0.35);
+    }
+    .hub-nav.hub-nav .nav-btn.active::after { display: none; }
+    .hub-nav.hub-nav .nav-btn.active svg { color: #fff; }
+    .hub-nav.hub-nav .nav-btn.active .nav-count { background: rgba(255, 255, 255, 0.26); color: #fff; }
+    [data-theme="dark"] .hub-nav.hub-nav { box-shadow: 0 2px 12px rgba(0, 0, 0, 0.5); }
+    .account-chip, #hub-auth-label { white-space: nowrap; }
+
+    @media (max-width: 980px) {
+      .mobile-tabbar { box-shadow: 0 -4px 18px rgba(0, 0, 0, 0.07); }
+      [data-theme="dark"] .mobile-tabbar { box-shadow: 0 -4px 18px rgba(0, 0, 0, 0.5); }
+      /* Equal-width tabs that fill the bar (the base grid assumed 4 tabs; there are 3) */
+      .mobile-tabbar { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); padding: 6px 6px calc(4px + env(safe-area-inset-bottom, 0px)); }
+      .mobile-tab {
+        position: relative; min-height: 56px; gap: 4px; padding: 6px 4px;
+        font-size: 12px; font-weight: 600; background: none; box-shadow: none;
+      }
+      .mobile-tab svg {
+        box-sizing: content-box; width: 24px; height: 24px; padding: 5px 18px; stroke-width: 2;
+        border-radius: 999px; transition: background .22s var(--ease-spring), color .22s, transform .22s var(--ease-spring);
+      }
+      .mobile-tab.active, [data-theme="dark"] .mobile-tab.active { background: none; box-shadow: none; color: var(--accent); font-weight: 750; }
+      .mobile-tab.active svg { background: var(--accent-soft); stroke-width: 2.3; transform: none; }
+      [data-theme="dark"] .mobile-tab.active svg { background: rgba(255, 90, 117, 0.18); }
+      .mobile-tab:active svg { transform: scale(0.92); }
+    }
   </style>
 </head>
 <body class="signed-out">
@@ -9274,7 +9318,7 @@ create policy "Users manage own Lumen data"
     })();
 
     /* App version label (Sync & Cloud). Keep APP_VERSION in step with CACHE_NAME in sw.js. */
-    const APP_VERSION = 'v13';
+    const APP_VERSION = 'v15';
     const APP_VERSION_DATE = '2026-11-26';
     (function showAppVersion() {
       const el = document.getElementById('app-version');
