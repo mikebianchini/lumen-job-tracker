@@ -335,7 +335,7 @@
     }
 
     .sidebar-section-label {
-      font-size: 11px;
+      font-size: 12px;
       font-weight: 600;
       letter-spacing: 0.04em;
       text-transform: uppercase;
@@ -469,7 +469,7 @@
       right: 10px;
       top: 50%;
       transform: translateY(-50%);
-      font-size: 11px;
+      font-size: 12px;
       font-family: var(--font-mono);
       color: var(--text-tertiary);
       padding: 2px 5px;
@@ -737,7 +737,7 @@
       gap: 5px;
       padding: 3px 9px;
       border-radius: var(--radius-pill);
-      font-size: 11.5px;
+      font-size: 12px;
       font-weight: 600;
       white-space: nowrap;
     }
@@ -757,7 +757,7 @@
       border-radius: var(--radius-pill);
       background: var(--glass-bg-subtle);
       border: 1px solid var(--divider);
-      font-size: 11.5px;
+      font-size: 12px;
       color: var(--text-secondary);
       font-variant-numeric: tabular-nums;
     }
@@ -838,7 +838,7 @@
     }
 
     .meta-label {
-      font-size: 11px;
+      font-size: 12px;
       font-weight: 600;
       text-transform: uppercase;
       letter-spacing: 0.04em;
@@ -1080,7 +1080,7 @@
     }
 
     .sync-tag {
-      font-size: 11px;
+      font-size: 12px;
       font-weight: 650;
       text-transform: uppercase;
       letter-spacing: 0.05em;
@@ -1357,7 +1357,7 @@
         background: transparent;
         color: var(--text-secondary);
         font-family: inherit;
-        font-size: 11px;
+        font-size: 12px;
         font-weight: 580;
         cursor: pointer;
         transition: all 0.2s var(--ease-spring);
@@ -1413,7 +1413,7 @@
     }
 
     .hero-kicker {
-      font-size: 11px;
+      font-size: 12px;
       font-weight: 660;
       letter-spacing: 0.06em;
       text-transform: uppercase;
@@ -1787,6 +1787,53 @@
       }
     }
 
+    /* Toast with action (e.g. Undo) */
+    .toast.has-action { pointer-events: auto; display: flex; align-items: center; gap: 12px; }
+    .toast-action { background: none; border: 0; color: var(--accent-text); font: inherit; font-weight: 700; padding: 6px 4px; min-height: 32px; cursor: pointer; }
+
+    /* Swipe gestures (touch) */
+    .item-card[data-job-id] { touch-action: pan-y; position: relative; }
+    #jobs-list.is-swiping { overflow-x: clip; }
+    .item-card.swiping { transition: none; z-index: 2; }
+    .item-card.swipe-settle { transition: transform 0.22s var(--ease-spring), opacity 0.22s; }
+    .item-card.swiping::after {
+      content: attr(data-swipe-label);
+      position: absolute; top: 50%; transform: translateY(-50%);
+      width: 120px; text-align: center; font-size: 13px; font-weight: 700; letter-spacing: 0.01em;
+      color: var(--swipe-fg, var(--text-secondary)); opacity: var(--swipe-progress, 0);
+    }
+    .item-card.swiping[data-swipe-dir="right"]::after { right: calc(100% + 8px); }
+    .item-card.swiping[data-swipe-dir="left"]::after { left: calc(100% + 8px); }
+    .item-card.swiping.swipe-armed { box-shadow: inset 0 0 0 2px var(--swipe-fg); }
+    @media (prefers-reduced-motion: reduce) { .item-card.swipe-settle { transition: none; } }
+
+    /* Utilities (replace repeated inline styles) */
+    .u-row8 { display: flex; gap: 8px; }
+    .u-min0 { min-width: 0; }
+    .u-flex1 { flex: 1; }
+
+    /* Stage badges: glyph + color so status never relies on hue alone */
+    .badge-saved::before { content: "\25CB\00a0"; }
+    .badge-applied::before { content: "\25CF\00a0"; }
+    .badge-screening::before { content: "\25D0\00a0"; }
+    .badge-interviewing::before { content: "\25C6\00a0"; }
+    .badge-offer::before { content: "\2713\00a0"; }
+    .badge-archived::before { content: "\2715\00a0"; }
+
+    /* Touch: larger tap targets for pills and chips */
+    @media (pointer: coarse) {
+      .pill { min-height: 44px; }
+      .icon-btn { min-width: 44px; min-height: 44px; }
+    }
+
+    /* Glass fallback: opaque surfaces when transparency is reduced or unsupported */
+    @media (prefers-reduced-transparency: reduce) {
+      *, *::before, *::after { -webkit-backdrop-filter: none !important; backdrop-filter: none !important; }
+    }
+    @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+      .modal-backdrop { background: rgba(0, 0, 0, 0.55); }
+    }
+
     /* Respect OS reduced-motion preferences */
     @media (prefers-reduced-motion: reduce) {
       *, *::before, *::after {
@@ -2031,7 +2078,7 @@
       display: flex;
       align-items: center;
       gap: 8px;
-      font-size: 11.5px;
+      font-size: 12px;
       color: var(--text-tertiary);
     }
 
@@ -2416,7 +2463,7 @@
     }
 
     .timeline-time {
-      font-size: 11.5px;
+      font-size: 12px;
       font-weight: 560;
       color: var(--text-tertiary);
       white-space: nowrap;
@@ -2460,7 +2507,7 @@
       color: var(--accent-text);
       display: grid;
       place-items: center;
-      font-size: 11.5px;
+      font-size: 12px;
       font-weight: 700;
       flex-shrink: 0;
     }
@@ -2732,7 +2779,7 @@
 
       .timeline-time {
         margin-top: 0;
-        font-size: 11px;
+        font-size: 12px;
       }
 
       .nudge-item {
@@ -2945,7 +2992,7 @@
       }
 
       .meta-label {
-        font-size: 11.5px;
+        font-size: 12px;
       }
 
       .meta-value {
@@ -3281,7 +3328,7 @@
         </div>
         <div class="field" id="gate-otp-wrap" style="display: none;">
           <label for="gate-otp">6-Digit Code <span style="font-weight:450; color:var(--text-tertiary)">(for iPhone Home Screen app)</span></label>
-          <div style="display:flex; gap:8px;">
+          <div class="u-row8">
             <input id="gate-otp" class="input" type="text" inputmode="numeric" autocomplete="one-time-code" placeholder="123456" maxlength="8" style="height:44px; flex:1; letter-spacing:0.15em; font-weight:650;" />
             <button type="button" class="btn btn-primary" id="gate-verify-otp-btn" style="height:44px;">Verify</button>
           </div>
@@ -3342,7 +3389,7 @@
 
       <div style="margin-top: auto; display: flex; flex-direction: column; gap: 10px;">
         <div class="bg-picker" title="Choose App Background">
-          <span style="font-size: 11px; font-weight: 600; color: var(--text-tertiary);">Canvas</span>
+          <span style="font-size: 12px; font-weight: 600; color: var(--text-tertiary);">Canvas</span>
           <div style="display: flex; gap: 6px;">
             <button class="bg-swatch" data-bg-pick="linen" title="Warm Linen" style="background: #faf8f5;"></button>
             <button class="bg-swatch" data-bg-pick="white" title="Pure Gallery" style="background: #ffffff;"></button>
@@ -3452,7 +3499,7 @@
       <section class="view" id="view-jobs" aria-label="Jobs tracker">
         <div class="visual-hero glass" id="jobs-visual-hero"></div>
         <div class="filter-row-wrap">
-          <div class="filter-bar" id="job-filters" style="flex:1;"></div>
+          <div class="u-flex1 filter-bar" id="job-filters"></div>
           <button type="button" class="btn btn-sm" id="jobs-paste-job-btn" style="flex-shrink:0;" title="Paste copied job link from clipboard"><svg class="ico-svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg> Paste Link</button>
           <div class="view-seg" role="tablist" aria-label="Jobs view mode">
             <button class="view-seg-btn active" id="jobs-mode-list" role="tab" aria-selected="true">List</button>
@@ -3491,7 +3538,7 @@
               <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
               <div style="font-size: 13.5px; font-weight: 600;">Upload Resume</div>
               <div style="font-size: 12px; color: var(--text-tertiary);">PDF, DOCX, TXT, or Markdown</div>
-              <div id="uploaded-file-badge" style="font-size: 11.5px; color: var(--accent-text); font-weight: 600;"></div>
+              <div id="uploaded-file-badge" style="font-size: 12px; color: var(--accent-text); font-weight: 600;"></div>
             </div>
 
             <div class="field">
@@ -3580,7 +3627,7 @@
           <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap; flex-shrink:0;">
             <button type="button" class="btn btn-sm" id="settings-theme-btn">Light / Dark</button>
             <div class="bg-picker" title="Choose App Background">
-            <span style="font-size: 11px; font-weight: 600; color: var(--text-tertiary);">Canvas</span>
+            <span style="font-size: 12px; font-weight: 600; color: var(--text-tertiary);">Canvas</span>
             <div style="display: flex; gap: 6px;">
               <button class="bg-swatch" data-bg-pick="linen" title="Warm Linen" style="background: #faf8f5;"></button>
               <button class="bg-swatch" data-bg-pick="white" title="Pure Gallery" style="background: #ffffff;"></button>
@@ -3603,11 +3650,11 @@
             </div>
             <div class="field">
               <label for="prof-linkedin">Your LinkedIn Profile URL</label>
-              <div style="display:flex; gap:8px;">
-                <input id="prof-linkedin" class="input" type="url" placeholder="https://www.linkedin.com/in/your-name" style="flex:1;" />
+              <div class="u-row8">
+                <input id="prof-linkedin" class="u-flex1 input" type="url" placeholder="https://www.linkedin.com/in/your-name" />
                 <button type="button" class="btn btn-sm" id="prof-autofill-btn" style="height:38px; padding:0 14px;">Import from LinkedIn</button>
               </div>
-              <div id="prof-autofill-status" style="font-size:11.5px; color:var(--accent-text); min-height:15px;"></div>
+              <div id="prof-autofill-status" style="font-size: 12px; color:var(--accent-text); min-height:15px;"></div>
             </div>
             <div class="form-row">
               <div class="field"><label for="prof-name">Your Name</label><input id="prof-name" class="input" placeholder="Mike Bianchini" /></div>
@@ -3907,8 +3954,8 @@ Product Design, Design Systems, Interaction Design, Prototyping, Figma, User Res
         sync: {
           autoSync: true,
           gsheetsUrl: '',
-          supaUrl: 'https://qyrzolvejabspgyuikba.supabase.co',
-          supaKey: 'sb_publishable_7IVH5r3zpjW9_rDebvSK6A_QwDK0L2J',
+          supaUrl: '',
+          supaKey: '',
           aiApiKey: '',
           supaSession: null
         },
@@ -4052,8 +4099,8 @@ Product Design, Design Systems, Interaction Design, Prototyping, Figma, User Res
           sync: {
             ...getDefaultState().sync,
             ...(parsed.sync || {}),
-            supaUrl: (parsed.sync && parsed.sync.supaUrl) || 'https://qyrzolvejabspgyuikba.supabase.co',
-            supaKey: (parsed.sync && parsed.sync.supaKey) || 'sb_publishable_7IVH5r3zpjW9_rDebvSK6A_QwDK0L2J'
+            supaUrl: (parsed.sync && parsed.sync.supaUrl) || '',
+            supaKey: (parsed.sync && parsed.sync.supaKey) || ''
           },
           profile: { ...getDefaultState().profile, ...(parsed.profile || {}) }
         };
@@ -4088,6 +4135,14 @@ Product Design, Design Systems, Interaction Design, Prototyping, Figma, User Res
       return String(str || '').replace(/[&<>"']/g, (m) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m]));
     }
 
+    function safeUrl(u) {
+      const v = String(u || '').trim();
+      try {
+        const p = new URL(v, location.href).protocol;
+        return p === 'http:' || p === 'https:' || p === 'mailto:' ? v : '';
+      } catch { return ''; }
+    }
+
     function uid(prefix) {
       return `${prefix}-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 6)}`;
     }
@@ -4111,12 +4166,24 @@ Product Design, Design Systems, Interaction Design, Prototyping, Figma, User Res
       return palette[Math.abs(hash) % palette.length];
     }
 
-    function toast(msg) {
+    function toast(msg, action) {
       const el = $('#toast');
       el.textContent = msg;
+      el.classList.toggle('has-action', Boolean(action));
+      if (action) {
+        const b = document.createElement('button');
+        b.type = 'button';
+        b.className = 'toast-action';
+        b.textContent = action.label;
+        b.addEventListener('click', () => {
+          el.classList.remove('show');
+          action.run();
+        });
+        el.appendChild(b);
+      }
       el.classList.add('show');
       clearTimeout(toast._t);
-      toast._t = setTimeout(() => el.classList.remove('show'), 2600);
+      toast._t = setTimeout(() => el.classList.remove('show'), action ? 5000 : 2600);
     }
 
     function statusClass(status) {
@@ -4493,7 +4560,7 @@ Product Design, Design Systems, Interaction Design, Prototyping, Figma, User Res
               <div class="section-head" style="flex-wrap:wrap;">
                 <span class="section-title">${ico("activity", 16, "var(--accent)")} Activity Timeline (${filteredEvents.length})</span>
                 <div style="display:flex; gap:6px; flex-wrap:wrap; align-items:center;">
-                  ${['All', 'Jobs', 'Interviews & Notes', 'People'].map((f) => `<button type="button" class="pill ${f === filter ? 'active' : ''}" style="padding:4px 10px; font-size:11.5px;" data-tl-filter="${f}">${f}</button>`).join('')}
+                  ${['All', 'Jobs', 'Interviews & Notes', 'People'].map((f) => `<button type="button" class="pill ${f === filter ? 'active' : ''}" style="padding:4px 10px; font-size: 12px;" data-tl-filter="${f}">${f}</button>`).join('')}
                   <button type="button" class="btn btn-sm" id="home-log-event-btn">+ Log Event</button>
                 </div>
               </div>
@@ -4508,7 +4575,7 @@ Product Design, Design Systems, Interaction Design, Prototyping, Figma, User Res
                             <div style="min-width:0; flex:1;">
                               <div style="display:flex; align-items:center; gap:7px; flex-wrap:wrap;">
                                 <span style="font-size:13.5px; font-weight:640; color:var(--text-primary);">${esc(ev.title)}</span>
-                                <span class="chip" style="padding:2px 8px; font-size:11px;">${kindLabels[ev.kind] || 'Activity'}</span>
+                                <span class="chip" style="padding:2px 8px; font-size: 12px;">${kindLabels[ev.kind] || 'Activity'}</span>
                               </div>
                               ${ev.detail ? `<div style="font-size:12.5px; color:var(--text-secondary); margin-top:2px;">${esc(ev.detail)}</div>` : ''}
                             </div>
@@ -4549,7 +4616,7 @@ Product Design, Design Systems, Interaction Design, Prototyping, Figma, User Res
                             : `<span class="badge badge-applied">${formatDate(item.date)}</span>`;
                           return `
                             <div class="agenda-row" data-agenda-type="${item.type}" data-agenda-id="${item.id}">
-                              <div style="min-width:0;">
+                              <div class="u-min0">
                                 <div style="font-size:13.5px; font-weight:620; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${esc(item.title)}</div>
                                 <div style="font-size:12px; color:var(--text-secondary); margin-top:2px;">${esc(item.sub)}</div>
                               </div>
@@ -4617,7 +4684,7 @@ Product Design, Design Systems, Interaction Design, Prototyping, Figma, User Res
                             .map(
                               (n) => `
                             <div class="nudge-item">
-                              <div style="min-width:0;">
+                              <div class="u-min0">
                                 <div style="font-size:13px; font-weight:630;">${esc(n.title)}</div>
                                 <div style="font-size:12px; color:var(--text-secondary); margin-top:2px;">${esc(n.sub)}</div>
                               </div>
@@ -4650,7 +4717,7 @@ Product Design, Design Systems, Interaction Design, Prototyping, Figma, User Res
                             <div class="agenda-row" data-agenda-type="job" data-agenda-id="${j.id}">
                               <div class="item-identity">
                                 <div class="monogram" style="width:34px; height:34px; font-size:12px; background:${bg}; color:${fg}">${esc(initials(j.company))}</div>
-                                <div style="min-width:0;">
+                                <div class="u-min0">
                                   <div style="font-size:13.5px; font-weight:620; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${esc(j.role)}</div>
                                   <div style="font-size:12px; color:var(--text-secondary);">${esc(j.company)}${j.comp ? ' · ' + esc(j.comp) : ''}</div>
                                 </div>
@@ -4895,11 +4962,11 @@ Product Design, Design Systems, Interaction Design, Prototyping, Figma, User Res
           <textarea id="m-ev-detail" class="notes-area" style="min-height:76px;" placeholder="Zoom / Google Meet link, office address, interviewers, prep notes…">${esc(ev.notes || '')}</textarea>
         </div>
         <div class="modal-footer" style="justify-content:space-between;">
-          <div style="display:flex; gap:8px;">
+          <div class="u-row8">
             ${existing ? `<button type="button" class="btn btn-danger btn-sm" id="del-ev-modal-btn">Delete</button>` : ''}
             ${existing ? `<button type="button" class="btn btn-sm" id="done-ev-modal-btn">${ev.completed ? 'Reopen' : 'Mark Done'}</button>` : ''}
           </div>
-          <div style="display:flex; gap:8px;">
+          <div class="u-row8">
             <button type="button" class="btn" onclick="closeModal()">Cancel</button>
             <button type="button" class="btn btn-primary" id="save-ev-modal-btn">${existing ? 'Save Changes' : 'Add Event'}</button>
           </div>
@@ -5088,7 +5155,7 @@ Product Design, Design Systems, Interaction Design, Prototyping, Figma, User Res
                 <div class="item-card-top">
                   <div class="item-identity">
                     <div class="monogram" style="background:${bg}; color:${fg}">${esc(initials(j.company))}</div>
-                    <div style="min-width:0">
+                    <div class="u-min0">
                       <div class="item-title">${esc(j.role)}</div>
                       <div class="item-subtitle">${esc(j.company)}${j.level ? ' · ' + esc(j.level) : ''}</div>
                     </div>
@@ -5145,7 +5212,7 @@ Product Design, Design Systems, Interaction Design, Prototyping, Figma, User Res
                     <div style="font-size:12px; color:var(--text-secondary);">${esc(j.company)}${j.comp ? ' · ' + esc(j.comp) : ''}</div>
                     <div style="display:flex; align-items:center; justify-content:space-between; gap:6px; margin-top:2px;">
                       <span class="chip">${esc(j.workMode || 'Hybrid')}</span>
-                      ${nextStage ? `<button class="btn btn-ghost btn-sm" style="height:26px; padding:0 8px; font-size:11.5px;" data-kadvance-id="${j.id}" data-knext="${nextStage}">${nextStage} →</button>` : ''}
+                      ${nextStage ? `<button class="btn btn-ghost btn-sm" style="height:26px; padding:0 8px; font-size: 12px;" data-kadvance-id="${j.id}" data-knext="${nextStage}">${nextStage} →</button>` : ''}
                     </div>
                   </div>`).join('') : `<div style="font-size:12px; color:var(--text-tertiary); padding:10px 4px;">No roles here</div>`}
               </div>`;
@@ -5286,12 +5353,12 @@ Product Design, Design Systems, Interaction Design, Prototyping, Figma, User Res
         <div class="detail-header">
           <div class="detail-title-group">
             <div class="monogram detail-monogram" style="background:${bg}; color:${fg}">${esc(initials(job.company))}</div>
-            <div style="min-width:0">
+            <div class="u-min0">
               <h2 class="detail-title">${esc(job.role)}</h2>
               <div class="detail-company">
                 <strong style="color:var(--text-primary)">${esc(job.company)}</strong>
                 ${job.location ? `<span>· ${esc(job.location)}</span>` : ''}
-                ${job.url ? `<a href="${esc(job.url)}" target="_blank" rel="noopener" style="color:var(--accent-text); text-decoration:none; font-weight:560;">View Posting ↗</a>` : ''}
+                ${safeUrl(job.url) ? `<a href="${esc(safeUrl(job.url))}" target="_blank" rel="noopener" style="color:var(--accent-text); text-decoration:none; font-weight:560;">View Posting ↗</a>` : ''}
               </div>
             </div>
           </div>
@@ -5345,7 +5412,7 @@ Product Design, Design Systems, Interaction Design, Prototyping, Figma, User Res
                   jobEvents.length
                     ? jobEvents.map((ev) => `
                         <div class="agenda-row" data-job-event-id="${ev.id}" style="${ev.completed ? 'opacity:0.62;' : ''}">
-                          <div style="min-width:0;">
+                          <div class="u-min0">
                             <div style="display:flex; align-items:center; gap:7px; flex-wrap:wrap;">
                               ${ev.round ? `<span class="badge badge-applied">${esc(ev.round)}</span>` : ''}
                               <span class="badge ${ev.completed ? 'badge-offer' : evBadgeClass(ev.type)}">${esc(ev.completed ? '✓ ' + (ev.type || 'Event') : (ev.type || 'Event'))}</span>
@@ -5377,7 +5444,7 @@ Product Design, Design Systems, Interaction Design, Prototyping, Figma, User Res
                       (p) => `
                 <div class="linked-pill" data-jump-person="${p.id}">
                   <span>${esc(p.name)}</span>
-                  <span style="font-size:11.5px; color:var(--text-tertiary)">${esc(p.roleType)}</span>
+                  <span style="font-size: 12px; color:var(--text-tertiary)">${esc(p.roleType)}</span>
                   <button class="unlink-x" data-unlink-person="${p.id}" title="Unlink">×</button>
                 </div>`
                     )
@@ -5448,7 +5515,7 @@ Product Design, Design Systems, Interaction Design, Prototyping, Figma, User Res
             <textarea class="notes-area" id="new-comment-input" style="min-height:74px; background:var(--input-bg);" placeholder="Add an interview takeaway, recruiter update, or question to ask…"></textarea>
             <div class="comment-composer-bar">
               <div style="display:flex; gap:5px; flex-wrap:wrap;">
-                ${COMMENT_TAGS.map((t) => `<button type="button" class="pill ${t === activeCommentTag ? 'active' : ''}" style="padding:4px 10px; font-size:11.5px;" data-comment-tag="${t}">${t}</button>`).join('')}
+                ${COMMENT_TAGS.map((t) => `<button type="button" class="pill ${t === activeCommentTag ? 'active' : ''}" style="padding:4px 10px; font-size: 12px;" data-comment-tag="${t}">${t}</button>`).join('')}
               </div>
               <button type="button" class="btn btn-primary btn-sm" id="post-comment-btn">Post Note</button>
             </div>
@@ -5468,8 +5535,8 @@ Product Design, Design Systems, Interaction Design, Prototyping, Figma, User Res
                               <span>${esc(dt)}</span>
                             </div>
                             <div class="comment-actions">
-                              <button type="button" class="btn btn-ghost btn-sm" style="height:26px; padding:0 8px; font-size:11.5px;" data-pin-comment="${c.id}" aria-label="${c.pinned ? 'Unpin note' : 'Pin note'}">${c.pinned ? 'Unpin' : 'Pin'}</button>
-                              <button type="button" class="btn btn-ghost btn-sm" style="height:26px; padding:0 8px; font-size:11.5px; color:var(--red);" data-del-comment="${c.id}" aria-label="Delete note">Delete</button>
+                              <button type="button" class="btn btn-ghost btn-sm" style="height:26px; padding:0 8px; font-size: 12px;" data-pin-comment="${c.id}" aria-label="${c.pinned ? 'Unpin note' : 'Pin note'}">${c.pinned ? 'Unpin' : 'Pin'}</button>
+                              <button type="button" class="btn btn-ghost btn-sm" style="height:26px; padding:0 8px; font-size: 12px; color:var(--red);" data-del-comment="${c.id}" aria-label="Delete note">Delete</button>
                             </div>
                           </div>
                           <div class="comment-body">${esc(c.text)}</div>
@@ -5674,9 +5741,9 @@ Product Design, Design Systems, Interaction Design, Prototyping, Figma, User Res
             return `
               <div class="network-orb-tile" data-hero-role="${r}">
                 <div class="orb-dot-wrap" style="background:${st.bg}; color:${st.fg}; font-size:13px;">${st.icon}</div>
-                <div style="min-width:0;">
+                <div class="u-min0">
                   <div style="font-size:16px; font-weight:700; font-variant-numeric:tabular-nums; line-height:1.1;">${counts[r]}</div>
-                  <div style="font-size:11.5px; color:var(--text-secondary); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${r}</div>
+                  <div style="font-size: 12px; color:var(--text-secondary); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${r}</div>
                 </div>
               </div>`;
           }).join('')}
@@ -5741,7 +5808,7 @@ Product Design, Design Systems, Interaction Design, Prototyping, Figma, User Res
                 <div class="item-card-top">
                   <div class="item-identity">
                     <div class="monogram avatar-circle" style="background:${bg}; color:${fg}">${esc(initials(p.name))}</div>
-                    <div style="min-width:0">
+                    <div class="u-min0">
                       <div class="item-title">${esc(p.name)}</div>
                       <div class="item-subtitle">${esc(p.title)}${p.company ? ' · ' + esc(p.company) : ''}</div>
                     </div>
@@ -5808,7 +5875,7 @@ Product Design, Design Systems, Interaction Design, Prototyping, Figma, User Res
         <div class="detail-header">
           <div class="detail-title-group">
             <div class="monogram detail-monogram avatar-circle" style="background:${bg}; color:${fg}">${esc(initials(person.name))}</div>
-            <div style="min-width:0">
+            <div class="u-min0">
               <h2 class="detail-title">${esc(person.name)}</h2>
               <div class="detail-company">
                 <span>${esc(person.title)}</span>
@@ -5844,7 +5911,7 @@ Product Design, Design Systems, Interaction Design, Prototyping, Figma, User Res
         ${person.email || person.linkedin ? `
           <div style="display:flex; gap:10px; flex-wrap:wrap;">
             ${person.email ? `<a class="btn btn-sm" href="mailto:${esc(person.email)}" style="text-decoration:none;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg> ${esc(person.email)}</a>` : ''}
-            ${person.linkedin ? `<a class="btn btn-sm" href="${esc(person.linkedin)}" target="_blank" rel="noopener" style="text-decoration:none;">LinkedIn ↗</a>` : ''}
+            ${safeUrl(person.linkedin) ? `<a class="btn btn-sm" href="${esc(safeUrl(person.linkedin))}" target="_blank" rel="noopener" style="text-decoration:none;">LinkedIn ↗</a>` : ''}
           </div>
         ` : ''}
 
@@ -5882,7 +5949,7 @@ Product Design, Design Systems, Interaction Design, Prototyping, Figma, User Res
             <textarea class="notes-area" id="new-person-note-input" style="min-height:74px; background:var(--input-bg);" placeholder="Add a call takeaway, referral insight, or follow-up note…"></textarea>
             <div class="comment-composer-bar">
               <div style="display:flex; gap:5px; flex-wrap:wrap;">
-                ${PERSON_NOTE_TAGS.map((t) => `<button type="button" class="pill ${t === activePNoteTag ? 'active' : ''}" style="padding:4px 10px; font-size:11.5px;" data-pnote-tag="${t}">${t}</button>`).join('')}
+                ${PERSON_NOTE_TAGS.map((t) => `<button type="button" class="pill ${t === activePNoteTag ? 'active' : ''}" style="padding:4px 10px; font-size: 12px;" data-pnote-tag="${t}">${t}</button>`).join('')}
               </div>
               <button type="button" class="btn btn-primary btn-sm" id="save-person-note-btn">Save Note</button>
             </div>
@@ -5899,7 +5966,7 @@ Product Design, Design Systems, Interaction Design, Prototyping, Figma, User Res
                           <article class="comment-card ${c.pinned ? 'pinned' : ''}" style="border-color: var(--accent);">
                             <div class="comment-head">
                               <div style="display:flex; gap:5px; flex-wrap:wrap;">
-                                ${PERSON_NOTE_TAGS.map((t) => `<button type="button" class="pill ${t === (ui.editingPersonNoteTag || c.tag || 'Note') ? 'active' : ''}" style="padding:3px 9px; font-size:11.5px;" data-edit-pnote-tag="${t}">${t}</button>`).join('')}
+                                ${PERSON_NOTE_TAGS.map((t) => `<button type="button" class="pill ${t === (ui.editingPersonNoteTag || c.tag || 'Note') ? 'active' : ''}" style="padding:3px 9px; font-size: 12px;" data-edit-pnote-tag="${t}">${t}</button>`).join('')}
                               </div>
                             </div>
                             <textarea class="notes-area" id="edit-pnote-textarea" style="min-height:80px; background:var(--input-bg);">${esc(c.text)}</textarea>
@@ -5918,9 +5985,9 @@ Product Design, Design Systems, Interaction Design, Prototyping, Figma, User Res
                               <span>${esc(dt)}${c.updatedAt ? ' · Edited' : ''}</span>
                             </div>
                             <div class="comment-actions">
-                              <button type="button" class="btn btn-ghost btn-sm" style="height:26px; padding:0 8px; font-size:11.5px;" data-edit-pnote="${c.id}" aria-label="Edit note">Edit</button>
-                              <button type="button" class="btn btn-ghost btn-sm" style="height:26px; padding:0 8px; font-size:11.5px;" data-pin-pnote="${c.id}" aria-label="${c.pinned ? 'Unpin note' : 'Pin note'}">${c.pinned ? 'Unpin' : 'Pin'}</button>
-                              <button type="button" class="btn btn-ghost btn-sm" style="height:26px; padding:0 8px; font-size:11.5px; color:var(--red);" data-del-pnote="${c.id}" aria-label="Delete note">Delete</button>
+                              <button type="button" class="btn btn-ghost btn-sm" style="height:26px; padding:0 8px; font-size: 12px;" data-edit-pnote="${c.id}" aria-label="Edit note">Edit</button>
+                              <button type="button" class="btn btn-ghost btn-sm" style="height:26px; padding:0 8px; font-size: 12px;" data-pin-pnote="${c.id}" aria-label="${c.pinned ? 'Unpin note' : 'Pin note'}">${c.pinned ? 'Unpin' : 'Pin'}</button>
+                              <button type="button" class="btn btn-ghost btn-sm" style="height:26px; padding:0 8px; font-size: 12px; color:var(--red);" data-del-pnote="${c.id}" aria-label="Delete note">Delete</button>
                             </div>
                           </div>
                           <div class="comment-body">${esc(c.text)}</div>
@@ -6420,9 +6487,9 @@ Product Design, Design Systems, Interaction Design, Prototyping, Figma, User Res
             const timer = setTimeout(() => controller.abort(), target.timeoutMs);
             try {
               btn.textContent = target.model === 'gemini-3.8-flash' ? 'Rewriting…' : 'Trying fast model…';
-              const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${target.model}:generateContent?key=${encodeURIComponent(apiKey)}`, {
+              const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${target.model}:generateContent`, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: { 'Content-Type': 'application/json', 'x-goog-api-key': apiKey },
                 body: JSON.stringify(target.body),
                 signal: controller.signal
               });
@@ -6622,7 +6689,6 @@ Product Design, Design Systems, Interaction Design, Prototyping, Figma, User Res
         profile: state.profile || {},
         baseResume: state.baseResume,
         baseResumeName: state.baseResumeName,
-        aiApiKey: state.sync?.aiApiKey || '',
         updatedAt: state.updatedAt || new Date().toISOString()
       };
     }
@@ -6641,7 +6707,6 @@ Product Design, Design Systems, Interaction Design, Prototyping, Figma, User Res
       if (data.profile && typeof data.profile === 'object') state.profile = { ...state.profile, ...data.profile };
       if (typeof data.baseResume === 'string') state.baseResume = data.baseResume;
       if (typeof data.baseResumeName === 'string') state.baseResumeName = data.baseResumeName;
-      if (typeof data.aiApiKey === 'string' && data.aiApiKey) state.sync.aiApiKey = data.aiApiKey;
       state.updatedAt = data.updatedAt || new Date().toISOString();
       saveState(true);
       renderCurrentView();
@@ -6809,9 +6874,16 @@ Product Design, Design Systems, Interaction Design, Prototyping, Figma, User Res
     /* ==========================================================================
        SUPABASE LINKEDIN OIDC AUTHENTICATION
        ========================================================================== */
-    const ADMIN_EMAIL = 'mikebianchini@gmail.com';
+    // Sync settings are editable until someone signs in; after that only the account
+    // that first signed in on this device (the owner) can change them.
     function isAdminUser() {
-      return (state.sync.supaSession?.user?.email || '').trim().toLowerCase() === ADMIN_EMAIL;
+      const email = (state.sync.supaSession?.user?.email || '').trim().toLowerCase();
+      if (!email) return true;
+      if (!state.sync.adminEmail) {
+        state.sync.adminEmail = email;
+        saveState(true);
+      }
+      return email === state.sync.adminEmail;
     }
 
     function updateAuthUI() {
@@ -7203,11 +7275,11 @@ Product Design, Design Systems, Interaction Design, Prototyping, Figma, User Res
         </p>
         <div class="field">
           <label for="ob-linkedin">LinkedIn Profile URL <span style="font-weight:450; color:var(--text-tertiary)">(optional — paste to auto-fill)</span></label>
-          <div style="display:flex; gap:8px;">
-            <input id="ob-linkedin" class="input" type="url" value="${esc(prof.linkedinUrl || '')}" placeholder="https://www.linkedin.com/in/your-name" style="flex:1;" />
+          <div class="u-row8">
+            <input id="ob-linkedin" class="u-flex1 input" type="url" value="${esc(prof.linkedinUrl || '')}" placeholder="https://www.linkedin.com/in/your-name" />
             <button type="button" class="btn btn-sm" id="ob-autofill-btn" style="height:38px; padding:0 12px;">Auto-Fill</button>
           </div>
-          <div id="ob-status" style="font-size:11.5px; color:var(--accent-text); min-height:14px;"></div>
+          <div id="ob-status" style="font-size: 12px; color:var(--accent-text); min-height:14px;"></div>
         </div>
         <div class="form-row">
           <div class="field"><label for="ob-name">Your Name *</label><input id="ob-name" class="input" value="${esc(suggestedName)}" placeholder="Mike Bianchini" /></div>
@@ -7290,7 +7362,7 @@ Product Design, Design Systems, Interaction Design, Prototyping, Figma, User Res
           </div>
           <div style="display:flex; align-items:center; gap:12px; padding:12px; border-radius:var(--radius-md); background:var(--glass-bg-subtle); border:1px solid var(--divider);">
             <div class="account-avatar" style="width:42px; height:42px; font-size:15px;">${meta.avatar_url ? `<img src="${esc(meta.avatar_url)}" alt="" style="width:100%; height:100%; border-radius:50%; object-fit:cover;" />` : esc(initials(fullName))}</div>
-            <div style="min-width:0;">
+            <div class="u-min0">
               <div style="font-size:15px; font-weight:700;">${esc(fullName)}</div>
               <div style="font-size:12.5px; color:var(--text-secondary);">${esc(user.email || 'Signed in with LinkedIn')}</div>
             </div>
@@ -7364,7 +7436,7 @@ Product Design, Design Systems, Interaction Design, Prototyping, Figma, User Res
       const openLink = $('#prof-open-link');
       if (openLink) {
         openLink.style.display = prof.linkedinUrl ? '' : 'none';
-        if (prof.linkedinUrl) openLink.href = prof.linkedinUrl;
+        if (prof.linkedinUrl) openLink.href = safeUrl(prof.linkedinUrl) || "#";
       }
       const resStatus = $('#prof-resume-status');
       if (resStatus) {
@@ -7711,11 +7783,11 @@ Product Design, Design Systems, Interaction Design, Prototyping, Figma, User Res
         </div>
         <div class="field">
           <label for="m-j-url">Job Posting Link <span style="font-weight:450; color:var(--text-tertiary)">— paste a link to prefill details automatically</span></label>
-          <div style="display:flex; gap:8px;">
-            <input id="m-j-url" class="input" type="url" value="${esc(j.url)}" placeholder="https://boards.greenhouse.io/… or any career URL" style="flex:1;" />
+          <div class="u-row8">
+            <input id="m-j-url" class="u-flex1 input" type="url" value="${esc(j.url)}" placeholder="https://boards.greenhouse.io/… or any career URL" />
             <button type="button" class="btn btn-sm" id="autofill-job-btn" style="height:38px; padding:0 14px;">Auto-Fill</button>
           </div>
-          <div id="autofill-status" style="font-size:11.5px; color:var(--accent-text); min-height:15px;"></div>
+          <div id="autofill-status" style="font-size: 12px; color:var(--accent-text); min-height:15px;"></div>
         </div>
         <div class="form-row">
           <div class="field"><label>Company *</label><input id="m-j-company" class="input" value="${esc(j.company)}" placeholder="Apple" /></div>
@@ -7938,11 +8010,11 @@ Product Design, Design Systems, Interaction Design, Prototyping, Figma, User Res
         </div>
         <div class="field">
           <label for="m-p-linkedin">LinkedIn Profile URL <span style="font-weight:450; color:var(--text-tertiary)">— paste a profile link to prefill automatically</span></label>
-          <div style="display:flex; gap:8px;">
-            <input id="m-p-linkedin" class="input" type="url" value="${esc(p.linkedin)}" placeholder="https://www.linkedin.com/in/…" style="flex:1;" />
+          <div class="u-row8">
+            <input id="m-p-linkedin" class="u-flex1 input" type="url" value="${esc(p.linkedin)}" placeholder="https://www.linkedin.com/in/…" />
             <button type="button" class="btn btn-sm" id="autofill-person-btn" style="height:38px; padding:0 14px;">Auto-Fill</button>
           </div>
-          <div id="autofill-person-status" style="font-size:11.5px; color:var(--accent-text); min-height:15px;"></div>
+          <div id="autofill-person-status" style="font-size: 12px; color:var(--accent-text); min-height:15px;"></div>
         </div>
         <div class="form-row">
           <div class="field"><label>Full Name *</label><input id="m-p-name" class="input" value="${esc(p.name)}" placeholder="Jordan Lee" /></div>
@@ -8825,6 +8897,167 @@ create policy "Users manage own Lumen data"
         });
       }).catch(() => {});
     }
+
+    /* ==========================================================================
+       Touch gestures: swipe job cards (right = advance, left = archive/restore),
+       swipe from the left edge to go back from a detail view.
+       Buttons and menus remain the non-gesture path for every action.
+       ========================================================================== */
+    (function initSwipeGestures() {
+      const COMMIT_PX = 88;
+      const LOCK_PX = 10;
+      const EDGE_PX = 32;
+      const flow = JOB_STATUSES.filter((x) => x.id !== 'Archived').map((x) => x.id);
+      let lastSwipeAt = 0;
+
+      function moveJob(job, status) {
+        const prev = job.status;
+        const prevApplied = job.appliedDate;
+        job.status = status;
+        if (status !== 'Saved' && status !== 'Archived' && !job.appliedDate) job.appliedDate = new Date().toISOString().slice(0, 10);
+        logActivity({
+          kind: status === 'Interviewing' ? 'interview' : status === 'Offer' ? 'offer' : 'status',
+          title: `Moved ${job.company} to ${status}`,
+          detail: `${job.role} (from ${prev})`,
+          targetType: 'job',
+          targetId: job.id
+        });
+        saveState();
+        renderJobs();
+        toast(status === 'Archived' ? `Archived ${job.company}` : `${job.company} → ${status}`, {
+          label: 'Undo',
+          run: () => {
+            job.status = prev;
+            job.appliedDate = prevApplied;
+            saveState();
+            renderJobs();
+          }
+        });
+      }
+
+      function plan(job, dir) {
+        if (dir === 'right') {
+          if (job.status === 'Archived') return { to: 'Saved', label: 'Restore', color: 'var(--green)' };
+          const i = flow.indexOf(job.status);
+          if (i < 0 || i >= flow.length - 1) return null;
+          return { to: flow[i + 1], label: `${flow[i + 1]} →`, color: 'var(--green)' };
+        }
+        if (job.status === 'Archived') return null;
+        return { to: 'Archived', label: '← Archive', color: 'var(--red)' };
+      }
+
+      const list = document.getElementById('jobs-list');
+      if (list) {
+        let g = null;
+        list.addEventListener('touchstart', (e) => {
+          if (e.touches.length !== 1) return;
+          const card = e.target.closest('.item-card[data-job-id]');
+          if (!card) return;
+          const t = e.touches[0];
+          g = { card, x: t.clientX, y: t.clientY, dx: 0, locked: false, dead: false, armed: false };
+        }, { passive: true });
+
+        list.addEventListener('touchmove', (e) => {
+          if (!g || g.dead) return;
+          const t = e.touches[0];
+          const dx = t.clientX - g.x;
+          const dy = t.clientY - g.y;
+          if (!g.locked) {
+            if (Math.abs(dy) > LOCK_PX && Math.abs(dy) > Math.abs(dx)) { g.dead = true; return; }
+            if (Math.abs(dx) < LOCK_PX || Math.abs(dx) < Math.abs(dy) * 1.5) return;
+            g.locked = true;
+            g.card.classList.add('swiping');
+            g.card.classList.remove('swipe-settle');
+            list.classList.add('is-swiping');
+          }
+          const job = state.jobs.find((j) => j.id === g.card.dataset.jobId);
+          const dir = dx > 0 ? 'right' : 'left';
+          const p = job && plan(job, dir);
+          // Rubber-band when there is nothing to do in this direction.
+          g.dx = p ? dx : dx * 0.25;
+          g.plan = p;
+          g.dir = dir;
+          const prog = Math.min(1, Math.abs(g.dx) / COMMIT_PX);
+          g.card.dataset.swipeDir = dir;
+          g.card.dataset.swipeLabel = p ? p.label : (dir === 'right' ? 'Last stage' : 'Archived');
+          g.card.style.setProperty('--swipe-fg', p ? p.color : 'var(--text-tertiary)');
+          g.card.style.setProperty('--swipe-progress', String(prog));
+          g.card.style.transform = `translateX(${g.dx}px)`;
+          const armed = Boolean(p) && Math.abs(g.dx) >= COMMIT_PX;
+          if (armed !== g.armed) {
+            g.armed = armed;
+            g.card.classList.toggle('swipe-armed', armed);
+            if (armed && navigator.vibrate) navigator.vibrate(8);
+          }
+        }, { passive: true });
+
+        const end = (cancel) => {
+          if (!g) return;
+          const cur = g; g = null;
+          list.classList.remove('is-swiping');
+          if (!cur.locked) return;
+          lastSwipeAt = Date.now();
+          const card = cur.card;
+          const finish = () => {
+            card.classList.remove('swiping', 'swipe-armed');
+            card.removeAttribute('data-swipe-dir');
+            card.style.transform = '';
+          };
+          if (!cancel && cur.armed && cur.plan) {
+            const job = state.jobs.find((j) => j.id === card.dataset.jobId);
+            card.classList.add('swipe-settle');
+            card.style.transform = `translateX(${cur.dir === 'right' ? 110 : -110}%)`;
+            card.style.opacity = '0';
+            setTimeout(() => { if (job) moveJob(job, cur.plan.to); }, 180);
+          } else {
+            card.classList.add('swipe-settle');
+            card.style.transform = 'translateX(0)';
+            setTimeout(() => { card.classList.remove('swipe-settle'); finish(); }, 230);
+          }
+        };
+        list.addEventListener('touchend', () => end(false));
+        list.addEventListener('touchcancel', () => end(true));
+
+        // A swipe must not also open the card.
+        list.addEventListener('click', (e) => {
+          if (Date.now() - lastSwipeAt < 400) { e.stopPropagation(); e.preventDefault(); }
+        }, true);
+      }
+
+      // Edge-swipe back from a detail view (Jobs / People).
+      let b = null;
+      document.addEventListener('touchstart', (e) => {
+        b = null;
+        if (e.touches.length !== 1 || !ui.mobileDetailOpen) return;
+        const t = e.touches[0];
+        if (t.clientX > EDGE_PX) return;
+        if (document.querySelector('.modal-backdrop.open')) return;
+        b = { x: t.clientX, y: t.clientY };
+      }, { passive: true });
+      document.addEventListener('touchend', (e) => {
+        if (!b) return;
+        const t = e.changedTouches[0];
+        const dx = t.clientX - b.x;
+        const dy = Math.abs(t.clientY - b.y);
+        b = null;
+        if (dx > 70 && dx > dy * 1.5) {
+          const back = document.querySelector('#view-jobs.active #job-mobile-back, #view-people.active #person-mobile-back');
+          if (back) back.click();
+        }
+      }, { passive: true });
+
+      // One-time hint on touch devices.
+      try {
+        if (window.matchMedia('(pointer: coarse)').matches && !localStorage.getItem('lumen-swipe-hint')) {
+          setTimeout(() => {
+            if (ui.view === 'jobs' && state.jobs.length) {
+              toast('Tip: swipe a job right to advance, left to archive');
+              localStorage.setItem('lumen-swipe-hint', '1');
+            }
+          }, 2500);
+        }
+      } catch {}
+    })();
   </script>
 </body>
 </html>

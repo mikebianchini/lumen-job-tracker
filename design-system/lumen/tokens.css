@@ -1,34 +1,45 @@
-/* Design Tokens - Auto-generated */
-/* Do not edit directly - modify tokens.json instead */
-
-/* === PRIMITIVES === */
+/* Design Tokens for Lumen. Mirrors the :root variables in index.html. */
 :root {
-
+  --lumen-accent: #ff385c;
+  --lumen-accent-soft: #fff1f3;
+  --lumen-accent-text: #d1123f;
+  --lumen-background: #faf8f5;
+  --lumen-surface: #ffffff;
+  --lumen-surface-subtle: #f7f7f7;
+  --lumen-border: #dddddd;
+  --lumen-text-primary: #222222;
+  --lumen-text-secondary: #555555;
+  --lumen-text-tertiary: #717171;
+  --lumen-success: #166534;
+  --lumen-warning: #b45309;
+  --lumen-danger: #b91c1c;
+  --lumen-info: #0f766e;
+  --lumen-neutral: #524d48;
+  --lumen-radius-sm: 10px;
+  --lumen-radius-md: 12px;
+  --lumen-radius-lg: 16px;
+  --lumen-radius-xl: 22px;
+  --lumen-radius-pill: 999px;
+  --lumen-font-size-min: 12px;
+  --lumen-font-size-body: 14px;
+  --lumen-font-size-input-mobile: 16px;
+  --lumen-tap-target: 44px;
 }
 
-/* === SEMANTIC === */
-:root {
-  --color-primary: #0369A1;
-  --color-on-primary: #FFFFFF;
-  --color-secondary: #0EA5E9;
-  --color-on-secondary: #0F172A;
-  --color-accent: #16A34A;
-  --color-on-accent: #000000;
-  --color-background: #F0F9FF;
-  --color-foreground: #0C4A6E;
-  --color-card: #FFFFFF;
-  --color-card-foreground: #0C4A6E;
-  --color-muted: #E7EFF5;
-  --color-muted-foreground: #475569;
-  --color-border: #BAE6FD;
-  --color-destructive: #DC2626;
-  --color-on-destructive: #FFFFFF;
-  --color-ring: #0369A1;
-  --font-heading: Inter, sans-serif;
-  --font-body: "Playfair Display", serif;
-}
-
-/* === COMPONENTS === */
-:root {
-
+[data-theme="dark"] {
+  --lumen-accent: #ff5a75;
+  --lumen-accent-soft: #2a171b;
+  --lumen-accent-text: #ff8ea1;
+  --lumen-background: #121212;
+  --lumen-surface: #1c1c1c;
+  --lumen-surface-subtle: #262626;
+  --lumen-border: #3a3a3a;
+  --lumen-text-primary: #f2f2f2;
+  --lumen-text-secondary: #c0c0c0;
+  --lumen-text-tertiary: #9a9a9a;
+  --lumen-success: #34d399;
+  --lumen-warning: #fbbf24;
+  --lumen-danger: #f87171;
+  --lumen-info: #5eead4;
+  --lumen-neutral: #d6cfc7;
 }
